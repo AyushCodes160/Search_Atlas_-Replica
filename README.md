@@ -50,6 +50,3 @@ Then visit http://localhost:3000.
 - [ ] Backlink overview (Common Crawl)
 - [ ] Rank tracker
 
-## License
-
-MIT.
