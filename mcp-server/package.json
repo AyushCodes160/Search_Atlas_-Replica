@@ -1,0 +1,20 @@
+{
+  "name": "search-atlas-replica-mcp",
+  "version": "0.1.0",
+  "description": "MCP server exposing Search Atlas Replica project context + conversation notes to any Claude chat.",
+  "type": "module",
+  "main": "index.js",
+  "bin": {
+    "search-atlas-mcp": "./index.js"
+  },
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js --self-check"
+  },
+  "dependencies": {
+    "@modelcontextprotocol/sdk": "^1.0.4"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}

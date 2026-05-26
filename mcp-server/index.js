@@ -1,0 +1,298 @@
+#!/usr/bin/env node
+/**
+ * Search Atlas Replica — MCP server.
+ *
+ * Exposes the project's conversation notes, README, source files, and a
+ * compact "project context" bundle to any Claude chat that connects.
+ *
+ * Transport: stdio (works in Claude Desktop, Claude Code, Antigravity, etc.)
+ */
+
+import { Server } from "@modelcontextprotocol/sdk/server/index.js";
+import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import {
+  CallToolRequestSchema,
+  ListResourcesRequestSchema,
+  ListToolsRequestSchema,
+  ReadResourceRequestSchema,
+} from "@modelcontextprotocol/sdk/types.js";
+import { readFile, readdir, stat } from "node:fs/promises";
+import { dirname, join, relative, resolve, sep } from "node:path";
+import { fileURLToPath } from "node:url";
+
+const __dirname = dirname(fileURLToPath(import.meta.url));
+// Repo root is one level up from this mcp-server/ folder.
+const PROJECT_ROOT = resolve(__dirname, "..");
+
+/* -------------------------------------------------------------------------- */
+/*  Helpers                                                                   */
+/* -------------------------------------------------------------------------- */
+
+const TEXT_EXTENSIONS = new Set([
+  ".md", ".txt", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
+  ".json", ".css", ".html", ".yml", ".yaml", ".env", ".example",
+]);
+
+const EXCLUDE_DIRS = new Set([
+  "node_modules", ".next", ".git", "dist", "build", ".turbo", ".vercel",
+]);
+
+function isTextFile(name) {
+  if (name.startsWith(".env")) return true;
+  const dot = name.lastIndexOf(".");
+  if (dot < 0) return false;
+  return TEXT_EXTENSIONS.has(name.slice(dot));
+}
+
+async function walk(dir, acc = []) {
+  let entries;
+  try {
+    entries = await readdir(dir, { withFileTypes: true });
+  } catch {
+    return acc;
+  }
+  for (const entry of entries) {
+    if (EXCLUDE_DIRS.has(entry.name)) continue;
+    const full = join(dir, entry.name);
+    if (entry.isDirectory()) {
+      await walk(full, acc);
+    } else if (entry.isFile() && isTextFile(entry.name)) {
+      acc.push(full);
+    }
+  }
+  return acc;
+}
+
+function safeResolve(rel) {
+  const resolved = resolve(PROJECT_ROOT, rel);
+  // Block path traversal outside the project root.
+  if (!resolved.startsWith(PROJECT_ROOT + sep) && resolved !== PROJECT_ROOT) {
+    throw new Error(`Path escapes project root: ${rel}`);
+  }
+  return resolved;
+}
+
+async function readSafe(rel) {
+  const full = safeResolve(rel);
+  const s = await stat(full);
+  if (!s.isFile()) throw new Error(`Not a file: ${rel}`);
+  return readFile(full, "utf8");
+}
+
+/* -------------------------------------------------------------------------- */
+/*  Server                                                                    */
+/* -------------------------------------------------------------------------- */
+
+const server = new Server(
+  { name: "search-atlas-replica", version: "0.1.0" },
+  { capabilities: { resources: {}, tools: {} } }
+);
+
+/* ----- Resources --------------------------------------------------------- */
+
+const STATIC_RESOURCES = [
+  {
+    uri: "search-atlas://conversation-notes",
+    name: "Conversation Notes",
+    description:
+      "Full write-up of the planning conversation: SEO primer, Search Atlas analysis, our free-stack strategy, what's been built, what's next.",
+    mimeType: "text/markdown",
+    file: "CONVERSATION_NOTES.md",
+  },
+  {
+    uri: "search-atlas://readme",
+    name: "README",
+    description: "Project README — setup steps, stack, roadmap.",
+    mimeType: "text/markdown",
+    file: "README.md",
+  },
+];
+
+server.setRequestHandler(ListResourcesRequestSchema, async () => {
+  const files = await walk(PROJECT_ROOT);
+  const dynamic = files.map((abs) => {
+    const rel = relative(PROJECT_ROOT, abs);
+    return {
+      uri: `search-atlas://file/${rel}`,
+      name: rel,
+      description: `Project file: ${rel}`,
+      mimeType: rel.endsWith(".md") ? "text/markdown" : "text/plain",
+    };
+  });
+  return { resources: [...STATIC_RESOURCES, ...dynamic] };
+});
+
+server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
+  const uri = req.params.uri;
+  const staticHit = STATIC_RESOURCES.find((r) => r.uri === uri);
+  if (staticHit) {
+    const text = await readSafe(staticHit.file);
+    return {
+      contents: [{ uri, mimeType: staticHit.mimeType, text }],
+    };
+  }
+  if (uri.startsWith("search-atlas://file/")) {
+    const rel = uri.slice("search-atlas://file/".length);
+    const text = await readSafe(rel);
+    return {
+      contents: [{ uri, mimeType: "text/plain", text }],
+    };
+  }
+  throw new Error(`Unknown resource: ${uri}`);
+});
+
+/* ----- Tools ------------------------------------------------------------- */
+
+const TOOLS = [
+  {
+    name: "get_project_context",
+    description:
+      "Return a single bundled snapshot of the Search Atlas Replica project: conversation notes, README, and the source files of the audit tool. Use this at the start of a new chat to instantly catch up.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        include_code: {
+          type: "boolean",
+          description: "Whether to include source code files (default true).",
+          default: true,
+        },
+      },
+    },
+  },
+  {
+    name: "read_project_file",
+    description:
+      "Read any text file inside the Search Atlas Replica project by its relative path (e.g. 'src/app/page.tsx').",
+    inputSchema: {
+      type: "object",
+      properties: {
+        path: {
+          type: "string",
+          description: "Path relative to the project root.",
+        },
+      },
+      required: ["path"],
+    },
+  },
+  {
+    name: "list_project_files",
+    description: "List all readable text files in the project.",
+    inputSchema: { type: "object", properties: {} },
+  },
+  {
+    name: "search_notes",
+    description:
+      "Case-insensitive substring search through CONVERSATION_NOTES.md. Returns matching lines with line numbers.",
+    inputSchema: {
+      type: "object",
+      properties: {
+        query: { type: "string", description: "Substring to search for." },
+      },
+      required: ["query"],
+    },
+  },
+];
+
+server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
+
+server.setRequestHandler(CallToolRequestSchema, async (req) => {
+  const { name, arguments: args = {} } = req.params;
+  try {
+    if (name === "get_project_context") {
+      const includeCode = args.include_code !== false;
+      const sections = [];
+      try {
+        sections.push(`# CONVERSATION_NOTES.md\n\n${await readSafe("CONVERSATION_NOTES.md")}`);
+      } catch {
+        sections.push("# CONVERSATION_NOTES.md\n\n(not found)");
+      }
+      try {
+        sections.push(`# README.md\n\n${await readSafe("README.md")}`);
+      } catch {}
+      if (includeCode) {
+        const codeFiles = [
+          "src/app/page.tsx",
+          "src/app/layout.tsx",
+          "src/components/AuditTool.tsx",
+          "src/app/api/audit/route.ts",
+          "package.json",
+        ];
+        for (const f of codeFiles) {
+          try {
+            const text = await readSafe(f);
+            sections.push(`# ${f}\n\n\`\`\`\n${text}\n\`\`\``);
+          } catch {}
+        }
+      }
+      return {
+        content: [{ type: "text", text: sections.join("\n\n---\n\n") }],
+      };
+    }
+
+    if (name === "read_project_file") {
+      const text = await readSafe(args.path);
+      return { content: [{ type: "text", text }] };
+    }
+
+    if (name === "list_project_files") {
+      const files = await walk(PROJECT_ROOT);
+      const rels = files.map((f) => relative(PROJECT_ROOT, f)).sort();
+      return { content: [{ type: "text", text: rels.join("\n") }] };
+    }
+
+    if (name === "search_notes") {
+      const q = String(args.query || "").toLowerCase();
+      if (!q) throw new Error("query is required");
+      let text;
+      try {
+        text = await readSafe("CONVERSATION_NOTES.md");
+      } catch {
+        return { content: [{ type: "text", text: "CONVERSATION_NOTES.md not found." }] };
+      }
+      const lines = text.split("\n");
+      const hits = [];
+      lines.forEach((line, i) => {
+        if (line.toLowerCase().includes(q)) {
+          hits.push(`${i + 1}: ${line}`);
+        }
+      });
+      return {
+        content: [
+          {
+            type: "text",
+            text: hits.length ? hits.join("\n") : `No matches for "${args.query}".`,
+          },
+        ],
+      };
+    }
+
+    throw new Error(`Unknown tool: ${name}`);
+  } catch (err) {
+    return {
+      isError: true,
+      content: [{ type: "text", text: `Error: ${err?.message ?? err}` }],
+    };
+  }
+});
+
+/* ----- Boot -------------------------------------------------------------- */
+
+async function main() {
+  if (process.argv.includes("--self-check")) {
+    // Lightweight smoke test: prove resources + tools are wired up.
+    const files = await walk(PROJECT_ROOT);
+    console.log(`[self-check] project root: ${PROJECT_ROOT}`);
+    console.log(`[self-check] tools: ${TOOLS.map((t) => t.name).join(", ")}`);
+    console.log(`[self-check] static resources: ${STATIC_RESOURCES.length}`);
+    console.log(`[self-check] dynamic file resources: ${files.length}`);
+    process.exit(0);
+  }
+  const transport = new StdioServerTransport();
+  await server.connect(transport);
+  console.error("[search-atlas-mcp] running on stdio");
+}
+
+main().catch((err) => {
+  console.error("[search-atlas-mcp] fatal:", err);
+  process.exit(1);
+});
