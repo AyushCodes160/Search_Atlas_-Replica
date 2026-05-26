@@ -62,15 +62,15 @@ export default function AuditTool() {
 
   return (
     <div>
-      {/* Input pill card */}
+      {/* Input surface */}
       <div
-        className="rounded-3xl p-4 sm:p-5"
+        className="rounded-2xl p-5 sm:p-6"
         style={{ backgroundColor: "#EDEDED" }}
       >
-        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
+        <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1 relative">
             <Globe
-              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+              className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
               strokeWidth={2}
             />
             <input
@@ -78,14 +78,14 @@ export default function AuditTool() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-transparent focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 outline-none text-[13px] placeholder:text-gray-400"
+              className="w-full pl-10 pr-3 py-2.5 rounded-full bg-transparent outline-none text-[13px] text-gray-900 placeholder:text-gray-400 focus:ring-2 focus:ring-blue-500/15 transition-all"
               onKeyDown={(e) => e.key === "Enter" && runAudit()}
             />
           </div>
           <button
             onClick={() => runAudit()}
             disabled={loading}
-            className="inline-flex items-center justify-center gap-2 text-[13px] font-medium text-blue-500 border border-blue-400 bg-white rounded-full px-6 py-3 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
+            className="inline-flex items-center gap-2 text-[13px] font-medium text-blue-500 border border-blue-400 rounded-full px-5 py-2.5 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -95,7 +95,7 @@ export default function AuditTool() {
             ) : (
               <>
                 Run audit
-                <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
                   →
                 </span>
               </>
@@ -103,9 +103,9 @@ export default function AuditTool() {
           </button>
         </div>
 
-        {/* Quick-test */}
-        <div className="flex flex-wrap items-center gap-2 mt-4">
-          <span className="text-[11.5px] text-gray-500 mr-1">Quick test</span>
+        {/* Quick test */}
+        <div className="flex flex-wrap items-center gap-2 mt-5">
+          <span className="text-[11.5px] text-gray-400 mr-1">Quick test</span>
           {QUICK_SITES.map((s) => (
             <button
               key={s.url}
@@ -114,10 +114,10 @@ export default function AuditTool() {
                 runAudit(s.url);
               }}
               disabled={loading}
-              className="text-[11.5px] font-medium px-3 py-1.5 rounded-full bg-white border border-transparent text-gray-700 hover:border-blue-400 hover:text-blue-500 transition-colors duration-200 disabled:opacity-50 group"
+              className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-gray-700 border border-gray-300 rounded-full px-3 py-1.5 hover:border-blue-400 hover:text-blue-500 transition-all duration-200 disabled:opacity-50 group"
             >
               {s.label}
-              <span className="inline-block ml-1 transition-transform duration-200 group-hover:translate-x-0.5">
+              <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
                 →
               </span>
             </button>
@@ -125,16 +125,16 @@ export default function AuditTool() {
         </div>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2 text-[12px] text-red-600 bg-white border border-red-100 rounded-2xl px-3 py-2.5">
+          <div className="mt-4 flex items-start gap-2 text-[12px] text-red-500">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={2} />
             <span>{error}</span>
           </div>
         )}
       </div>
 
-      {/* Loading state */}
+      {/* Loading */}
       {loading && (
-        <div className="mt-10 text-center text-[12px] text-gray-500">
+        <div className="mt-12 text-center text-[13px] text-gray-400">
           <Loader2
             className="w-5 h-5 animate-spin mx-auto mb-3 text-blue-500"
             strokeWidth={2}
@@ -153,7 +153,7 @@ export default function AuditTool() {
 
 function Results({ result }: { result: AuditResult }) {
   return (
-    <div className="mt-12 space-y-10">
+    <div className="mt-12 sm:mt-20 space-y-12 sm:space-y-20">
       <Section
         kicker="Lighthouse"
         title="Audit scores"
@@ -162,13 +162,13 @@ function Results({ result }: { result: AuditResult }) {
             href={result.finalUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-[11.5px] text-gray-500 hover:text-gray-700 truncate max-w-[16rem] hover:underline underline-offset-2"
+            className="text-[11.5px] text-gray-400 hover:text-blue-500 truncate max-w-[18rem] transition-colors duration-200"
           >
             {result.finalUrl}
           </a>
         }
       >
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           <ScoreCard label="Performance" score={result.scores.performance} />
           <ScoreCard label="SEO" score={result.scores.seo} />
           <ScoreCard
@@ -182,8 +182,8 @@ function Results({ result }: { result: AuditResult }) {
         </div>
       </Section>
 
-      <Section kicker="Core metrics" title="Speed & layout">
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+      <Section kicker="Core metrics" title="Speed &amp; layout">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4">
           <MetricCard label="LCP" value={result.metrics.lcp} />
           <MetricCard label="CLS" value={result.metrics.cls} />
           <MetricCard label="FCP" value={result.metrics.fcp} />
@@ -194,7 +194,7 @@ function Results({ result }: { result: AuditResult }) {
 
       <Section kicker="Gemini" title="AI fix plan">
         <div
-          className="rounded-3xl p-6 sm:p-7 ai-prose"
+          className="rounded-2xl p-6 sm:p-8 ai-prose"
           style={{ backgroundColor: "#EDEDED" }}
           dangerouslySetInnerHTML={{ __html: result.aiSuggestions }}
         />
@@ -202,22 +202,22 @@ function Results({ result }: { result: AuditResult }) {
 
       {result.issues.length > 0 && (
         <Section kicker="Lighthouse" title="Top issues">
-          <ul className="space-y-2">
+          <ul className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {result.issues.map((issue, i) => (
               <li
                 key={i}
-                className="flex gap-4 p-4 sm:p-5 rounded-2xl"
+                className="flex gap-4 p-5 sm:p-6 rounded-2xl"
                 style={{ backgroundColor: "#EDEDED" }}
               >
                 <span className="text-[11.5px] font-medium text-blue-500 shrink-0 mt-0.5 tabular-nums">
                   {String(i + 1).padStart(2, "0")}
                 </span>
                 <div>
-                  <div className="font-medium text-[13px] text-gray-900">
+                  <div className="font-medium text-[13px] text-gray-900 mb-1.5">
                     {issue.title}
                   </div>
                   <div
-                    className="ai-prose-mini mt-1.5"
+                    className="text-[13px] text-gray-400 leading-relaxed"
                     dangerouslySetInnerHTML={{ __html: issue.description }}
                   />
                 </div>
@@ -243,14 +243,15 @@ function Section({
 }) {
   return (
     <section>
-      <div className="flex items-end justify-between mb-4">
+      <div className="flex items-end justify-between mb-5">
         <div>
-          <div className="text-[11.5px] font-medium text-blue-500 mb-1">
+          <div className="text-[11.5px] font-medium text-blue-500 mb-2">
             {kicker}
           </div>
-          <h2 className="text-[18px] font-medium text-gray-900 tracking-tight">
-            {title}
-          </h2>
+          <h2
+            className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight"
+            dangerouslySetInnerHTML={{ __html: title }}
+          />
         </div>
         {meta}
       </div>
@@ -268,7 +269,7 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
 
   return (
     <div
-      className="rounded-2xl p-4 sm:p-5 flex items-center gap-4"
+      className="rounded-2xl p-5 sm:p-6 flex items-center gap-4"
       style={{ backgroundColor: "#EDEDED" }}
     >
       <div className="relative w-12 h-12 shrink-0">
@@ -277,7 +278,7 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
             cx="28"
             cy="28"
             r={radius}
-            stroke="#ffffff"
+            stroke="#f0f0ee"
             strokeWidth="4"
             fill="none"
           />
@@ -296,11 +297,8 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
         </svg>
       </div>
       <div className="min-w-0">
-        <div className="text-[11.5px] text-gray-500 truncate">{label}</div>
-        <div
-          className="text-[20px] font-medium tabular-nums leading-tight mt-0.5"
-          style={{ color }}
-        >
+        <div className="text-[11.5px] text-gray-400 truncate">{label}</div>
+        <div className="text-[22px] font-medium tabular-nums leading-tight mt-0.5 text-gray-900">
           {score}
         </div>
       </div>
@@ -311,10 +309,10 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
     <div
-      className="rounded-2xl p-4 sm:p-5"
+      className="rounded-2xl p-5 sm:p-6"
       style={{ backgroundColor: "#EDEDED" }}
     >
-      <div className="text-[11.5px] text-gray-500 mb-2">{label}</div>
+      <div className="text-[11.5px] text-gray-400 mb-2">{label}</div>
       <div className="text-[15px] font-medium text-gray-900 tabular-nums">
         {value}
       </div>
