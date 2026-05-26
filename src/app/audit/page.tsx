@@ -9,7 +9,6 @@ export default function AuditPage() {
         <Navbar />
 
         <main className="px-6 sm:px-12 md:px-20 lg:px-28 py-10 sm:py-16">
-          {/* Header */}
           <section className="mb-12 sm:mb-20 max-w-xl">
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
               Site Audit
@@ -23,12 +22,10 @@ export default function AuditPage() {
             </p>
           </section>
 
-          {/* Audit tool */}
           <section className="mb-12 sm:mb-20">
             <AuditTool />
           </section>
 
-          {/* Features */}
           <section id="features" className="mb-12 sm:mb-20">
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
               Features
@@ -79,7 +76,6 @@ export default function AuditPage() {
             </div>
           </section>
 
-          {/* About */}
           <section id="about" className="mb-12 sm:mb-20">
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
               About
@@ -159,7 +155,6 @@ export default function AuditPage() {
             </div>
           </section>
 
-          {/* Roadmap teaser */}
           <section id="coming-next" className="mb-12 sm:mb-20">
             <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
               Coming next
@@ -191,7 +186,6 @@ export default function AuditPage() {
             </div>
           </section>
 
-          {/* Back link */}
           <section className="pb-4">
             <Link
               href="/"

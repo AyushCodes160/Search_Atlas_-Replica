@@ -1,13 +1,4 @@
 #!/usr/bin/env node
-/**
- * Search Atlas Replica — MCP server.
- *
- * Exposes the project's conversation notes, README, source files, and a
- * compact "project context" bundle to any Claude chat that connects.
- *
- * Transport: stdio (works in Claude Desktop, Claude Code, Antigravity, etc.)
- */
-
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
 import {
@@ -21,12 +12,9 @@ import { dirname, join, relative, resolve, sep } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-// Repo root is one level up from this mcp-server/ folder.
 const PROJECT_ROOT = resolve(__dirname, "..");
 
-/* -------------------------------------------------------------------------- */
-/*  Helpers                                                                   */
-/* -------------------------------------------------------------------------- */
+// helpers
 
 const TEXT_EXTENSIONS = new Set([
   ".md", ".txt", ".ts", ".tsx", ".js", ".jsx", ".mjs", ".cjs",
@@ -65,7 +53,6 @@ async function walk(dir, acc = []) {
 
 function safeResolve(rel) {
   const resolved = resolve(PROJECT_ROOT, rel);
-  // Block path traversal outside the project root.
   if (!resolved.startsWith(PROJECT_ROOT + sep) && resolved !== PROJECT_ROOT) {
     throw new Error(`Path escapes project root: ${rel}`);
   }
@@ -79,16 +66,14 @@ async function readSafe(rel) {
   return readFile(full, "utf8");
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Server                                                                    */
-/* -------------------------------------------------------------------------- */
+// server
 
 const server = new Server(
   { name: "search-atlas-replica", version: "0.1.0" },
   { capabilities: { resources: {}, tools: {} } }
 );
 
-/* ----- Resources --------------------------------------------------------- */
+// resources
 
 const STATIC_RESOURCES = [
   {
@@ -141,7 +126,7 @@ server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
   throw new Error(`Unknown resource: ${uri}`);
 });
 
-/* ----- Tools ------------------------------------------------------------- */
+// tools
 
 const TOOLS = [
   {
@@ -275,11 +260,10 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
   }
 });
 
-/* ----- Boot -------------------------------------------------------------- */
+// boot
 
 async function main() {
   if (process.argv.includes("--self-check")) {
-    // Lightweight smoke test: prove resources + tools are wired up.
     const files = await walk(PROJECT_ROOT);
     console.log(`[self-check] project root: ${PROJECT_ROOT}`);
     console.log(`[self-check] tools: ${TOOLS.map((t) => t.name).join(", ")}`);

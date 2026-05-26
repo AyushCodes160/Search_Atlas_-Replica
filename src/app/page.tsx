@@ -4,7 +4,6 @@ import { Navbar } from "@/components/Navbar";
 export default function Home() {
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#f0f0ee]">
-      {/* Background video */}
       <video
         autoPlay
         muted
@@ -18,7 +17,6 @@ export default function Home() {
         />
       </video>
 
-      {/* Foreground */}
       <div className="relative z-10 flex flex-col min-h-screen">
         <Navbar />
 

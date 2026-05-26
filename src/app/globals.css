@@ -19,14 +19,10 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Offset for sticky navbar when scrolling to in-page anchors. */
 [id] {
   scroll-margin-top: 6rem;
 }
 
-/* Minimal prose styles for Gemini-generated markdown.
-   Stays inside the design system: same type scale, same colors, no
-   external prose plugin. */
 .ai-prose > *:first-child {
   margin-top: 0;
 }

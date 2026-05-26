@@ -3,18 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 60;
 
-/* -------------------------------------------------------------------------- */
-/*  Source classifier                                                         */
-/*                                                                            */
-/*  Rules (strict priority order):                                            */
-/*    1. URL path contains /api          → API (hard override)                */
-/*    2. URL path contains /v1/ or /v2/  → API                                */
-/*    3. URL path contains /graphql      → API                                */
-/*    4. URL path ends with .json/.xml   → API                                */
-/*    5. Content-Type is json/xml        → API                                */
-/*    6. Response body parses as JSON    → API                                */
-/*    7. Otherwise                       → WEB                                */
-/* -------------------------------------------------------------------------- */
+// classifier
 
 type Classification = {
   type: "api" | "web";
@@ -90,7 +79,6 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
 
   const contentType = (res.headers.get("content-type") || "").toLowerCase();
   const text = await res.text();
-  // Cap retained body to 2MB — enough to JSON.parse any sane API response.
   const sample = text.length > 2_000_000 ? text.slice(0, 2_000_000) : text;
 
   const isJsonCT =
@@ -159,9 +147,7 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Web (Lighthouse) path                                                     */
-/* -------------------------------------------------------------------------- */
+// web path
 
 type LighthouseAudit = {
   id: string;
@@ -212,9 +198,7 @@ async function callPageSpeed(url: string): Promise<PageSpeedResponse> {
   return res.json();
 }
 
-/* -------------------------------------------------------------------------- */
-/*  API path                                                                  */
-/* -------------------------------------------------------------------------- */
+// api path
 
 type SchemaSummary = {
   rootType: "object" | "array" | "primitive" | "null";
@@ -250,7 +234,6 @@ function inferSchema(parsed: unknown): SchemaSummary {
     if (first) sampleItemKeys = Object.keys(first as Record<string, unknown>).slice(0, 24);
   } else if (rootType === "object") {
     keys = Object.keys(parsed as Record<string, unknown>).slice(0, 24);
-    // If this looks like a paginated list, capture inner item keys too.
     for (const k of ["hits", "items", "data", "results", "records"]) {
       const v = (parsed as Record<string, unknown>)[k];
       if (Array.isArray(v) && v.length) {
@@ -269,7 +252,6 @@ function checkCompleteness(parsed: unknown, sampleKeys: string[]): {
   totalChecked: number;
   nullFields: { field: string; nullCount: number }[];
 } {
-  // Find the "items" array we care about.
   let items: unknown[] | null = null;
   if (Array.isArray(parsed)) items = parsed;
   else if (parsed && typeof parsed === "object") {
@@ -334,9 +316,7 @@ async function timeRequests(url: string, samples = 3): Promise<{
   };
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Gemini                                                                    */
-/* -------------------------------------------------------------------------- */
+// gemini
 
 async function callGemini(prompt: string): Promise<string> {
   const key = process.env.GEMINI_API_KEY;
@@ -385,9 +365,7 @@ function mdToHtml(md: string): string {
   return html;
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Route handler                                                             */
-/* -------------------------------------------------------------------------- */
+// route
 
 export async function POST(req: NextRequest) {
   try {
@@ -404,7 +382,6 @@ export async function POST(req: NextRequest) {
 
     const probe = await classifySource(target.toString());
 
-    /* ---------------- API path -------------------------------------------- */
     if (probe.classification.type === "api") {
       let parsed: unknown = null;
       let parseError: string | null = null;
@@ -485,7 +462,6 @@ Stay under 400 words.`;
       });
     }
 
-    /* ---------------- Web (Lighthouse) path ------------------------------- */
     const ps = await callPageSpeed(target.toString());
     const lr = ps.lighthouseResult;
     const cats = lr.categories;

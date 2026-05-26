@@ -104,7 +104,6 @@ export default function AuditTool() {
 
   return (
     <div>
-      {/* Input surface */}
       <div className="rounded-2xl p-5 sm:p-6" style={{ backgroundColor: "#EDEDED" }}>
         <div className="flex flex-col sm:flex-row sm:items-center gap-3">
           <div className="flex-1 relative">
@@ -192,9 +191,7 @@ export default function AuditTool() {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Shared bits                                                               */
-/* -------------------------------------------------------------------------- */
+// shared
 
 function Section({
   kicker,
@@ -245,7 +242,6 @@ function SourceBanner({
       className="rounded-2xl p-5 sm:p-6 flex flex-col gap-5"
       style={{ backgroundColor: "#EDEDED" }}
     >
-      {/* Top row: detected label + final URL */}
       <div className="flex flex-col sm:flex-row sm:items-center gap-4">
         <div className="flex items-center gap-3 shrink-0">
           <div className="w-9 h-9 rounded-full bg-blue-500/10 text-blue-500 flex items-center justify-center">
@@ -271,7 +267,6 @@ function SourceBanner({
         </div>
       </div>
 
-      {/* Signals row */}
       {classification.signals.length > 0 && (
         <div>
           <div className="text-[11.5px] font-medium text-blue-500 mb-2">
@@ -291,7 +286,6 @@ function SourceBanner({
         </div>
       )}
 
-      {/* Allowed / Blocked metric panels */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
         <MetricsListPanel
           label="Allowed metrics"
@@ -343,9 +337,7 @@ function MetricsListPanel({
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  Web results                                                               */
-/* -------------------------------------------------------------------------- */
+// web results
 
 function WebResults({ result }: { result: WebAuditResult }) {
   return (
@@ -463,9 +455,7 @@ function MetricCard({ label, value }: { label: string; value: string }) {
   );
 }
 
-/* -------------------------------------------------------------------------- */
-/*  API results                                                               */
-/* -------------------------------------------------------------------------- */
+// api results
 
 function ApiResults({ result }: { result: ApiAuditResult }) {
   return (
