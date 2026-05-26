@@ -72,7 +72,7 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
     cache: "no-store",
     headers: {
       "User-Agent":
-        "Mozilla/5.0 (compatible; SearchAtlasReplica/1.0; +https://github.com/AyushCodes160/Search_Atlas_-Replica)",
+        "Mozilla/5.0 (compatible; SEOEngine/1.0; +https://github.com/AyushCodes160/SEO_Engine)",
       Accept: "*/*",
     },
   });
@@ -299,7 +299,7 @@ async function timeRequests(url: string, samples = 3): Promise<{
     const t0 = Date.now();
     const r = await fetch(url, {
       cache: "no-store",
-      headers: { "User-Agent": "SearchAtlasReplica/1.0", Accept: "*/*" },
+      headers: { "User-Agent": "SEOEngine/1.0", Accept: "*/*" },
     });
     const text = await r.text();
     const ms = Date.now() - t0;

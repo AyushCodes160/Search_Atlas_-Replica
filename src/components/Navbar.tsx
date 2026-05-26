@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { Logo } from "./Logo";
 
-const GITHUB_URL = "https://github.com/AyushCodes160/Search_Atlas_-Replica";
+const GITHUB_URL = "https://github.com/AyushCodes160/SEO_Engine";
 
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Audit", href: "/audit" },

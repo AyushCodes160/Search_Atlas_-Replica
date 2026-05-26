@@ -1,6 +1,6 @@
-# Search Atlas Replica
+# SEO Engine
 
-A free, AI-powered SEO toolkit — a lightweight, open-source take on Search Atlas. The first module is a **Site Audit + AI Fix Suggester** that pairs Google PageSpeed Insights with Llama 3.3 70B on Groq to turn raw Lighthouse data into a code-aware fix plan.
+A free, AI-powered SEO toolkit — a lightweight, open-source take on enterprise SEO platforms. The first module is a **Site Audit + AI Fix Suggester** that pairs Google PageSpeed Insights with Llama 3.3 70B on Groq to turn raw Lighthouse data into a code-aware fix plan.
 
 ## Features (v0.1)
 

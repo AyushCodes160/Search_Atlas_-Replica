@@ -1,8 +1,8 @@
-# Search Atlas Replica — MCP Server
+# SEO Engine — MCP Server
 
 Lets any Claude chat (Claude Desktop, Claude Code, Antigravity, etc.) load this project's full context — conversation notes, README, source files — via the [Model Context Protocol](https://modelcontextprotocol.io).
 
-So when you start a new chat, you ask "load my Search Atlas project" and the assistant can call this server to catch up instantly.
+So when you start a new chat, you ask "load my SEO Engine project" and the assistant can call this server to catch up instantly.
 
 ## What's exposed
 
@@ -15,9 +15,9 @@ So when you start a new chat, you ask "load my Search Atlas project" and the ass
 | `search_notes` | Substring search through `CONVERSATION_NOTES.md`. |
 
 ### Resources (auto-discoverable)
-- `search-atlas://conversation-notes` — the master notes file.
-- `search-atlas://readme` — project README.
-- `search-atlas://file/<path>` — every text file in the repo, dynamically listed.
+- `seo-engine://conversation-notes` — the master notes file.
+- `seo-engine://readme` — project README.
+- `seo-engine://file/<path>` — every text file in the repo, dynamically listed.
 
 ## Setup (one-time)
 
@@ -30,22 +30,22 @@ Edit (or create) `~/Library/Application Support/Claude/claude_desktop_config.jso
 ```json
 {
   "mcpServers": {
-    "search-atlas-replica": {
+    "seo-engine": {
       "command": "node",
-      "args": ["/Users/ayushkumar/Desktop/Search_Atlas_Replica/mcp-server/index.js"]
+      "args": ["/Users/ayushkumar/Desktop/SEO_Engine/mcp-server/index.js"]
     }
   }
 }
 ```
 
-Then **fully quit and reopen Claude Desktop**. In a new chat, you'll see a 🔌 indicator showing the server is connected. Ask: *"Use the search-atlas-replica MCP to load my project context."*
+Then **fully quit and reopen Claude Desktop**. In a new chat, you'll see a 🔌 indicator showing the server is connected. Ask: *"Use the seo-engine MCP to load my project context."*
 
 ### Option B — Claude Code
 
 Add the server to Claude Code via its CLI:
 
 ```bash
-claude mcp add search-atlas-replica node /Users/ayushkumar/Desktop/Search_Atlas_Replica/mcp-server/index.js
+claude mcp add seo-engine node /Users/ayushkumar/Desktop/SEO_Engine/mcp-server/index.js
 ```
 
 Or edit `~/.claude/settings.json` directly and add:
@@ -53,9 +53,9 @@ Or edit `~/.claude/settings.json` directly and add:
 ```json
 {
   "mcpServers": {
-    "search-atlas-replica": {
+    "seo-engine": {
       "command": "node",
-      "args": ["/Users/ayushkumar/Desktop/Search_Atlas_Replica/mcp-server/index.js"]
+      "args": ["/Users/ayushkumar/Desktop/SEO_Engine/mcp-server/index.js"]
     }
   }
 }
@@ -72,7 +72,7 @@ Use the same JSON config — most clients accept the standard `mcpServers` schem
 From the terminal:
 
 ```bash
-cd /Users/ayushkumar/Desktop/Search_Atlas_Replica/mcp-server
+cd /Users/ayushkumar/Desktop/SEO_Engine/mcp-server
 node index.js --self-check
 ```
 
@@ -87,11 +87,11 @@ You should see:
 
 Once connected, start any new Claude chat with one of these prompts:
 
-> *"Use the `search-atlas-replica` MCP to call `get_project_context` and catch me up on the Search Atlas project."*
+> *"Use the `seo-engine` MCP to call `get_project_context` and catch me up on the SEO Engine project."*
 
-> *"Read the conversation notes from the search-atlas-replica server and pick up where we left off."*
+> *"Read the conversation notes from the seo-engine server and pick up where we left off."*
 
-> *"Use `search_notes` on the search-atlas-replica MCP to find what we decided about OTTO-lite."*
+> *"Use `search_notes` on the seo-engine MCP to find what we decided about OTTO-lite."*
 
 That's it — no copy-paste, no re-explaining the project.
 

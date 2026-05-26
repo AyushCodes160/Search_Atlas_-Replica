@@ -29,7 +29,7 @@ export default function AboutPage() {
             </h2>
             <div className="space-y-4 text-[13px] text-gray-400 font-normal leading-relaxed">
               <p>
-                Search Atlas Replica is an open-source take on the all-in-one
+                SEO Engine is an open-source take on the all-in-one
                 SEO platforms that charge agencies hundreds a month. The first
                 module pairs Google's free Lighthouse data with Groq to turn
                 raw performance audits into actionable, code-aware fix plans.
@@ -94,7 +94,7 @@ export default function AboutPage() {
                 </span>
               </Link>
               <a
-                href="https://github.com/AyushCodes160/Search_Atlas_-Replica"
+                href="https://github.com/AyushCodes160/SEO_Engine"
                 target="_blank"
                 rel="noreferrer"
                 className="inline-flex items-center gap-2 text-[13px] font-medium text-gray-700 border border-gray-300 rounded-full px-5 py-2.5 hover:border-blue-400 hover:text-blue-500 transition-all duration-200 group"

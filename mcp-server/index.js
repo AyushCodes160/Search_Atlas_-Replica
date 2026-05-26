@@ -69,7 +69,7 @@ async function readSafe(rel) {
 // server
 
 const server = new Server(
-  { name: "search-atlas-replica", version: "0.1.0" },
+  { name: "seo-engine", version: "0.1.0" },
   { capabilities: { resources: {}, tools: {} } }
 );
 
@@ -77,15 +77,15 @@ const server = new Server(
 
 const STATIC_RESOURCES = [
   {
-    uri: "search-atlas://conversation-notes",
+    uri: "seo-engine://conversation-notes",
     name: "Conversation Notes",
     description:
-      "Full write-up of the planning conversation: SEO primer, Search Atlas analysis, our free-stack strategy, what's been built, what's next.",
+      "Full write-up of the planning conversation: SEO primer, competitor analysis, our free-stack strategy, what's been built, what's next.",
     mimeType: "text/markdown",
     file: "CONVERSATION_NOTES.md",
   },
   {
-    uri: "search-atlas://readme",
+    uri: "seo-engine://readme",
     name: "README",
     description: "Project README — setup steps, stack, roadmap.",
     mimeType: "text/markdown",
@@ -98,7 +98,7 @@ server.setRequestHandler(ListResourcesRequestSchema, async () => {
   const dynamic = files.map((abs) => {
     const rel = relative(PROJECT_ROOT, abs);
     return {
-      uri: `search-atlas://file/${rel}`,
+      uri: `seo-engine://file/${rel}`,
       name: rel,
       description: `Project file: ${rel}`,
       mimeType: rel.endsWith(".md") ? "text/markdown" : "text/plain",
@@ -116,8 +116,8 @@ server.setRequestHandler(ReadResourceRequestSchema, async (req) => {
       contents: [{ uri, mimeType: staticHit.mimeType, text }],
     };
   }
-  if (uri.startsWith("search-atlas://file/")) {
-    const rel = uri.slice("search-atlas://file/".length);
+  if (uri.startsWith("seo-engine://file/")) {
+    const rel = uri.slice("seo-engine://file/".length);
     const text = await readSafe(rel);
     return {
       contents: [{ uri, mimeType: "text/plain", text }],
@@ -132,7 +132,7 @@ const TOOLS = [
   {
     name: "get_project_context",
     description:
-      "Return a single bundled snapshot of the Search Atlas Replica project: conversation notes, README, and the source files of the audit tool. Use this at the start of a new chat to instantly catch up.",
+      "Return a single bundled snapshot of the SEO Engine project: conversation notes, README, and the source files of the audit tool. Use this at the start of a new chat to instantly catch up.",
     inputSchema: {
       type: "object",
       properties: {
@@ -147,7 +147,7 @@ const TOOLS = [
   {
     name: "read_project_file",
     description:
-      "Read any text file inside the Search Atlas Replica project by its relative path (e.g. 'src/app/page.tsx').",
+      "Read any text file inside the SEO Engine project by its relative path (e.g. 'src/app/page.tsx').",
     inputSchema: {
       type: "object",
       properties: {
@@ -273,10 +273,10 @@ async function main() {
   }
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("[search-atlas-mcp] running on stdio");
+  console.error("[seo-engine-mcp] running on stdio");
 }
 
 main().catch((err) => {
-  console.error("[search-atlas-mcp] fatal:", err);
+  console.error("[seo-engine-mcp] fatal:", err);
   process.exit(1);
 });

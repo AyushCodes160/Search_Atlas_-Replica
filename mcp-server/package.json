@@ -1,11 +1,11 @@
 {
-  "name": "search-atlas-replica-mcp",
+  "name": "seo-engine-mcp",
   "version": "0.1.0",
-  "description": "MCP server exposing Search Atlas Replica project context + conversation notes to any Claude chat.",
+  "description": "MCP server exposing SEO Engine project context + conversation notes to any Claude chat.",
   "type": "module",
   "main": "index.js",
   "bin": {
-    "search-atlas-mcp": "./index.js"
+    "seo-engine-mcp": "./index.js"
   },
   "scripts": {
     "start": "node index.js",

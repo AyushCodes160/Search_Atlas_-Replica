@@ -100,7 +100,7 @@ export default function AuditPage() {
                 </h3>
                 <div className="space-y-4 text-[13px] text-gray-400 font-normal leading-relaxed">
                   <p>
-                    Search Atlas Replica is an open-source take on the
+                    SEO Engine is an open-source take on the
                     all-in-one SEO platforms that charge agencies hundreds a
                     month. The first module pairs Google's free Lighthouse
                     data with Groq to turn raw performance audits into
@@ -140,7 +140,7 @@ export default function AuditPage() {
                 </ul>
                 <div className="mt-2">
                   <a
-                    href="https://github.com/AyushCodes160/Search_Atlas_-Replica"
+                    href="https://github.com/AyushCodes160/SEO_Engine"
                     target="_blank"
                     rel="noreferrer"
                     className="inline-flex items-center gap-2 text-[13px] font-medium text-blue-500 hover:text-blue-600 transition-colors duration-200 group"
@@ -163,7 +163,7 @@ export default function AuditPage() {
               Three more tools, one quiet toolkit.
             </h2>
             <p className="text-[13px] text-gray-400 font-normal mb-10 max-w-xl">
-              Audit is the first module. The rest fill out a full Search-Atlas-class
+              Audit is the first module. The rest fill out a full enterprise-class
               workflow without the enterprise price tag.
             </p>
 

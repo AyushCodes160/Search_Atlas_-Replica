@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import "./globals.css";
 
 export const metadata: Metadata = {
-  title: "Search Atlas Replica — AI SEO Toolkit",
+  title: "SEO Engine — AI SEO Toolkit",
   description: "Free AI-powered SEO audit & fix tool. Built for indie SEO.",
 };
 
