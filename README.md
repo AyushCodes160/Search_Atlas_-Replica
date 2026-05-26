@@ -1,20 +1,21 @@
 # Search Atlas Replica
 
-A free, AI-powered SEO toolkit — a lightweight, open-source take on Search Atlas. The first tool is a **Site Audit + AI Fix Suggester** that pairs Google PageSpeed Insights with Gemini to turn raw Lighthouse data into actionable fixes.
+A free, AI-powered SEO toolkit — a lightweight, open-source take on Search Atlas. The first module is a **Site Audit + AI Fix Suggester** that pairs Google PageSpeed Insights with Llama 3.3 70B on Groq to turn raw Lighthouse data into a code-aware fix plan.
 
 ## Features (v0.1)
 
-- **Site Audit** — Real Lighthouse scores (Performance, SEO, Accessibility, Best Practices) plus Core Web Vitals.
-- **AI Fix Suggestions** — Gemini reads the audit and writes a prioritized, code-aware fix plan.
-- **Quick-test buttons** — One-click audit for `gotoretreats.com` and `app.aibridge.one`.
-- **Zero paid services** — Built entirely on free APIs (Google PageSpeed + Gemini free tier).
+- **Site Audit** — Real Lighthouse scores (Performance, SEO, Accessibility, Best Practices) plus Core Web Vitals (LCP, CLS, FCP, TBT, Speed Index).
+- **AI Fix Plan** — Groq + Llama 3.3 reads the audit and writes prioritized, copy-paste-ready fixes scoped to your actual scores.
+- **Source Classifier** — Auto-detects whether the URL is a web page or a JSON API. APIs skip Lighthouse and get a backend-focused review (timing, schema, completeness) instead of misleading SEO scores.
+- **Quick-test buttons** — One-click audit for `gotoretreats.com`, `app.aibridge.one`, and a sample API endpoint.
+- **Zero paid services** — Free Google PageSpeed (25,000 audits/day) + free Groq tier (14,400 fix reports/day). No card, no signup, no paywall.
 
 ## Tech Stack
 
 - Next.js 16 (App Router) + TypeScript
 - Tailwind CSS
 - Google PageSpeed Insights API (free)
-- Google Gemini 1.5 Flash (free tier)
+- Groq + Llama 3.3 70B Versatile (free tier)
 
 ## Getting Started
 
@@ -23,9 +24,8 @@ A free, AI-powered SEO toolkit — a lightweight, open-source take on Search Atl
 npm install --legacy-peer-deps
 
 # 2. Add API keys to .env.local
-#    (the file already exists with placeholders)
 #    Get free keys at:
-#    - Gemini:    https://aistudio.google.com/app/apikey
+#    - Groq:      https://console.groq.com/keys
 #    - PageSpeed: https://developers.google.com/speed/docs/insights/v5/get-started
 #                 (optional — works without a key, but rate-limited)
 
@@ -39,8 +39,24 @@ Then visit http://localhost:3000.
 
 | Key | Required | Purpose |
 | --- | --- | --- |
-| `GEMINI_API_KEY` | Recommended | AI fix suggestions. Without it, audits still work but the AI section is disabled. |
+| `GROQ_API_KEY` | Recommended | AI fix plan. Without it, audits still run but the AI section is disabled. |
 | `PAGESPEED_API_KEY` | Optional | Higher PageSpeed quota. Works without a key for casual use. |
+
+## Project Structure
+
+```
+src/
+  app/
+    page.tsx              # landing (video hero)
+    audit/page.tsx        # audit + features + about + roadmap
+    about/page.tsx        # standalone about
+    api/audit/route.ts    # source classifier + audit pipeline
+  components/
+    AuditTool.tsx         # URL input, results renderer (web + api branches)
+    Navbar.tsx, Logo.tsx  # shared chrome
+mcp-server/
+  index.js                # MCP server exposing project context to Claude chats
+```
 
 ## Roadmap
 
@@ -49,4 +65,3 @@ Then visit http://localhost:3000.
 - [ ] OTTO-lite — JS snippet that auto-applies on-page SEO fixes
 - [ ] Backlink overview (Common Crawl)
 - [ ] Rank tracker
-

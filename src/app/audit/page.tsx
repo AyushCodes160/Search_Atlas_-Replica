@@ -17,7 +17,7 @@ export default function AuditPage() {
               See what's holding your site back.
             </h1>
             <p className="text-[13px] text-gray-400 font-normal">
-              Real Lighthouse scores. Gemini-written fix plans. Forty seconds
+              Real Lighthouse scores. Groq-written fix plans. Forty seconds
               from URL to action items.
             </p>
           </section>
@@ -31,12 +31,12 @@ export default function AuditPage() {
               Features
             </div>
             <h2 className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight mb-3 max-w-xl">
-              Free Google APIs, behind a calm interface.
+              Free APIs, behind a calm interface.
             </h2>
             <p className="text-[13px] text-gray-400 font-normal mb-10 max-w-xl">
-              Everything below runs on your own free API keys. No paywall, no
-              quota games, no signup. Read the source and self-host if you'd
-              rather.
+              PageSpeed from Google for the audit, Llama 3.3 on Groq for the
+              fix plan. Both free, both your own keys. No paywall, no signup,
+              no quota games.
             </p>
 
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -65,10 +65,10 @@ export default function AuditPage() {
               <FeatureCard
                 kicker="03"
                 title="Free Forever"
-                desc="Built on Google's generous free tiers. Use your own keys, keep your data, owe nothing."
+                desc="Built on PageSpeed (Google) and Groq's generous free tiers. Use your own keys, keep your data, owe nothing."
                 bullets={[
                   "25,000 PageSpeed audits per day",
-                  "1,500 Gemini fix reports per day",
+                  "14,400 Groq fix reports per day",
                   "No card, no signup, no paywall",
                   "Open source — fork it, self-host it",
                 ]}
@@ -103,7 +103,7 @@ export default function AuditPage() {
                     Search Atlas Replica is an open-source take on the
                     all-in-one SEO platforms that charge agencies hundreds a
                     month. The first module pairs Google's free Lighthouse
-                    data with Gemini to turn raw performance audits into
+                    data with Groq to turn raw performance audits into
                     actionable, code-aware fix plans.
                   </p>
                   <p>
@@ -176,7 +176,7 @@ export default function AuditPage() {
               <RoadmapCard
                 kicker="05"
                 title="Keyword Research"
-                desc="Long-tail keyword ideas from Google Autocomplete and Trends, expanded and clustered by Gemini."
+                desc="Long-tail keyword ideas from Google Autocomplete and Trends, expanded and clustered by Groq."
               />
               <RoadmapCard
                 kicker="06"

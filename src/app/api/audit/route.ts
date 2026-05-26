@@ -316,29 +316,33 @@ async function timeRequests(url: string, samples = 3): Promise<{
   };
 }
 
-// gemini
+// llm
 
-async function callGemini(prompt: string): Promise<string> {
-  const key = process.env.GEMINI_API_KEY;
-  if (!key || key === "PLACEHOLDER_GEMINI_KEY") {
-    return `<p class="text-amber-700"><strong>Gemini API key not set.</strong> Add your free key to <code>.env.local</code> as <code>GEMINI_API_KEY</code> to get AI-powered fix suggestions. Get one at <a href="https://aistudio.google.com/app/apikey" target="_blank" class="underline">aistudio.google.com</a>.</p>`;
+async function callGroq(prompt: string): Promise<string> {
+  const key = process.env.GROQ_API_KEY;
+  if (!key || key === "PLACEHOLDER_GROQ_KEY") {
+    return `<p class="text-amber-700"><strong>Groq API key not set.</strong> Add your free key to <code>.env.local</code> as <code>GROQ_API_KEY</code>. Get one at <a href="https://console.groq.com/keys" target="_blank" class="underline">console.groq.com/keys</a>.</p>`;
   }
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${key}`;
-  const res = await fetch(endpoint, {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
-    headers: { "Content-Type": "application/json" },
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${key}`,
+    },
     body: JSON.stringify({
-      contents: [{ parts: [{ text: prompt }] }],
-      generationConfig: { temperature: 0.4, maxOutputTokens: 1500 },
+      model: "llama-3.3-70b-versatile",
+      messages: [{ role: "user", content: prompt }],
+      temperature: 0.4,
+      max_tokens: 1500,
     }),
   });
   if (!res.ok) {
     const text = await res.text();
-    return `<p class="text-red-600">Gemini API error: ${text.slice(0, 300)}</p>`;
+    return `<p class="text-red-600">Groq API error: ${text.slice(0, 300)}</p>`;
   }
   const data = await res.json();
   const text: string =
-    data?.candidates?.[0]?.content?.parts?.[0]?.text ?? "No suggestions returned.";
+    data?.choices?.[0]?.message?.content ?? "No suggestions returned.";
   return mdToHtml(text);
 }
 
@@ -441,9 +445,9 @@ Write a concise, actionable report in Markdown with these sections. NEVER refere
 ## Recommendations
 (3–5 numbered, specific, code-level next steps for the team that owns this API.)
 
-Stay under 400 words.`;
+Stay under 400 words. Do not use emojis anywhere in the output.`;
 
-      const aiSuggestions = await callGemini(prompt);
+      const aiSuggestions = await callGroq(prompt);
 
       return NextResponse.json({
         sourceType: "api",
@@ -533,18 +537,18 @@ Top issues found:
 ${issues.map((i, idx) => `${idx + 1}. ${i.title}`).join("\n")}
 
 Write a concise but actionable fix plan with these sections in Markdown:
-## 🔥 Top 3 Priorities
+## Top 3 Priorities
 (3 bullet points - the highest-impact fixes for THIS site, with specific code-level guidance)
 
-## ⚡ Quick Wins
+## Quick Wins
 (3-5 fixes that take under 30 minutes)
 
-## 📈 SEO Recommendations
+## SEO Recommendations
 (specific on-page SEO improvements based on the audit data)
 
-Be specific. Reference the actual scores. Give code snippets where helpful. Keep it under 400 words total.`;
+Be specific. Reference the actual scores. Give code snippets where helpful. Keep it under 400 words total. Do not use emojis anywhere in the output.`;
 
-    const aiSuggestions = await callGemini(prompt);
+    const aiSuggestions = await callGroq(prompt);
 
     return NextResponse.json({
       sourceType: "web",

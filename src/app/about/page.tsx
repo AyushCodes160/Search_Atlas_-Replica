@@ -31,7 +31,7 @@ export default function AboutPage() {
               <p>
                 Search Atlas Replica is an open-source take on the all-in-one
                 SEO platforms that charge agencies hundreds a month. The first
-                module pairs Google's free Lighthouse data with Gemini to turn
+                module pairs Google's free Lighthouse data with Groq to turn
                 raw performance audits into actionable, code-aware fix plans.
               </p>
               <p>
@@ -59,7 +59,7 @@ export default function AboutPage() {
                 kicker="01"
                 status="Live"
                 title="Site Audit"
-                desc="Lighthouse data plus a Gemini-written fix plan."
+                desc="Lighthouse data plus a Groq-written fix plan."
               />
               <RoadmapCard
                 kicker="02"
@@ -71,7 +71,7 @@ export default function AboutPage() {
                 kicker="03"
                 status="Soon"
                 title="Keyword Research"
-                desc="Long-tail ideas from Autocomplete and Trends, clustered by Gemini."
+                desc="Long-tail ideas from Autocomplete and Trends, clustered by Groq."
               />
               <RoadmapCard
                 kicker="04"

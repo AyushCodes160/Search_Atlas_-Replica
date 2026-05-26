@@ -26,7 +26,7 @@ export default function Home() {
               href="/about"
               className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 hover:text-blue-600 transition-colors mb-3 group"
             >
-              Powered by Google PageSpeed + Gemini AI
+              Powered by Google PageSpeed + Groq AI
               <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
                 →
               </span>

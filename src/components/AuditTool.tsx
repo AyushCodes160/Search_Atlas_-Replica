@@ -169,7 +169,7 @@ export default function AuditTool() {
         )}
 
         <p className="mt-4 text-[11.5px] text-gray-400 leading-relaxed">
-          Web URLs run a full Lighthouse + Gemini audit. JSON APIs auto-detect
+          Web URLs run a full Lighthouse + Groq audit. JSON APIs auto-detect
           and switch to a backend-only review — no misleading SEO scores on
           endpoints.
         </p>
@@ -368,7 +368,7 @@ function WebResults({ result }: { result: WebAuditResult }) {
         </div>
       </Section>
 
-      <Section kicker="Gemini" title="AI fix plan">
+      <Section kicker="Groq" title="AI fix plan">
         <div
           className="rounded-2xl p-6 sm:p-8 ai-prose"
           style={{ backgroundColor: "#EDEDED" }}
@@ -544,7 +544,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
         </Section>
       )}
 
-      <Section kicker="Gemini" title="Backend review">
+      <Section kicker="Groq" title="Backend review">
         <div
           className="rounded-2xl p-6 sm:p-8 ai-prose"
           style={{ backgroundColor: "#EDEDED" }}
