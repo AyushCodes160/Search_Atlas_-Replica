@@ -7,6 +7,10 @@
   --foreground: 17 24 39;
 }
 
+html {
+  scroll-behavior: smooth;
+}
+
 html,
 body {
   background: rgb(var(--background));
@@ -15,7 +19,14 @@ body {
   font-feature-settings: "rlig" 1, "calt" 1;
 }
 
-/* Inline-prose styles for AI-generated markdown blocks. */
+/* Offset for sticky navbar when scrolling to in-page anchors. */
+[id] {
+  scroll-margin-top: 6rem;
+}
+
+/* Minimal prose styles for Gemini-generated markdown.
+   Stays inside the design system: same type scale, same colors, no
+   external prose plugin. */
 .ai-prose > *:first-child {
   margin-top: 0;
 }
@@ -24,34 +35,36 @@ body {
 }
 .ai-prose h1,
 .ai-prose h2 {
-  font-size: 14px;
-  font-weight: 600;
+  font-size: 15px;
+  font-weight: 500;
   color: rgb(17 24 39);
+  letter-spacing: -0.01em;
   margin-top: 1.25rem;
   margin-bottom: 0.5rem;
-  letter-spacing: -0.005em;
 }
 .ai-prose h3 {
   font-size: 13px;
-  font-weight: 600;
+  font-weight: 500;
   color: rgb(17 24 39);
   margin-top: 1rem;
   margin-bottom: 0.375rem;
 }
 .ai-prose p {
   font-size: 13px;
-  color: rgb(55 65 81);
+  font-weight: 400;
+  color: rgb(156 163 175);
   line-height: 1.65;
   margin-bottom: 0.75rem;
 }
 .ai-prose ul {
-  padding-left: 1rem;
   margin-bottom: 0.75rem;
   list-style: none;
+  padding-left: 0;
 }
 .ai-prose li {
   font-size: 13px;
-  color: rgb(55 65 81);
+  font-weight: 400;
+  color: rgb(156 163 175);
   line-height: 1.65;
   margin-bottom: 0.25rem;
   position: relative;
@@ -69,27 +82,26 @@ body {
 }
 .ai-prose strong {
   color: rgb(17 24 39);
-  font-weight: 600;
+  font-weight: 500;
 }
 .ai-prose em {
-  font-style: italic;
   color: rgb(55 65 81);
+  font-style: italic;
 }
 .ai-prose code {
   font-size: 12px;
-  color: rgb(37 99 235);
-  background: #ffffff;
-  padding: 0.125rem 0.375rem;
+  color: rgb(59 130 246);
+  background: rgba(0, 0, 0, 0.04);
+  padding: 0.0625rem 0.375rem;
   border-radius: 0.25rem;
   font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, monospace;
 }
 .ai-prose pre {
-  background: #ffffff;
+  background: rgba(0, 0, 0, 0.04);
   padding: 0.875rem 1rem;
   border-radius: 0.5rem;
   overflow-x: auto;
   margin-bottom: 0.875rem;
-  border: 1px solid rgb(229 231 235);
 }
 .ai-prose pre code {
   background: transparent;
@@ -104,19 +116,6 @@ body {
   text-underline-offset: 2px;
 }
 
-/* Issue description shrunk variant. */
-.ai-prose-mini {
-  font-size: 12px;
-  color: rgb(75 85 99);
-  line-height: 1.6;
-}
-.ai-prose-mini a {
-  color: rgb(59 130 246);
-  text-decoration: underline;
-  text-underline-offset: 2px;
-}
-
-/* Score ring animation. */
 .score-ring {
   transition: stroke-dashoffset 1s ease-out;
 }
