@@ -6,13 +6,13 @@ const GITHUB_URL = "https://github.com/AyushCodes160/Search_Atlas_-Replica";
 const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
   { label: "Audit", href: "/audit" },
   { label: "Features", href: "/audit#features" },
-  { label: "About", href: "/about" },
+  { label: "About", href: "/audit#about" },
   { label: "GitHub", href: GITHUB_URL, external: true },
 ];
 
 export function Navbar() {
   return (
-    <nav className="flex items-center justify-center pt-4 sm:pt-6 px-4 sm:px-8 gap-2 sm:gap-3">
+    <nav className="sticky top-0 z-50 flex items-center justify-center pt-4 sm:pt-6 pb-4 sm:pb-5 px-4 sm:px-8 gap-2 sm:gap-3 bg-[#f0f0ee]/70 backdrop-blur-xl">
       <Link
         href="/"
         aria-label="Home"
