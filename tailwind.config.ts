@@ -9,17 +9,43 @@ const config: Config = {
   theme: {
     extend: {
       colors: {
-        brand: {
-          50: "#eef4ff",
-          100: "#dbe6ff",
-          500: "#3b6bff",
-          600: "#2a52e0",
-          700: "#1f3fb0",
-          900: "#0f1f5e",
+        paper: {
+          DEFAULT: "#f4ecd8",
+          50: "#fbf8ef",
+          100: "#f4ecd8",
+          200: "#e8d9b4",
+          300: "#d4be8e",
+        },
+        ink: {
+          DEFAULT: "#2c2417",
+          soft: "#5a4b32",
+          muted: "#8a7b5f",
+        },
+        leaf: {
+          DEFAULT: "#8a9a5b",
+          dark: "#6b7a3f",
+        },
+        clay: {
+          DEFAULT: "#8b6f47",
+          dark: "#6a5535",
+        },
+        teal: {
+          accent: "#1aa49a",
+          dark: "#118a82",
+        },
+        sunset: {
+          DEFAULT: "#e67e22",
+          dark: "#c2691b",
         },
       },
       fontFamily: {
-        sans: ["Inter", "ui-sans-serif", "system-ui", "sans-serif"],
+        hand: ["var(--font-hand)", "cursive"],
+        sans: ["var(--font-sans)", "ui-sans-serif", "system-ui", "sans-serif"],
+        mono: ["var(--font-mono)", "ui-monospace", "monospace"],
+      },
+      rotate: {
+        "1.5": "1.5deg",
+        "-1.5": "-1.5deg",
       },
     },
   },

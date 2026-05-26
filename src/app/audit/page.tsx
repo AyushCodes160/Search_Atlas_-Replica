@@ -1,269 +1,117 @@
 import Link from "next/link";
 import AuditTool from "@/components/AuditTool";
 import { Navbar } from "@/components/Navbar";
+import RoadmapCarousel from "@/components/RoadmapCarousel";
 
 export default function AuditPage() {
   return (
-    <div className="relative min-h-screen bg-[#f0f0ee]">
-      <div className="relative z-10 flex flex-col min-h-screen">
-        <Navbar />
+    <div className="relative min-h-screen paper-bg">
+      <Navbar />
 
-        <main className="px-6 sm:px-12 md:px-20 lg:px-28 py-10 sm:py-16">
-          <section className="mb-12 sm:mb-20 max-w-xl">
-            <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
-              Site Audit
-            </div>
-            <h1 className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight mb-3">
-              See what's holding your site back.
-            </h1>
-            <p className="text-[13px] text-gray-400 font-normal">
-              Real Lighthouse scores. Groq-written fix plans. Forty seconds
-              from URL to action items.
-            </p>
-          </section>
+      <main className="relative max-w-7xl mx-auto px-6 sm:px-10 py-10 sm:py-14">
+        <div className="pointer-events-none absolute -top-10 right-0 w-96 h-96 watercolor-teal opacity-70" />
+        <div className="pointer-events-none absolute bottom-40 -left-20 w-80 h-80 watercolor-sunset opacity-60" />
 
-          <section className="mb-12 sm:mb-20">
+        <header className="mb-12 max-w-2xl relative">
+          <p className="font-hand text-clay text-[18px] mb-2">~ site audit ~</p>
+          <h1 className="font-hand text-[3rem] sm:text-[4rem] leading-[0.95] text-ink mb-3">
+            What's holding
+            <br />
+            <span className="text-teal-accent hand-underline">your page back?</span>
+          </h1>
+          <p className="font-sans text-[14.5px] text-ink-soft leading-relaxed">
+            Paste a URL on the left. Real Lighthouse scores plus a Llama 3.3 fix
+            plan land on the right in about forty seconds. JSON APIs auto-route
+            to a backend review.
+          </p>
+        </header>
+
+        <div className="grid grid-cols-1 lg:grid-cols-[1.6fr_1fr] gap-8 mb-20 relative">
+          <div>
             <AuditTool />
-          </section>
+          </div>
 
-          <section id="features" className="mb-12 sm:mb-20">
-            <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
-              Features
-            </div>
-            <h2 className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight mb-3 max-w-xl">
-              Free APIs, behind a calm interface.
-            </h2>
-            <p className="text-[13px] text-gray-400 font-normal mb-10 max-w-xl">
-              PageSpeed from Google for the audit, Llama 3.3 on Groq for the
-              fix plan. Both free, both your own keys. No paywall, no signup,
-              no quota games.
-            </p>
-
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <FeatureCard
-                kicker="01"
-                title="Lightning Audit"
-                desc="Real Lighthouse scores from Google's own engine. Same data Chrome uses — no proxies, no estimations."
-                bullets={[
-                  "Performance, SEO, Accessibility, Best Practices",
-                  "Core Web Vitals (LCP, CLS, FCP, TBT, Speed Index)",
-                  "Mobile-first by default",
-                  "Top failing audits surfaced automatically",
-                ]}
-              />
-              <FeatureCard
-                kicker="02"
-                title="AI Fix Suggester"
-                desc="Most tools tell you what's wrong. This one tells you exactly what to change, scoped to your actual scores."
-                bullets={[
-                  "Top 3 priorities, ranked by impact",
-                  "Quick wins under 30 minutes each",
-                  "Copy-paste-ready code snippets",
-                  "Specific to your audit, not generic advice",
-                ]}
-              />
-              <FeatureCard
-                kicker="03"
-                title="Free Forever"
-                desc="Built on PageSpeed (Google) and Groq's generous free tiers. Use your own keys, keep your data, owe nothing."
-                bullets={[
-                  "25,000 PageSpeed audits per day",
-                  "14,400 Groq fix reports per day",
-                  "No card, no signup, no paywall",
-                  "Open source — fork it, self-host it",
-                ]}
-              />
-            </div>
-          </section>
-
-          <section id="about" className="mb-12 sm:mb-20">
-            <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
-              About
-            </div>
-            <h2 className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight mb-3 max-w-xl">
-              A free, indie SEO toolkit.
-            </h2>
-            <p className="text-[13px] text-gray-400 font-normal mb-10 max-w-xl">
-              Built for the operator, not the enterprise dashboard.
-            </p>
-
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div
-                className="rounded-2xl p-6 lg:col-span-2"
-                style={{ backgroundColor: "#EDEDED" }}
-              >
-                <div className="text-[11.5px] font-medium text-blue-500 mb-3">
-                  Story
-                </div>
-                <h3 className="text-[15px] font-medium text-gray-900 mb-3">
-                  Why this exists.
-                </h3>
-                <div className="space-y-4 text-[13px] text-gray-400 font-normal leading-relaxed">
-                  <p>
-                    SEO Engine is an open-source take on the
-                    all-in-one SEO platforms that charge agencies hundreds a
-                    month. The first module pairs Google's free Lighthouse
-                    data with Groq to turn raw performance audits into
-                    actionable, code-aware fix plans.
-                  </p>
-                  <p>
-                    Built for the indie operator — freelancers, in-house
-                    engineers, anyone who wants one calm tool instead of four
-                    enterprise dashboards. No paywalls, no upsell, no trial
-                    timer.
-                  </p>
-                </div>
+          <aside className="space-y-6">
+            <section id="features">
+              <p className="font-hand text-clay text-[16px] mb-2">~ features ~</p>
+              <h2 className="font-hand text-[32px] text-ink leading-tight mb-4">
+                The whole toolkit, on a sticky note.
+              </h2>
+              <div className="space-y-4">
+                <Sticky tilt="-2deg" kicker="01" title="Lightning audit" body="Real Lighthouse scores: Performance, SEO, A11y, Best Practices + Core Web Vitals." />
+                <Sticky tilt="1.5deg" kicker="02" title="API auto-detect" body="URL with /api, /v1/, /graphql or JSON content-type skips Lighthouse and gets a backend review." />
+                <Sticky tilt="-1deg" kicker="03" title="Latency + schema" body="3-sample timing, payload size, root + item keys, null-field completeness." />
+                <Sticky tilt="2deg" kicker="04" title="AI fix plan" body="Llama 3.3 70B (via Groq) writes Top 3 priorities, Quick Wins, SEO recs — specific to your scores." />
               </div>
+            </section>
 
-              <div
-                className="rounded-2xl p-6 flex flex-col gap-4"
-                style={{ backgroundColor: "#EDEDED" }}
+            <section id="about" className="dotted-card p-5">
+              <p className="font-hand text-clay text-[15px] mb-1">~ about ~</p>
+              <h3 className="font-hand text-[24px] text-ink leading-tight mb-2">
+                Built for indie operators.
+              </h3>
+              <p className="font-sans text-[13.5px] text-ink-soft leading-relaxed mb-3">
+                SEO Engine is open-source and free forever. No paywalls, no
+                signup, no card. Use your own API keys, keep your data.
+              </p>
+              <Link
+                href="/about"
+                className="font-hand text-[17px] text-teal-accent hover:text-teal-dark inline-flex items-center gap-1.5 group"
               >
-                <div className="text-[11.5px] font-medium text-blue-500">
-                  Principles
-                </div>
-                <ul className="space-y-2.5">
-                  {[
-                    "Free APIs over paid data",
-                    "Local-first, your keys, your data",
-                    "Plain HTML, no enterprise jargon",
-                    "One calm tool, not a dashboard zoo",
-                  ].map((p) => (
-                    <li
-                      key={p}
-                      className="text-[13px] text-gray-700 font-normal leading-relaxed flex items-start gap-2"
-                    >
-                      <span className="text-blue-500 mt-0.5">•</span>
-                      <span>{p}</span>
-                    </li>
-                  ))}
-                </ul>
-                <div className="mt-2">
-                  <a
-                    href="https://github.com/AyushCodes160/SEO_Engine"
-                    target="_blank"
-                    rel="noreferrer"
-                    className="inline-flex items-center gap-2 text-[13px] font-medium text-blue-500 hover:text-blue-600 transition-colors duration-200 group"
-                  >
-                    View source
-                    <span className="inline-block transition-transform duration-200 group-hover:translate-x-0.5">
-                      →
-                    </span>
-                  </a>
-                </div>
-              </div>
-            </div>
-          </section>
+                Read the story
+                <span className="inline-block group-hover:translate-x-0.5 transition-transform">→</span>
+              </Link>
+            </section>
+          </aside>
+        </div>
 
-          <section id="coming-next" className="mb-12 sm:mb-20">
-            <div className="inline-flex items-center gap-1.5 text-[11.5px] font-medium text-blue-500 mb-3">
-              Coming next
-            </div>
-            <h2 className="text-[1.5rem] sm:text-[1.75rem] leading-[1.15] font-medium text-gray-900 tracking-tight mb-3 max-w-xl">
-              Three more tools, one quiet toolkit.
-            </h2>
-            <p className="text-[13px] text-gray-400 font-normal mb-10 max-w-xl">
-              Audit is the first module. The rest fill out a full enterprise-class
-              workflow without the enterprise price tag.
-            </p>
+        <section id="coming-next" className="mb-12 relative">
+          <p className="font-hand text-clay text-[18px] mb-2">~ coming next ~</p>
+          <h2 className="font-hand text-[40px] sm:text-[46px] text-ink leading-tight mb-2 max-w-2xl">
+            Three more notebooks
+            <br />
+            in the toolkit.
+          </h2>
+          <p className="font-sans text-[14.5px] text-ink-soft leading-relaxed mb-8 max-w-xl">
+            Drag the stack to flip through. The audit is page 1 — these three
+            are still drafts on the workbench.
+          </p>
+          <RoadmapCarousel />
+        </section>
 
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-              <RoadmapCard
-                kicker="04"
-                title="AI Content Writer"
-                desc="SEO-optimized drafts from a target keyword and intent. Tunes for E-E-A-T and search snippet formats."
-              />
-              <RoadmapCard
-                kicker="05"
-                title="Keyword Research"
-                desc="Long-tail keyword ideas from Google Autocomplete and Trends, expanded and clustered by Groq."
-              />
-              <RoadmapCard
-                kicker="06"
-                title="OTTO-lite"
-                desc="A single script tag that scans your live site and proposes on-page fixes — meta, schema, alt text — for one-click apply."
-              />
-            </div>
-          </section>
-
-          <section className="pb-4">
-            <Link
-              href="/"
-              className="inline-flex items-center gap-2 text-[13px] font-medium text-gray-700 hover:text-blue-500 transition-colors duration-200 group"
-            >
-              <span className="inline-block transition-transform duration-200 group-hover:-translate-x-0.5">
-                ←
-              </span>
-              Back to home
-            </Link>
-          </section>
-        </main>
-      </div>
-    </div>
-  );
-}
-
-function FeatureCard({
-  kicker,
-  title,
-  desc,
-  bullets,
-}: {
-  kicker: string;
-  title: string;
-  desc: string;
-  bullets: string[];
-}) {
-  return (
-    <div
-      className="rounded-2xl p-6 flex flex-col gap-4"
-      style={{ backgroundColor: "#EDEDED" }}
-    >
-      <div className="text-[11.5px] font-medium text-blue-500 tabular-nums">
-        {kicker}
-      </div>
-      <div>
-        <h3 className="text-[15px] font-medium text-gray-900 mb-2">{title}</h3>
-        <p className="text-[13px] text-gray-400 font-normal leading-relaxed">
-          {desc}
-        </p>
-      </div>
-      <ul className="mt-1 space-y-1.5">
-        {bullets.map((b) => (
-          <li
-            key={b}
-            className="text-[12.5px] text-gray-700 font-normal leading-relaxed flex items-start gap-2"
+        <div className="pb-4">
+          <Link
+            href="/"
+            className="font-hand text-[18px] text-ink hover:text-teal-accent inline-flex items-center gap-1.5 group"
           >
-            <span className="text-blue-500 mt-0.5">•</span>
-            <span>{b}</span>
-          </li>
-        ))}
-      </ul>
+            <span className="inline-block group-hover:-translate-x-1 transition-transform">←</span>
+            back to home
+          </Link>
+        </div>
+      </main>
     </div>
   );
 }
 
-function RoadmapCard({
+function Sticky({
+  tilt,
   kicker,
   title,
-  desc,
+  body,
 }: {
+  tilt: string;
   kicker: string;
   title: string;
-  desc: string;
+  body: string;
 }) {
   return (
     <div
-      className="rounded-2xl p-6"
-      style={{ backgroundColor: "#EDEDED" }}
+      className="sticky-note rounded-md p-4 border-2 border-ink/80"
+      style={{ transform: `rotate(${tilt})` }}
     >
-      <div className="text-[11.5px] font-medium text-blue-500 mb-3 tabular-nums">
-        {kicker}
-      </div>
-      <h3 className="text-[15px] font-medium text-gray-900 mb-2">{title}</h3>
-      <p className="text-[13px] text-gray-400 font-normal leading-relaxed">
-        {desc}
-      </p>
+      <div className="font-hand text-teal-accent text-[18px] mb-1">{kicker}</div>
+      <h4 className="font-hand text-[22px] text-ink leading-tight mb-1.5">{title}</h4>
+      <p className="font-sans text-[13px] text-ink-soft leading-relaxed">{body}</p>
     </div>
   );
 }
