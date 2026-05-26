@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { Loader2, Globe, Sparkles, AlertCircle, CheckCircle2, ArrowRight } from "lucide-react";
+import { Loader2, Globe, AlertCircle } from "lucide-react";
 
 type AuditResult = {
   url: string;
@@ -52,8 +52,9 @@ export default function AuditTool() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Audit failed");
       setResult(data);
-    } catch (e: any) {
-      setError(e.message || "Something went wrong");
+    } catch (e: unknown) {
+      const message = e instanceof Error ? e.message : "Something went wrong";
+      setError(message);
     } finally {
       setLoading(false);
     }
@@ -61,40 +62,50 @@ export default function AuditTool() {
 
   return (
     <div>
-      {/* Input card */}
-      <div className="glass rounded-3xl p-6 md:p-8 border border-white/40 shadow-xl shadow-brand-500/5">
-        <div className="flex flex-col md:flex-row gap-3">
+      {/* Input pill card */}
+      <div
+        className="rounded-3xl p-4 sm:p-5"
+        style={{ backgroundColor: "#EDEDED" }}
+      >
+        <div className="flex flex-col sm:flex-row gap-2 sm:gap-3">
           <div className="flex-1 relative">
-            <Globe className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+            <Globe
+              className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400"
+              strokeWidth={2}
+            />
             <input
               type="url"
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com"
-              className="w-full pl-12 pr-4 py-4 rounded-xl bg-white border border-gray-200 focus:border-brand-500 focus:ring-4 focus:ring-brand-500/10 outline-none text-base"
+              className="w-full pl-11 pr-4 py-3 rounded-2xl bg-white border border-transparent focus:border-blue-400 focus:ring-2 focus:ring-blue-500/10 outline-none text-[13px] placeholder:text-gray-400"
               onKeyDown={(e) => e.key === "Enter" && runAudit()}
             />
           </div>
           <button
             onClick={() => runAudit()}
             disabled={loading}
-            className="px-6 py-4 rounded-xl bg-gradient-to-r from-brand-500 to-purple-600 text-white font-semibold hover:opacity-90 disabled:opacity-50 transition-all flex items-center justify-center gap-2 shadow-lg shadow-brand-500/30"
+            className="inline-flex items-center justify-center gap-2 text-[13px] font-medium text-blue-500 border border-blue-400 bg-white rounded-full px-6 py-3 hover:bg-blue-500 hover:text-white hover:border-blue-500 transition-all duration-200 group disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
-                <Loader2 className="w-5 h-5 animate-spin" /> Auditing…
+                <Loader2 className="w-4 h-4 animate-spin" strokeWidth={2.5} />
+                Auditing
               </>
             ) : (
               <>
-                <Sparkles className="w-5 h-5" /> Run Audit
+                Run audit
+                <span className="transition-transform duration-200 group-hover:translate-x-0.5">
+                  →
+                </span>
               </>
             )}
           </button>
         </div>
 
-        {/* Quick-test buttons */}
+        {/* Quick-test */}
         <div className="flex flex-wrap items-center gap-2 mt-4">
-          <span className="text-xs text-gray-500 mr-1">Quick test:</span>
+          <span className="text-[11.5px] text-gray-500 mr-1">Quick test</span>
           {QUICK_SITES.map((s) => (
             <button
               key={s.url}
@@ -103,26 +114,32 @@ export default function AuditTool() {
                 runAudit(s.url);
               }}
               disabled={loading}
-              className="text-xs px-3 py-1.5 rounded-full bg-white border border-gray-200 hover:border-brand-500 hover:text-brand-600 transition-colors disabled:opacity-50"
+              className="text-[11.5px] font-medium px-3 py-1.5 rounded-full bg-white border border-transparent text-gray-700 hover:border-blue-400 hover:text-blue-500 transition-colors duration-200 disabled:opacity-50 group"
             >
-              {s.label} <ArrowRight className="inline w-3 h-3" />
+              {s.label}
+              <span className="inline-block ml-1 transition-transform duration-200 group-hover:translate-x-0.5">
+                →
+              </span>
             </button>
           ))}
         </div>
 
         {error && (
-          <div className="mt-4 flex items-start gap-2 text-sm text-red-600 bg-red-50 border border-red-100 rounded-xl p-3">
-            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
+          <div className="mt-4 flex items-start gap-2 text-[12px] text-red-600 bg-white border border-red-100 rounded-2xl px-3 py-2.5">
+            <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" strokeWidth={2} />
             <span>{error}</span>
           </div>
         )}
       </div>
 
-      {/* Loading skeleton */}
+      {/* Loading state */}
       {loading && (
-        <div className="mt-8 text-center text-gray-500 text-sm">
-          <Loader2 className="w-6 h-6 animate-spin mx-auto mb-3 text-brand-500" />
-          Running Lighthouse audit + AI analysis. Takes 20–40 seconds.
+        <div className="mt-10 text-center text-[12px] text-gray-500">
+          <Loader2
+            className="w-5 h-5 animate-spin mx-auto mb-3 text-blue-500"
+            strokeWidth={2}
+          />
+          Running Lighthouse + AI analysis. Takes 20–40 seconds.
         </div>
       )}
 
@@ -132,100 +149,144 @@ export default function AuditTool() {
   );
 }
 
+/* -------------------------------------------------------------------------- */
+
 function Results({ result }: { result: AuditResult }) {
   return (
-    <div className="mt-8 space-y-6">
-      {/* Scores */}
-      <div className="glass rounded-2xl p-6 border border-white/40">
-        <div className="flex items-center justify-between mb-4">
-          <h2 className="font-semibold text-lg">Audit Scores</h2>
+    <div className="mt-12 space-y-10">
+      <Section
+        kicker="Lighthouse"
+        title="Audit scores"
+        meta={
           <a
             href={result.finalUrl}
             target="_blank"
             rel="noreferrer"
-            className="text-xs text-brand-600 hover:underline truncate max-w-xs"
+            className="text-[11.5px] text-gray-500 hover:text-gray-700 truncate max-w-[16rem] hover:underline underline-offset-2"
           >
             {result.finalUrl}
           </a>
+        }
+      >
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
+          <ScoreCard label="Performance" score={result.scores.performance} />
+          <ScoreCard label="SEO" score={result.scores.seo} />
+          <ScoreCard
+            label="Accessibility"
+            score={result.scores.accessibility}
+          />
+          <ScoreCard
+            label="Best Practices"
+            score={result.scores.bestPractices}
+          />
         </div>
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          <ScoreRing label="Performance" score={result.scores.performance} />
-          <ScoreRing label="SEO" score={result.scores.seo} />
-          <ScoreRing label="Accessibility" score={result.scores.accessibility} />
-          <ScoreRing label="Best Practices" score={result.scores.bestPractices} />
-        </div>
-      </div>
+      </Section>
 
-      {/* Core Web Vitals */}
-      <div className="glass rounded-2xl p-6 border border-white/40">
-        <h2 className="font-semibold text-lg mb-4">Core Metrics</h2>
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4">
-          <Metric label="LCP" value={result.metrics.lcp} />
-          <Metric label="CLS" value={result.metrics.cls} />
-          <Metric label="FCP" value={result.metrics.fcp} />
-          <Metric label="TBT" value={result.metrics.tbt} />
-          <Metric label="Speed Index" value={result.metrics.speedIndex} />
+      <Section kicker="Core metrics" title="Speed & layout">
+        <div className="grid grid-cols-2 md:grid-cols-5 gap-3">
+          <MetricCard label="LCP" value={result.metrics.lcp} />
+          <MetricCard label="CLS" value={result.metrics.cls} />
+          <MetricCard label="FCP" value={result.metrics.fcp} />
+          <MetricCard label="TBT" value={result.metrics.tbt} />
+          <MetricCard label="Speed Index" value={result.metrics.speedIndex} />
         </div>
-      </div>
+      </Section>
 
-      {/* AI Suggestions */}
-      <div className="glass rounded-2xl p-6 border border-white/40 bg-gradient-to-br from-purple-50/40 to-brand-50/40">
-        <div className="flex items-center gap-2 mb-4">
-          <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-purple-500 to-brand-500 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-white" />
-          </div>
-          <h2 className="font-semibold text-lg">AI Fix Suggestions</h2>
-        </div>
+      <Section kicker="Gemini" title="AI fix plan">
         <div
-          className="prose prose-sm max-w-none prose-headings:font-semibold prose-headings:text-gray-900 prose-p:text-gray-700 prose-li:text-gray-700 prose-code:text-purple-700 prose-code:bg-purple-50 prose-code:px-1 prose-code:py-0.5 prose-code:rounded prose-code:before:hidden prose-code:after:hidden"
+          className="rounded-3xl p-6 sm:p-7 ai-prose"
+          style={{ backgroundColor: "#EDEDED" }}
           dangerouslySetInnerHTML={{ __html: result.aiSuggestions }}
         />
-      </div>
+      </Section>
 
-      {/* Top issues */}
       {result.issues.length > 0 && (
-        <div className="glass rounded-2xl p-6 border border-white/40">
-          <h2 className="font-semibold text-lg mb-4">Top Issues Found</h2>
-          <ul className="space-y-3">
+        <Section kicker="Lighthouse" title="Top issues">
+          <ul className="space-y-2">
             {result.issues.map((issue, i) => (
               <li
                 key={i}
-                className="flex gap-3 p-3 rounded-xl bg-white/60 border border-gray-100"
+                className="flex gap-4 p-4 sm:p-5 rounded-2xl"
+                style={{ backgroundColor: "#EDEDED" }}
               >
-                <AlertCircle className="w-5 h-5 text-orange-500 shrink-0 mt-0.5" />
+                <span className="text-[11.5px] font-medium text-blue-500 shrink-0 mt-0.5 tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
                 <div>
-                  <div className="font-medium text-sm">{issue.title}</div>
+                  <div className="font-medium text-[13px] text-gray-900">
+                    {issue.title}
+                  </div>
                   <div
-                    className="text-xs text-gray-600 mt-1"
+                    className="ai-prose-mini mt-1.5"
                     dangerouslySetInnerHTML={{ __html: issue.description }}
                   />
                 </div>
               </li>
             ))}
           </ul>
-        </div>
+        </Section>
       )}
     </div>
   );
 }
 
-function ScoreRing({ label, score }: { label: string; score: number }) {
-  const color = score >= 90 ? "#22c55e" : score >= 50 ? "#f59e0b" : "#ef4444";
-  const radius = 32;
+function Section({
+  kicker,
+  title,
+  meta,
+  children,
+}: {
+  kicker: string;
+  title: string;
+  meta?: React.ReactNode;
+  children: React.ReactNode;
+}) {
+  return (
+    <section>
+      <div className="flex items-end justify-between mb-4">
+        <div>
+          <div className="text-[11.5px] font-medium text-blue-500 mb-1">
+            {kicker}
+          </div>
+          <h2 className="text-[18px] font-medium text-gray-900 tracking-tight">
+            {title}
+          </h2>
+        </div>
+        {meta}
+      </div>
+      {children}
+    </section>
+  );
+}
+
+function ScoreCard({ label, score }: { label: string; score: number }) {
+  const color =
+    score >= 90 ? "#16a34a" : score >= 50 ? "#d97706" : "#dc2626";
+  const radius = 22;
   const circ = 2 * Math.PI * radius;
   const offset = circ - (score / 100) * circ;
 
   return (
-    <div className="flex flex-col items-center">
-      <div className="relative w-20 h-20">
-        <svg className="w-20 h-20 -rotate-90" viewBox="0 0 80 80">
-          <circle cx="40" cy="40" r={radius} stroke="#e5e7eb" strokeWidth="6" fill="none" />
+    <div
+      className="rounded-2xl p-4 sm:p-5 flex items-center gap-4"
+      style={{ backgroundColor: "#EDEDED" }}
+    >
+      <div className="relative w-12 h-12 shrink-0">
+        <svg className="w-12 h-12 -rotate-90" viewBox="0 0 56 56">
           <circle
-            cx="40"
-            cy="40"
+            cx="28"
+            cy="28"
+            r={radius}
+            stroke="#ffffff"
+            strokeWidth="4"
+            fill="none"
+          />
+          <circle
+            cx="28"
+            cy="28"
             r={radius}
             stroke={color}
-            strokeWidth="6"
+            strokeWidth="4"
             fill="none"
             strokeDasharray={circ}
             strokeDashoffset={offset}
@@ -233,23 +294,30 @@ function ScoreRing({ label, score }: { label: string; score: number }) {
             className="score-ring"
           />
         </svg>
+      </div>
+      <div className="min-w-0">
+        <div className="text-[11.5px] text-gray-500 truncate">{label}</div>
         <div
-          className="absolute inset-0 flex items-center justify-center font-bold text-lg"
+          className="text-[20px] font-medium tabular-nums leading-tight mt-0.5"
           style={{ color }}
         >
           {score}
         </div>
       </div>
-      <div className="text-xs text-gray-600 mt-2">{label}</div>
     </div>
   );
 }
 
-function Metric({ label, value }: { label: string; value: string }) {
+function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-3 rounded-xl bg-white/60 border border-gray-100">
-      <div className="text-xs text-gray-500">{label}</div>
-      <div className="font-semibold text-lg mt-0.5">{value}</div>
+    <div
+      className="rounded-2xl p-4 sm:p-5"
+      style={{ backgroundColor: "#EDEDED" }}
+    >
+      <div className="text-[11.5px] text-gray-500 mb-2">{label}</div>
+      <div className="text-[15px] font-medium text-gray-900 tabular-nums">
+        {value}
+      </div>
     </div>
   );
 }
