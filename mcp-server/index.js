@@ -77,14 +77,6 @@ const server = new Server(
 
 const STATIC_RESOURCES = [
   {
-    uri: "seo-engine://conversation-notes",
-    name: "Conversation Notes",
-    description:
-      "Full write-up of the planning conversation: SEO primer, competitor analysis, our free-stack strategy, what's been built, what's next.",
-    mimeType: "text/markdown",
-    file: "CONVERSATION_NOTES.md",
-  },
-  {
     uri: "seo-engine://readme",
     name: "README",
     description: "Project README — setup steps, stack, roadmap.",
@@ -132,7 +124,7 @@ const TOOLS = [
   {
     name: "get_project_context",
     description:
-      "Return a single bundled snapshot of the SEO Engine project: conversation notes, README, and the source files of the audit tool. Use this at the start of a new chat to instantly catch up.",
+      "Return a single bundled snapshot of the SEO Engine project: README plus the source files of the audit tool. Use this at the start of a new chat to instantly catch up.",
     inputSchema: {
       type: "object",
       properties: {
@@ -164,18 +156,6 @@ const TOOLS = [
     description: "List all readable text files in the project.",
     inputSchema: { type: "object", properties: {} },
   },
-  {
-    name: "search_notes",
-    description:
-      "Case-insensitive substring search through CONVERSATION_NOTES.md. Returns matching lines with line numbers.",
-    inputSchema: {
-      type: "object",
-      properties: {
-        query: { type: "string", description: "Substring to search for." },
-      },
-      required: ["query"],
-    },
-  },
 ];
 
 server.setRequestHandler(ListToolsRequestSchema, async () => ({ tools: TOOLS }));
@@ -186,11 +166,6 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
     if (name === "get_project_context") {
       const includeCode = args.include_code !== false;
       const sections = [];
-      try {
-        sections.push(`# CONVERSATION_NOTES.md\n\n${await readSafe("CONVERSATION_NOTES.md")}`);
-      } catch {
-        sections.push("# CONVERSATION_NOTES.md\n\n(not found)");
-      }
       try {
         sections.push(`# README.md\n\n${await readSafe("README.md")}`);
       } catch {}
@@ -223,32 +198,6 @@ server.setRequestHandler(CallToolRequestSchema, async (req) => {
       const files = await walk(PROJECT_ROOT);
       const rels = files.map((f) => relative(PROJECT_ROOT, f)).sort();
       return { content: [{ type: "text", text: rels.join("\n") }] };
-    }
-
-    if (name === "search_notes") {
-      const q = String(args.query || "").toLowerCase();
-      if (!q) throw new Error("query is required");
-      let text;
-      try {
-        text = await readSafe("CONVERSATION_NOTES.md");
-      } catch {
-        return { content: [{ type: "text", text: "CONVERSATION_NOTES.md not found." }] };
-      }
-      const lines = text.split("\n");
-      const hits = [];
-      lines.forEach((line, i) => {
-        if (line.toLowerCase().includes(q)) {
-          hits.push(`${i + 1}: ${line}`);
-        }
-      });
-      return {
-        content: [
-          {
-            type: "text",
-            text: hits.length ? hits.join("\n") : `No matches for "${args.query}".`,
-          },
-        ],
-      };
     }
 
     throw new Error(`Unknown tool: ${name}`);
