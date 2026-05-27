@@ -2,6 +2,7 @@ import Link from "next/link";
 import { PageHeader } from "@/components/PageHeader";
 import {
   Activity,
+  Layers,
   KeyRound,
   Wand2,
   Bot,
@@ -16,6 +17,7 @@ import {
 
 const QUICK_LINKS = [
   { label: "Site Audit", href: "/app/site-audit", Icon: Activity, ready: true, note: "Lighthouse + Llama" },
+  { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true, note: "Up to 10 URLs · CSV export" },
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true, note: "Free Autocomplete + Llama" },
   { label: "Atlas Agent", href: "/app/atlas-agent", Icon: Bot, ready: true, note: "Llama chat" },
   { label: "OTTO SEO", href: "/app/otto-seo", Icon: Wand2, ready: false, note: "Needs OAuth" },
