@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Globe, Loader2, ServerCog, FileCode } from "lucide-react";
+import { AlertCircle, Globe, Loader2, ServerCog, FileCode, Share2, Check, Link as LinkIcon } from "lucide-react";
 import { saveLastAudit, type StoredAudit } from "@/lib/auditContext";
 
 type Classification = {
@@ -80,7 +80,35 @@ export default function AuditTool() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<AuditResult | null>(null);
   const [progress, setProgress] = useState(0);
+  const [sharedView, setSharedView] = useState(false);
+  const [shareCopied, setShareCopied] = useState(false);
   const progRef = useRef<number | null>(null);
+
+  // Load audit from URL hash if present (?share-link flow).
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const m = window.location.hash.match(/^#share=(.+)$/);
+    if (!m) return;
+    const decoded = decodeShare(m[1]);
+    if (decoded) {
+      setResult(decoded);
+      setSharedView(true);
+      setUrl(decoded.url);
+    }
+  }, []);
+
+  function shareCurrent() {
+    if (!result) return;
+    const hash = encodeShare(result);
+    const link = `${window.location.origin}${window.location.pathname}#share=${hash}`;
+    if (link.length > 8000) {
+      setError("Audit too large to share via URL. Try CSV export instead.");
+      return;
+    }
+    navigator.clipboard?.writeText(link);
+    setShareCopied(true);
+    setTimeout(() => setShareCopied(false), 1800);
+  }
 
   useEffect(() => {
     if (!loading) {
@@ -258,6 +286,23 @@ export default function AuditTool() {
           </div>
         )}
       </div>
+
+      {result && (
+        <div className="flex flex-wrap items-center gap-3 -mb-2">
+          {sharedView && (
+            <span className="font-hand text-[14px] text-clay inline-flex items-center gap-1.5 border-2 border-ink/40 bg-paper-50 rounded-full px-3 py-1">
+              <LinkIcon className="w-3.5 h-3.5" /> loaded from shared link
+            </span>
+          )}
+          <button
+            onClick={shareCurrent}
+            className="font-hand text-[15px] text-ink border-2 border-ink/70 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(44,36,23,0.6)]"
+          >
+            {shareCopied ? <Check className="w-4 h-4 text-teal-accent" /> : <Share2 className="w-4 h-4" />}
+            {shareCopied ? "link copied" : "share this audit"}
+          </button>
+        </div>
+      )}
 
       {result?.sourceType === "web" && <WebResults result={result} />}
       {result?.sourceType === "api" && <ApiResults result={result} />}
@@ -702,6 +747,48 @@ function CountChip({ label, n }: { label: string; n: number }) {
       <div className="font-hand text-[11px] text-clay">{label}</div>
     </div>
   );
+}
+
+function stripHtml(s: string): string {
+  return s.replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim();
+}
+
+function trimForShare(r: AuditResult): AuditResult {
+  if (r.sourceType === "web") {
+    const issues = r.issues.slice(0, 8).map((i) => ({
+      title: i.title,
+      description: stripHtml(i.description).slice(0, 180),
+      impact: i.impact,
+    }));
+    const onPage = r.onPage
+      ? {
+          ...r.onPage,
+          images: { ...r.onPage.images, sampleMissing: [] },
+          headings: { ...r.onPage.headings, h1: r.onPage.headings.h1.slice(0, 1) },
+        }
+      : null;
+    return { ...r, aiSuggestions: "", issues, onPage };
+  }
+  return { ...r, aiSuggestions: "" };
+}
+
+function encodeShare(r: AuditResult): string {
+  const trimmed = trimForShare(r);
+  const json = JSON.stringify(trimmed);
+  // URL-safe base64
+  const b64 = typeof window === "undefined" ? Buffer.from(json).toString("base64") : btoa(unescape(encodeURIComponent(json)));
+  return b64.replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+}
+
+function decodeShare(hash: string): AuditResult | null {
+  try {
+    const b64 = hash.replace(/-/g, "+").replace(/_/g, "/");
+    const padded = b64 + "=".repeat((4 - (b64.length % 4)) % 4);
+    const json = decodeURIComponent(escape(atob(padded)));
+    return JSON.parse(json) as AuditResult;
+  } catch {
+    return null;
+  }
 }
 
 const IMPACT_ORDER: Record<string, number> = { high: 0, medium: 1, info: 2 };
