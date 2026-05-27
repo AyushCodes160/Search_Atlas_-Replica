@@ -11,6 +11,28 @@ type Classification = {
   blockedMetrics: string[];
 };
 
+type OnPageAudit = {
+  words: number;
+  readingMinutes: number;
+  readability: { flesch: number; grade: number; label: string };
+  headings: { h1: string[]; h2Count: number; h3Count: number; h4Count: number; issues: string[] };
+  images: { total: number; missingAlt: number; sampleMissing: { src: string; nearbyText: string }[] };
+  links: { internal: number; external: number; nofollow: number; dofollow: number };
+  schema: { types: string[]; count: number; suggested: string[] };
+  meta: {
+    title: string | null;
+    titleLength: number;
+    description: string | null;
+    descriptionLength: number;
+    canonical: string | null;
+    viewport: string | null;
+    ogTitle: string | null;
+    ogDescription: string | null;
+    ogImage: string | null;
+    robots: string | null;
+  };
+};
+
 type WebAuditResult = {
   sourceType: "web";
   url: string;
@@ -20,6 +42,7 @@ type WebAuditResult = {
   scores: { performance: number; seo: number; accessibility: number; bestPractices: number };
   metrics: { lcp: string; cls: string; fcp: string; tbt: string; speedIndex: string };
   issues: { title: string; description: string; impact: string }[];
+  onPage: OnPageAudit | null;
   aiSuggestions: string;
 };
 
@@ -314,6 +337,8 @@ function WebResults({ result }: { result: WebAuditResult }) {
         </div>
       </div>
 
+      {result.onPage && <OnPagePanel onPage={result.onPage} />}
+
       <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.4deg)" }}>
         <PanelHeader kicker="llama 3.3" title="AI fix plan" />
         <div className="ai-prose" dangerouslySetInnerHTML={{ __html: result.aiSuggestions }} />
@@ -471,6 +496,171 @@ function KeyChips({ label, keys }: { label: string; keys: string[] }) {
           ))}
         </div>
       )}
+    </div>
+  );
+}
+
+function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
+  const titleTone =
+    onPage.meta.titleLength === 0
+      ? "text-sunset"
+      : onPage.meta.titleLength > 60
+        ? "text-sunset"
+        : "text-ink";
+  const descTone =
+    onPage.meta.descriptionLength === 0
+      ? "text-sunset"
+      : onPage.meta.descriptionLength > 160
+        ? "text-sunset"
+        : "text-ink";
+  return (
+    <div className="sticky-note rounded-lg p-5 sm:p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.3deg)" }}>
+      <PanelHeader kicker="on-page" title="What's on the page" />
+
+      <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
+        <MetricCard label="Words" value={onPage.words.toLocaleString()} />
+        <MetricCard label="Reading time" value={`${onPage.readingMinutes} min`} />
+        <MetricCard
+          label={`Readability · ${onPage.readability.label}`}
+          value={`Flesch ${onPage.readability.flesch}`}
+        />
+        <MetricCard label="Grade level" value={`${onPage.readability.grade}`} />
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
+        {/* Meta tags */}
+        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="font-hand text-[14px] text-clay mb-2">Meta tags</div>
+          <div className="space-y-2 font-sans text-[13px] text-ink-soft">
+            <div>
+              <span className="font-hand text-[12px] text-clay">title</span>
+              <div className={`${titleTone} typewriter text-[12.5px] break-words`}>
+                {onPage.meta.title || "(missing)"}
+                <span className="font-hand text-[11px] text-clay ml-2">
+                  {onPage.meta.titleLength} chars
+                  {onPage.meta.titleLength > 60 ? " · too long" : ""}
+                </span>
+              </div>
+            </div>
+            <div>
+              <span className="font-hand text-[12px] text-clay">description</span>
+              <div className={`${descTone} typewriter text-[12.5px] break-words`}>
+                {onPage.meta.description || "(missing)"}
+                <span className="font-hand text-[11px] text-clay ml-2">
+                  {onPage.meta.descriptionLength} chars
+                  {onPage.meta.descriptionLength > 160 ? " · too long" : ""}
+                </span>
+              </div>
+            </div>
+            <div className="font-hand text-[12px] text-clay flex flex-wrap gap-x-3 gap-y-0.5 mt-1">
+              <span>canonical: <span className={onPage.meta.canonical ? "text-ink" : "text-sunset"}>{onPage.meta.canonical ? "✓" : "missing"}</span></span>
+              <span>viewport: <span className={onPage.meta.viewport ? "text-ink" : "text-sunset"}>{onPage.meta.viewport ? "✓" : "missing"}</span></span>
+              <span>og:title: <span className={onPage.meta.ogTitle ? "text-ink" : "text-sunset"}>{onPage.meta.ogTitle ? "✓" : "missing"}</span></span>
+              <span>og:image: <span className={onPage.meta.ogImage ? "text-ink" : "text-sunset"}>{onPage.meta.ogImage ? "✓" : "missing"}</span></span>
+              <span>robots: <span className="text-ink">{onPage.meta.robots || "—"}</span></span>
+            </div>
+          </div>
+        </div>
+
+        {/* Headings */}
+        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="font-hand text-[14px] text-clay mb-2">Headings</div>
+          <div className="flex gap-4 mb-2">
+            <CountChip label="H1" n={onPage.headings.h1.length} />
+            <CountChip label="H2" n={onPage.headings.h2Count} />
+            <CountChip label="H3" n={onPage.headings.h3Count} />
+            <CountChip label="H4" n={onPage.headings.h4Count} />
+          </div>
+          {onPage.headings.h1.length > 0 && (
+            <div className="font-sans text-[12.5px] text-ink mb-2">
+              <span className="font-hand text-[11px] text-clay">H1:</span>{" "}
+              {onPage.headings.h1[0]}
+            </div>
+          )}
+          {onPage.headings.issues.length > 0 && (
+            <ul className="space-y-1">
+              {onPage.headings.issues.map((iss) => (
+                <li key={iss} className="font-sans text-[12px] text-sunset flex items-start gap-1.5">
+                  <span>!</span>
+                  <span>{iss}</span>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+      </div>
+
+      <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
+        {/* Images */}
+        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="font-hand text-[14px] text-clay mb-2">Images</div>
+          <div className="font-hand text-[28px] text-ink leading-none">
+            {onPage.images.missingAlt}
+            <span className="font-hand text-[15px] text-clay"> / {onPage.images.total}</span>
+          </div>
+          <div className="font-sans text-[12px] text-ink-soft mt-1">
+            missing alt attribute
+          </div>
+          {onPage.images.sampleMissing.length > 0 && (
+            <ul className="mt-3 space-y-1 max-h-32 overflow-y-auto">
+              {onPage.images.sampleMissing.map((img, i) => (
+                <li key={i} className="typewriter text-[11px] text-ink-soft truncate" title={img.src}>
+                  {img.src.replace(/^https?:\/\//, "")}
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        {/* Links */}
+        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="font-hand text-[14px] text-clay mb-2">Links</div>
+          <div className="flex gap-4 mb-2">
+            <CountChip label="internal" n={onPage.links.internal} />
+            <CountChip label="external" n={onPage.links.external} />
+          </div>
+          <div className="font-sans text-[12.5px] text-ink-soft">
+            {onPage.links.dofollow} dofollow · {onPage.links.nofollow} nofollow
+          </div>
+        </div>
+
+        {/* Schema */}
+        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="font-hand text-[14px] text-clay mb-2">Schema (JSON-LD)</div>
+          {onPage.schema.types.length === 0 ? (
+            <div className="font-sans text-[12.5px] text-sunset mb-2">No schema detected</div>
+          ) : (
+            <div className="flex flex-wrap gap-1.5 mb-2">
+              {onPage.schema.types.map((t) => (
+                <span key={t} className="typewriter text-[11px] text-ink bg-paper-100 border border-ink/40 px-2 py-0.5 rounded">
+                  {t}
+                </span>
+              ))}
+            </div>
+          )}
+          {onPage.schema.suggested.length > 0 && (
+            <div>
+              <div className="font-hand text-[12px] text-clay mt-1 mb-1">consider adding:</div>
+              <div className="flex flex-wrap gap-1.5">
+                {onPage.schema.suggested.map((t) => (
+                  <span key={t} className="typewriter text-[11px] text-teal-dark bg-teal-accent/15 border border-teal-accent/40 px-2 py-0.5 rounded">
+                    {t}
+                  </span>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CountChip({ label, n }: { label: string; n: number }) {
+  return (
+    <div>
+      <div className="font-hand text-[22px] text-ink leading-none tabular-nums">{n}</div>
+      <div className="font-hand text-[11px] text-clay">{label}</div>
     </div>
   );
 }

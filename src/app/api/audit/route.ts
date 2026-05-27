@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
+import { analyzeOnPage, type OnPageAudit } from "@/lib/onPage";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -466,6 +467,15 @@ Stay under 400 words. Do not use emojis anywhere in the output.`;
       });
     }
 
+    // Parallel: Lighthouse + on-page parse. On-page reuses the already-fetched
+    // HTML from the classifier so we don't refetch.
+    let onPage: OnPageAudit | null = null;
+    try {
+      onPage = analyzeOnPage(probe.bodySample, target.toString());
+    } catch {
+      onPage = null;
+    }
+
     const ps = await callPageSpeed(target.toString());
     const lr = ps.lighthouseResult;
     const cats = lr.categories;
@@ -562,6 +572,7 @@ Be specific. Reference the actual scores. Give code snippets where helpful. Keep
       scores,
       metrics,
       issues,
+      onPage,
       aiSuggestions,
     });
   } catch (err: unknown) {
