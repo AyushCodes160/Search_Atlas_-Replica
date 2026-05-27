@@ -9,7 +9,17 @@ type ContentKind =
   | "ad"
   | "email"
   | "meta"
-  | "product";
+  | "product"
+  | "youtube"
+  | "instagram"
+  | "tiktok"
+  | "pressrelease"
+  | "amazon"
+  | "buyerguide"
+  | "landing"
+  | "coldemail";
+
+type POV = "first" | "second" | "third";
 
 type Body = {
   kind: ContentKind;
@@ -18,6 +28,9 @@ type Body = {
   tone?: string;
   brandVoice?: string;
   length?: "short" | "medium" | "long";
+  pov?: POV;
+  language?: string;
+  variations?: number;
 };
 
 const SYSTEM_BASE = `You are an elite, highly adaptable copywriter and content strategist. Your goal is to generate high-converting, professional content based strictly on the provided parameters.
@@ -50,6 +63,20 @@ const FORMAT_LABEL: Record<ContentKind, string> = {
   email: "Marketing email",
   meta: "SEO meta tags",
   product: "Product description",
+  youtube: "YouTube video script",
+  instagram: "Instagram caption",
+  tiktok: "TikTok script",
+  pressrelease: "Press release",
+  amazon: "Amazon product listing",
+  buyerguide: "Buyer's guide article",
+  landing: "Landing page copy",
+  coldemail: "Cold outreach email",
+};
+
+const POV_HINT: Record<POV, string> = {
+  first: "first person (I / we)",
+  second: "second person (you)",
+  third: "third person (they / the user)",
 };
 
 function formatRequirements(kind: ContentKind, length?: Body["length"]): string {
@@ -94,28 +121,109 @@ function formatRequirements(kind: ContentKind, length?: Body["length"]): string 
 - "## Variations" — 3 alternative title + description pairs in a numbered list.
 - After each title and description line, append "— XX chars" (XX = actual count).`;
   }
-  return `Target length: ${lengthHint("product")}.
+  if (kind === "product") {
+    return `Target length: ${lengthHint("product")}.
 - "## Headline" — under 80 characters, benefit-led.
 - "## Description" — 2-3 short paragraphs covering problem, product, proof.
 - "## Key features" — 4-6 bullets, each starting with a verb, each under 80 characters.
 - "## Best for" — one sentence listing the target buyer.`;
+  }
+  if (kind === "youtube") {
+    return `Produce a YouTube video script for a ~5-7 minute video.
+- "## Title" — under 70 characters, hook-led, includes the keyword.
+- "## Hook (0:00-0:15)" — 2-3 sentences. Stop-the-scroll opener; tease the payoff.
+- "## Intro (0:15-0:45)" — promise + credibility line + outline of 3 sections.
+- "## Section 1", "## Section 2", "## Section 3" — each has a 1-line summary, then talking points as bullets, then a B-roll suggestion line (italic).
+- "## CTA & outro" — 2 sentences ending with a like/subscribe nudge.
+- "## Description" — 3 short paragraphs with keywords + 5 hashtags on the last line.
+- "## Chapters" — numbered timestamps for the sections.`;
+  }
+  if (kind === "instagram") {
+    return `Produce 3 distinct Instagram caption variations.
+- Use "## Variation 1", "## Variation 2", "## Variation 3".
+- Each variation: a 1-line hook (under 125 chars — what shows before "more"), 2-4 short paragraphs separated by blank lines, a one-line CTA, then a hashtag block (5-10 hashtags, last line only).
+- No emojis. Casual rhythm, lowercase if natural.`;
+  }
+  if (kind === "tiktok") {
+    return `Produce a TikTok script for a 30-45 second video.
+- "## Hook (0-3s)" — single sentence. Pattern interrupt; promise a payoff.
+- "## Beats" — numbered list (5-7 beats), each beat is one spoken line + " — [visual: what's on screen]".
+- "## On-screen text" — 4-6 short text overlays (under 30 chars each).
+- "## Caption" — under 150 characters with a CTA + 4 hashtags.`;
+  }
+  if (kind === "pressrelease") {
+    return `Produce a professional press release in classic AP style.
+- "## Headline" — under 100 characters, factual, not hype.
+- "## Subhead" — one sentence amplifying the headline.
+- "## Dateline" — format "CITY, State — Month Day, Year —".
+- "## Body" — 4-6 paragraphs. Lead paragraph answers who/what/when/where/why. Second paragraph has a direct quote attributed to a named spokesperson. Third paragraph adds context/data. Fourth paragraph has a second quote. Final paragraph forward-looks.
+- "## Boilerplate" — 3-4 sentence "About [Company]" block.
+- "## Media contact" — name, title, email placeholder, phone placeholder.
+- End with "###" centered on its own line.`;
+  }
+  if (kind === "amazon") {
+    return `Produce an Amazon product listing optimised for search + conversion.
+- "## Title" — under 200 characters, format: [Brand] [Product] [Key feature] [Material/Size] [Pack count] [Use case]. Front-load keywords.
+- "## Bullet points" — exactly 5 bullets. Each bullet ALL CAPS lead phrase (3-5 words) followed by a colon and a benefit-led sentence. Under 250 chars per bullet.
+- "## Product description" — 3 short paragraphs in plain text (no Markdown headings). Cover problem, product, proof.
+- "## Backend search terms" — single line, comma-separated keywords, under 250 bytes total, no duplicates of title words.`;
+  }
+  if (kind === "buyerguide") {
+    return `Produce an SEO buyer's guide article. Target ~2000 words.
+- Start with a single H1 (# Title) including the keyword.
+- "## Why [topic] matters" — 2 short paragraphs framing the problem.
+- "## What to look for" — H3 sub-sections, one per criterion (5-7 criteria). Each H3 has 1-2 paragraphs + a "Quick check:" bold line.
+- "## Top 5 options" — numbered list with name + 1-line best-for + 3 short pros + 2 short cons.
+- "## How to decide" — short decision-tree style paragraph or bullets.
+- "## FAQ" — 4-6 Q&A pairs as H3 questions + 1-paragraph answers.
+- "## Meta tags" — Title (<60ch) + Description (<160ch).`;
+  }
+  if (kind === "landing") {
+    return `Produce conversion-focused landing page copy.
+- "## Hero headline" — under 70 chars, outcome-led.
+- "## Hero subhead" — one sentence under 140 chars explaining what + for whom.
+- "## Hero CTA" — 2-4 word button label.
+- "## Trust strip" — one line listing 3-5 social-proof items (placeholders OK).
+- "## Problem section" — H3 "The problem" + 2 short paragraphs naming the pain.
+- "## Solution section" — H3 "How it works" + 3 numbered steps, each one sentence.
+- "## Features" — 3-6 feature cards. Each: bold feature name + 1-sentence benefit.
+- "## Social proof" — 2 sample testimonials in blockquote format, each with a name placeholder + role.
+- "## Pricing teaser" — 1 paragraph + a single CTA line.
+- "## FAQ" — 4 Q&A pairs.
+- "## Final CTA section" — 1 headline (<60ch) + 1 CTA button label.`;
+  }
+  if (kind === "coldemail") {
+    return `Produce 3 cold outreach email variations for B2B prospecting.
+- Use "## Variation 1 — [angle]", "## Variation 2 — [angle]", "## Variation 3 — [angle]". Pick three distinct angles (e.g. pain-led, complimentary, data-led, mutual-connection-style).
+- Each variation: "Subject:" line (under 45 chars), then a 60-100 word body broken into 3-4 short paragraphs, then a one-line soft CTA ending in a question.
+- Keep it personal-sounding. No "I hope this finds you well". No "circling back". No emojis. No sales jargon.`;
+  }
+  return "";
 }
 
 function buildUserPrompt(body: Body): string {
-  const { kind, topic, audience, tone, brandVoice, length } = body;
+  const { kind, topic, audience, tone, brandVoice, length, pov, language, variations } = body;
   const format = FORMAT_LABEL[kind];
+  const povLine = pov ? POV_HINT[pov] : "(default — pick what fits the format)";
+  const langLine = language?.trim() || "English";
+  const variationsLine =
+    variations && variations > 1
+      ? `\n- Variations requested: ${variations}. Produce ${variations} clearly separated drafts, each wrapped in its own "## Draft N" section. Each draft must independently follow the FORMAT REQUIREMENTS below.`
+      : "";
 
   return `### INPUT PARAMETERS:
 - Format: ${format}
 - Topic/Keyword: ${topic}
 - Target Audience: ${audience?.trim() || "(none provided — infer from topic)"}
 - Requested Tone: ${tone?.trim() || "(default: clear, conversational, expert)"}
-- Brand Voice/SOP: ${brandVoice?.trim() || "(none provided)"}
+- Point of view: ${povLine}
+- Output language: ${langLine}
+- Brand Voice/SOP: ${brandVoice?.trim() || "(none provided)"}${variationsLine}
 
 ### FORMAT REQUIREMENTS:
 ${formatRequirements(kind, length)}
 
-Generate the ${format} now.`;
+Generate the ${format} now${langLine !== "English" ? ` in ${langLine}` : ""}.`;
 }
 
 export async function POST(req: NextRequest) {
@@ -135,14 +243,20 @@ export async function POST(req: NextRequest) {
       );
     }
 
-    const maxTokens =
-      body.kind === "blog"
-        ? body.length === "long"
-          ? 3500
-          : body.length === "short"
-            ? 1400
-            : 2400
-        : 1100;
+    const baseTokens = (() => {
+      if (body.kind === "blog") {
+        if (body.length === "long") return 3500;
+        if (body.length === "short") return 1400;
+        return 2400;
+      }
+      if (body.kind === "buyerguide") return 3000;
+      if (body.kind === "landing" || body.kind === "pressrelease") return 2000;
+      if (body.kind === "youtube") return 2200;
+      if (body.kind === "amazon") return 1400;
+      return 1100;
+    })();
+    const v = body.variations && body.variations > 1 ? body.variations : 1;
+    const maxTokens = Math.min(7000, Math.round(baseTokens * (v === 1 ? 1 : v === 2 ? 1.7 : 2.3)));
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",

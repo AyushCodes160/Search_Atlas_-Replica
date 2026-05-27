@@ -13,19 +13,51 @@ import {
   Mail,
   Tag,
   Package,
+  Youtube,
+  Instagram,
+  Music2,
+  Newspaper,
+  ShoppingCart,
+  BookOpen,
+  MousePointerClick,
+  Send,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
-type Kind = "blog" | "linkedin" | "ad" | "email" | "meta" | "product";
+type Kind =
+  | "blog"
+  | "linkedin"
+  | "ad"
+  | "email"
+  | "meta"
+  | "product"
+  | "youtube"
+  | "instagram"
+  | "tiktok"
+  | "pressrelease"
+  | "amazon"
+  | "buyerguide"
+  | "landing"
+  | "coldemail";
 
 const KINDS: { value: Kind; label: string; Icon: typeof FileText; hint: string }[] = [
   { value: "blog", label: "Blog post", Icon: FileText, hint: "SEO-optimised article with headings + meta tags" },
+  { value: "buyerguide", label: "Buyer's guide", Icon: BookOpen, hint: "Long-form review-style article + FAQ" },
+  { value: "landing", label: "Landing page", Icon: MousePointerClick, hint: "Hero, features, social proof, FAQ, final CTA" },
   { value: "linkedin", label: "LinkedIn post", Icon: Linkedin, hint: "Mobile-friendly hook + paragraphs + CTA" },
+  { value: "youtube", label: "YouTube script", Icon: Youtube, hint: "Title, hook, sections, B-roll, chapters" },
+  { value: "tiktok", label: "TikTok script", Icon: Music2, hint: "30-45s script with beats + overlays" },
+  { value: "instagram", label: "Instagram caption", Icon: Instagram, hint: "3 caption variations + hashtags" },
+  { value: "email", label: "Marketing email", Icon: Mail, hint: "Subject + preview + body + CTA" },
+  { value: "coldemail", label: "Cold outreach", Icon: Send, hint: "3 cold-email variations, different angles" },
   { value: "ad", label: "Google Ad", Icon: Megaphone, hint: "3 variations, headlines + descriptions, char-counted" },
-  { value: "email", label: "Email", Icon: Mail, hint: "Subject + preview + body + CTA" },
-  { value: "meta", label: "Meta tags", Icon: Tag, hint: "Title + description + 3 alt variations" },
+  { value: "pressrelease", label: "Press release", Icon: Newspaper, hint: "AP-style release with quotes + boilerplate" },
+  { value: "amazon", label: "Amazon listing", Icon: ShoppingCart, hint: "Title, 5 bullets, description, backend keywords" },
   { value: "product", label: "Product description", Icon: Package, hint: "Headline + description + features + best-for" },
+  { value: "meta", label: "Meta tags", Icon: Tag, hint: "Title + description + 3 alt variations" },
 ];
+
+const LANGUAGES = ["English", "Spanish", "French", "German", "Hindi", "Portuguese", "Italian", "Japanese"];
 
 function mdToHtml(md: string): string {
   let html = md.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
@@ -56,6 +88,9 @@ export default function ContentPage() {
   const [tone, setTone] = useState("Confident, plain, expert");
   const [brandVoice, setBrandVoice] = useState("");
   const [length, setLength] = useState<"short" | "medium" | "long">("medium");
+  const [pov, setPov] = useState<"first" | "second" | "third">("second");
+  const [language, setLanguage] = useState<string>("English");
+  const [variations, setVariations] = useState<1 | 2 | 3>(1);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<{
@@ -84,6 +119,9 @@ export default function ContentPage() {
           tone: tone || undefined,
           brandVoice: brandVoice || undefined,
           length: kind === "blog" ? length : undefined,
+          pov,
+          language,
+          variations,
         }),
       });
       const data = await res.json();
@@ -187,6 +225,60 @@ export default function ContentPage() {
               </div>
             </Field>
           )}
+        </div>
+
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
+          <Field label="Point of view">
+            <div className="flex gap-2">
+              {(
+                [
+                  { v: "first", label: "I / we" },
+                  { v: "second", label: "you" },
+                  { v: "third", label: "they" },
+                ] as const
+              ).map((p) => (
+                <button
+                  key={p.v}
+                  type="button"
+                  onClick={() => setPov(p.v)}
+                  className={`flex-1 font-hand text-[14px] px-2 py-2 rounded-full border-2 transition-colors ${
+                    pov === p.v ? "bg-paper border-ink text-ink" : "border-ink/40 text-ink-soft hover:border-ink"
+                  }`}
+                >
+                  {p.label}
+                </button>
+              ))}
+            </div>
+          </Field>
+          <Field label="Language">
+            <select
+              value={language}
+              onChange={(e) => setLanguage(e.target.value)}
+              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
+            >
+              {LANGUAGES.map((l) => (
+                <option key={l} value={l}>
+                  {l}
+                </option>
+              ))}
+            </select>
+          </Field>
+          <Field label="Variations">
+            <div className="flex gap-2">
+              {([1, 2, 3] as const).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => setVariations(n)}
+                  className={`flex-1 font-hand text-[14px] px-2 py-2 rounded-full border-2 transition-colors ${
+                    variations === n ? "bg-paper border-ink text-ink" : "border-ink/40 text-ink-soft hover:border-ink"
+                  }`}
+                >
+                  {n === 1 ? "1 (single draft)" : `${n} drafts`}
+                </button>
+              ))}
+            </div>
+          </Field>
         </div>
 
         <Field label="Brand voice / SOP (optional)" className="mt-4">
