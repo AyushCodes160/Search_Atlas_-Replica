@@ -86,6 +86,15 @@ export function clearHistory() {
   }
 }
 
+export function deleteFromHistory(url: string, ranAt: number) {
+  try {
+    const next = readHistory().filter((e) => !(e.url === url && e.ranAt === ranAt));
+    localStorage.setItem(AUDIT_HISTORY_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
 // Render as a compact text block we can hand to the LLM as system context.
 export function summariseForAgent(a: StoredAudit): string {
   const lines: string[] = [];

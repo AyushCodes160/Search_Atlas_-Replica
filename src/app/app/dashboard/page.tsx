@@ -19,6 +19,7 @@ import {
   Megaphone,
   FileBarChart2,
   Clock,
+  History,
 } from "lucide-react";
 
 const QUICK_LINKS = [
@@ -27,6 +28,7 @@ const QUICK_LINKS = [
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true, note: "You vs them, side by side" },
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true, note: "Free Autocomplete + Llama" },
   { label: "Atlas Agent", href: "/app/atlas-agent", Icon: Bot, ready: true, note: "Llama chat" },
+  { label: "Audit History", href: "/app/history", Icon: History, ready: true, note: "Last 10 audits, locally stored" },
   { label: "OTTO SEO", href: "/app/otto-seo", Icon: Wand2, ready: false, note: "Needs OAuth" },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true, note: "Llama-powered writer" },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: false, note: "Needs SerpAPI" },
@@ -190,7 +192,7 @@ export default function DashboardPage() {
       <section className="mb-12">
         <p className="font-hand text-clay text-[16px] mb-2">~ modules ~</p>
         <h2 className="font-hand text-[28px] text-ink leading-tight mb-6">
-          Thirteen tools, one toolkit.
+          Fourteen tools, one toolkit.
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {QUICK_LINKS.map((m) => (

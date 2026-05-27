@@ -84,17 +84,27 @@ export default function AuditTool() {
   const [shareCopied, setShareCopied] = useState(false);
   const progRef = useRef<number | null>(null);
 
-  // Load audit from URL hash if present (?share-link flow).
+  // Load audit from URL hash if present (?share-link flow). Also support
+  // ?url=... query param from the history page's re-run button.
   useEffect(() => {
     if (typeof window === "undefined") return;
     const m = window.location.hash.match(/^#share=(.+)$/);
-    if (!m) return;
-    const decoded = decodeShare(m[1]);
-    if (decoded) {
-      setResult(decoded);
-      setSharedView(true);
-      setUrl(decoded.url);
+    if (m) {
+      const decoded = decodeShare(m[1]);
+      if (decoded) {
+        setResult(decoded);
+        setSharedView(true);
+        setUrl(decoded.url);
+        return;
+      }
     }
+    const params = new URLSearchParams(window.location.search);
+    const preset = params.get("url");
+    if (preset) {
+      setUrl(preset);
+      runAudit(preset);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function shareCurrent() {

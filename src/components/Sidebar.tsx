@@ -20,6 +20,7 @@ import {
   Bot,
   Menu,
   X,
+  History,
 } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -30,6 +31,7 @@ const NAV = [
   { label: "Site Audit", href: "/app/site-audit", Icon: Activity, ready: true },
   { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true },
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true },
+  { label: "History", href: "/app/history", Icon: History, ready: true },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: false },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: false },
