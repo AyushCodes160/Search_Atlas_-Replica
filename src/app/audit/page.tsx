@@ -66,15 +66,15 @@ export default function AuditPage() {
         </div>
 
         <section id="coming-next" className="mb-12 relative">
-          <p className="font-hand text-clay text-[18px] mb-2">~ coming next ~</p>
+          <p className="font-hand text-clay text-[18px] mb-2">~ the toolkit ~</p>
           <h2 className="font-hand text-[40px] sm:text-[46px] text-ink leading-tight mb-2 max-w-2xl">
-            Three more notebooks
+            Three notebooks live,
             <br />
-            in the toolkit.
+            one still on the workbench.
           </h2>
           <p className="font-sans text-[14.5px] text-ink-soft leading-relaxed mb-8 max-w-xl">
-            Drag the stack to flip through. The audit is page 1 — these three
-            are still drafts on the workbench.
+            Drag the stack to flip through. Site Audit, Content Writer, and
+            Keyword Research all ship today. OTTO-lite is up next.
           </p>
           <RoadmapCarousel />
         </section>
