@@ -20,7 +20,16 @@ type Body = {
   length?: "short" | "medium" | "long";
 };
 
-const SYSTEM_BASE = `You are a senior SEO content writer working inside the SEO Engine product. You produce copy that is direct, useful, and free of fluff. You never use emojis. You use Markdown only when the requested format calls for it. You match the requested tone and audience precisely.`;
+const SYSTEM_BASE = `You are an elite, highly adaptable copywriter and content strategist. Your goal is to generate high-converting, professional content based strictly on the provided parameters.
+
+### CORE DIRECTIVES (Apply to ALL outputs):
+1. NO AI FLUFF: Never use generic introductory phrases (e.g., "Here is the content," "Sure, I can help," or "In today's fast-paced digital world"). Start immediately with the content.
+2. ADAPT TO FORMAT: Strictly follow the structural conventions of the requested format. (e.g., If the format is a 'Google Ad', strictly adhere to character limits. If 'LinkedIn', use scannable single-sentence paragraphs. If 'Blog', use hierarchical headers).
+3. LEAD WITH A HOOK: Your very first sentence must be a strong, attention-grabbing hook relevant to the topic. Do not waste the first line on a dry summary.
+4. TONE MATTERS: Perfectly mirror the requested tone. If no tone is provided, default to clear, conversational, and expert.
+5. STRICT MARKDOWN: Output the final response using clean, standard Markdown formatting. Do not wrap the entire response in a code block unless specifically requested.
+6. BRAND RULES: If a specific Brand Voice or SOP is provided, those rules override any of the above directives.
+7. NO EMOJIS: Never use emojis in the output.`;
 
 function lengthHint(kind: ContentKind, length?: Body["length"]): string {
   if (kind === "blog") {
@@ -34,124 +43,79 @@ function lengthHint(kind: ContentKind, length?: Body["length"]): string {
   return "";
 }
 
+const FORMAT_LABEL: Record<ContentKind, string> = {
+  blog: "Blog post",
+  linkedin: "LinkedIn post",
+  ad: "Google Search Ad",
+  email: "Marketing email",
+  meta: "SEO meta tags",
+  product: "Product description",
+};
+
+function formatRequirements(kind: ContentKind, length?: Body["length"]): string {
+  if (kind === "blog") {
+    return `Target length: ${lengthHint("blog", length)}.
+- Start with a single H1 (# Title) that is hook-led and contains the primary keyword.
+- Use H2 (##) and H3 (###) for sections in a logical hierarchy.
+- Open with a 2-3 sentence intro that previews the value of the article.
+- Weave in semantic / NLP variations of the target keyword naturally.
+- Include at least one bulleted list and one numbered list where they earn their place.
+- Close with a conclusion + a single direct call-to-action sentence.
+- Append a final "## Meta tags" section with two lines:
+  - "Title:" under 60 characters, includes the keyword.
+  - "Description:" under 160 characters, compelling, includes the keyword.`;
+  }
+  if (kind === "linkedin") {
+    return `Target length: ${lengthHint("linkedin")}.
+- Lead with a single-line hook under 90 characters. The hook is its own paragraph.
+- Use scannable single-sentence paragraphs separated by blank lines.
+- 3-5 short paragraphs total.
+- End with a CTA or open question on its own line.
+- No Markdown headings (no # or ##).
+- Place any hashtags (max 5) on the final line only.`;
+  }
+  if (kind === "ad") {
+    return `Produce 3 distinct variations of a Google Search Ad.
+- For each variation: 3 headlines (max 30 chars each) and 2 descriptions (max 90 chars each).
+- Use H2 sections "## Variation 1", "## Variation 2", "## Variation 3".
+- Format each field line as: "Field: text — XX chars" (XX = actual character count of the text).
+- Never exceed character limits. Recount before returning.`;
+  }
+  if (kind === "email") {
+    return `Target length: ${lengthHint("email")}.
+- "## Subject" — under 50 characters. Compelling, not clickbait.
+- "## Preview text" — under 90 characters, complements the subject.
+- "## Body" — hook-led opening line, 2-3 short paragraphs, one direct CTA at the bottom.`;
+  }
+  if (kind === "meta") {
+    return `Produce SEO meta tags suitable for the <head> of a page.
+- "## Title" — under 60 characters, includes the primary keyword, compelling.
+- "## Description" — under 160 characters, includes the keyword and a value proposition.
+- "## Variations" — 3 alternative title + description pairs in a numbered list.
+- After each title and description line, append "— XX chars" (XX = actual count).`;
+  }
+  return `Target length: ${lengthHint("product")}.
+- "## Headline" — under 80 characters, benefit-led.
+- "## Description" — 2-3 short paragraphs covering problem, product, proof.
+- "## Key features" — 4-6 bullets, each starting with a verb, each under 80 characters.
+- "## Best for" — one sentence listing the target buyer.`;
+}
+
 function buildUserPrompt(body: Body): string {
   const { kind, topic, audience, tone, brandVoice, length } = body;
-  const tonePart = tone ? `Tone: ${tone}.` : "Tone: confident, plain, expert.";
-  const audPart = audience ? `Audience: ${audience}.` : "";
-  const voicePart = brandVoice
-    ? `Brand voice / style guide:\n${brandVoice.trim()}`
-    : "";
+  const format = FORMAT_LABEL[kind];
 
-  if (kind === "blog") {
-    return `Write a complete SEO-optimised blog post about: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
+  return `### INPUT PARAMETERS:
+- Format: ${format}
+- Topic/Keyword: ${topic}
+- Target Audience: ${audience?.trim() || "(none provided — infer from topic)"}
+- Requested Tone: ${tone?.trim() || "(default: clear, conversational, expert)"}
+- Brand Voice/SOP: ${brandVoice?.trim() || "(none provided)"}
 
-Target length: ${lengthHint("blog", length)}.
+### FORMAT REQUIREMENTS:
+${formatRequirements(kind, length)}
 
-Output requirements:
-- Start with an H1 (# Title) that is engaging and contains the primary keyword.
-- Use H2 (##) and H3 (###) for sections. Use a logical hierarchy.
-- Include a short intro (2-3 sentences) that hooks the reader and previews the article.
-- Naturally weave in semantic / NLP variations of the target keyword.
-- Include at least one bulleted list and one numbered list where it fits.
-- End with a clear conclusion + a single call-to-action sentence.
-- Add a final section "## Meta tags" with two lines:
-  - "Title:" — under 60 characters, includes the keyword.
-  - "Description:" — under 160 characters, compelling, includes the keyword.
-- Do NOT use emojis.
-
-Return only the article in Markdown. Do not wrap it in code fences. Do not add commentary before or after.`;
-  }
-
-  if (kind === "linkedin") {
-    return `Write a LinkedIn post about: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
-
-Target length: ${lengthHint("linkedin")}.
-
-Structure:
-- Hook line (one short, punchy line — under 90 characters).
-- Single blank line.
-- 3-5 short paragraphs (1-2 sentences each).
-- Use line breaks generously so it reads well on mobile.
-- Final line: a clear CTA or open question.
-- Do NOT use emojis.
-- Do NOT use Markdown headings (no # or ##).
-- Do NOT add hashtags inside the body — list any hashtags on the LAST line, max 5.
-
-Return only the post. Plain text. No commentary.`;
-  }
-
-  if (kind === "ad") {
-    return `Generate 3 variations of a Google Search Ad for: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
-
-For each variation provide:
-- Headline 1 (max 30 characters)
-- Headline 2 (max 30 characters)
-- Headline 3 (max 30 characters)
-- Description 1 (max 90 characters)
-- Description 2 (max 90 characters)
-
-Output as Markdown, three sections labelled "## Variation 1", "## Variation 2", "## Variation 3".
-Each line is "Field: text — XX chars" (replace XX with the actual char count of that line).
-Do NOT use emojis. Do NOT exceed the character limits.
-
-Return only the variations. No commentary.`;
-  }
-
-  if (kind === "email") {
-    return `Write a marketing email about: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
-
-Target length: ${lengthHint("email")}.
-
-Output as Markdown with these sections:
-- "## Subject" — under 50 characters, intriguing.
-- "## Preview text" — under 90 characters, complements the subject.
-- "## Body" — opening line that earns the next sentence, 2-3 short paragraphs, single clear CTA at the bottom.
-
-Do NOT use emojis. Return only the email. No commentary.`;
-  }
-
-  if (kind === "meta") {
-    return `Generate SEO meta tags for a page about: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
-
-Output as Markdown with these sections:
-- "## Title" — under 60 characters, includes the primary keyword, compelling.
-- "## Description" — under 160 characters, includes the keyword and a value proposition, ends with implied or direct CTA.
-- "## Variations" — 3 alternative title + description pairs in a numbered list.
-
-After each title and description, append "— XX chars" (replace XX with the actual count).
-Do NOT use emojis. Return only the meta tags. No commentary.`;
-  }
-
-  // product
-  return `Write a product description for: ${topic}
-${audPart}
-${tonePart}
-${voicePart}
-
-Target length: ${lengthHint("product")}.
-
-Structure as Markdown:
-- "## Headline" — under 80 characters, benefit-led.
-- "## Description" — 2-3 short paragraphs covering the problem, the product, and the proof.
-- "## Key features" — 4-6 bullet points, each starting with a verb, each under 80 characters.
-- "## Best for" — one sentence listing the target buyer.
-
-Do NOT use emojis. Return only the description. No commentary.`;
+Generate the ${format} now.`;
 }
 
 export async function POST(req: NextRequest) {
