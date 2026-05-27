@@ -208,3 +208,48 @@ html, body {
 
 .cursor-grab { cursor: grab; }
 .cursor-grabbing { cursor: grabbing; }
+
+/* Print stylesheet — engages when user picks "Export PDF" (window.print()). */
+@media print {
+  @page {
+    margin: 14mm 12mm;
+    size: A4;
+  }
+  body {
+    background: #fff !important;
+    color: #1c1c1c !important;
+  }
+  aside,
+  nav,
+  .print-hide,
+  [data-print-hide="true"] {
+    display: none !important;
+  }
+  main, [class*="max-w-"] {
+    max-width: none !important;
+    width: 100% !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .sticky-note,
+  .dotted-card {
+    box-shadow: none !important;
+    transform: none !important;
+    background: #fff !important;
+    border-color: #1c1c1c !important;
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  section, .ai-prose, ul, ol, table {
+    page-break-inside: avoid;
+    break-inside: avoid;
+  }
+  h1, h2, h3 {
+    page-break-after: avoid;
+    break-after: avoid;
+  }
+  * {
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}

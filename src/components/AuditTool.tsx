@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, Globe, Loader2, ServerCog, FileCode, Share2, Check, Link as LinkIcon } from "lucide-react";
+import { AlertCircle, Globe, Loader2, ServerCog, FileCode, Share2, Check, Link as LinkIcon, Printer } from "lucide-react";
 import { saveLastAudit, type StoredAudit } from "@/lib/auditContext";
 
 type Classification = {
@@ -199,7 +199,7 @@ export default function AuditTool() {
 
   return (
     <div className="space-y-6">
-      <div className="dotted-card p-5 sm:p-6 relative">
+      <div className="dotted-card p-5 sm:p-6 relative" data-print-hide="true">
         <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
           ~ audit form ~
         </span>
@@ -298,7 +298,7 @@ export default function AuditTool() {
       </div>
 
       {result && (
-        <div className="flex flex-wrap items-center gap-3 -mb-2">
+        <div className="flex flex-wrap items-center gap-3 -mb-2" data-print-hide="true">
           {sharedView && (
             <span className="font-hand text-[14px] text-clay inline-flex items-center gap-1.5 border-2 border-ink/40 bg-paper-50 rounded-full px-3 py-1">
               <LinkIcon className="w-3.5 h-3.5" /> loaded from shared link
@@ -310,6 +310,13 @@ export default function AuditTool() {
           >
             {shareCopied ? <Check className="w-4 h-4 text-teal-accent" /> : <Share2 className="w-4 h-4" />}
             {shareCopied ? "link copied" : "share this audit"}
+          </button>
+          <button
+            onClick={() => window.print()}
+            className="font-hand text-[15px] text-ink border-2 border-ink/70 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(44,36,23,0.6)]"
+          >
+            <Printer className="w-4 h-4" />
+            export PDF
           </button>
         </div>
       )}
