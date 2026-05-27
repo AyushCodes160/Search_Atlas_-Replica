@@ -45,6 +45,28 @@ function classifyIntent(kw: string): "informational" | "navigational" | "commerc
   return "informational";
 }
 
+// Heuristic difficulty 0-100. We have no SERP data, so we infer from the shape of the query:
+// short head terms with commercial signals = hard; long-tail questions = easy.
+function scoreDifficulty(kw: string, intent: string): { score: number; label: "easy" | "medium" | "hard" } {
+  const k = kw.toLowerCase();
+  const words = k.split(/\s+/).length;
+  let score = 50;
+  if (words <= 2) score += 25;
+  else if (words === 3) score += 10;
+  else if (words >= 5) score -= 20;
+  else if (words === 4) score -= 8;
+  if (intent === "transactional") score += 15;
+  else if (intent === "commercial") score += 10;
+  else if (intent === "informational") score -= 5;
+  if (/^(how|what|why|when|where|is|are|can|should)\b/.test(k)) score -= 12;
+  if (/(near me|in [a-z]+)$/.test(k)) score -= 8;
+  if (/(reddit|forum|tutorial|guide|examples?)/.test(k)) score -= 8;
+  if (/(insurance|loan|mortgage|lawyer|attorney|crypto|software|hosting)/.test(k)) score += 15;
+  score = Math.max(5, Math.min(95, score));
+  const label = score >= 65 ? "hard" : score >= 40 ? "medium" : "easy";
+  return { score, label };
+}
+
 async function clusterWithGroq(seed: string, keywords: string[]): Promise<{
   clusters: { name: string; keywords: string[] }[];
   raw?: string;
@@ -102,12 +124,18 @@ export async function POST(req: NextRequest) {
         { status: 502 },
       );
     }
-    const withIntent = keywords.map((k) => ({
-      keyword: k,
-      intent: classifyIntent(k),
-      words: k.split(/\s+/).length,
-      questionLike: /^(how|what|why|when|where|is|are|can|should)\b/.test(k),
-    }));
+    const withIntent = keywords.map((k) => {
+      const intent = classifyIntent(k);
+      const diff = scoreDifficulty(k, intent);
+      return {
+        keyword: k,
+        intent,
+        words: k.split(/\s+/).length,
+        questionLike: /^(how|what|why|when|where|is|are|can|should)\b/.test(k),
+        difficulty: diff.score,
+        difficultyLabel: diff.label,
+      };
+    });
     const clustered = await clusterWithGroq(seed, keywords);
     return NextResponse.json({
       seed,

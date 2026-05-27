@@ -1,12 +1,20 @@
 "use client";
 
-import { useState } from "react";
-import { Loader2, KeyRound, AlertCircle } from "lucide-react";
+import { useEffect, useMemo, useState } from "react";
+import { Loader2, KeyRound, AlertCircle, Download, Save, Trash2, FolderOpen } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
 type Intent = "informational" | "navigational" | "commercial" | "transactional";
+type DifficultyLabel = "easy" | "medium" | "hard";
 
-type KeywordRow = { keyword: string; intent: Intent; words: number; questionLike: boolean };
+type KeywordRow = {
+  keyword: string;
+  intent: Intent;
+  words: number;
+  questionLike: boolean;
+  difficulty: number;
+  difficultyLabel: DifficultyLabel;
+};
 type Cluster = { name: string; keywords: string[] };
 
 type ApiResponse = {
@@ -17,11 +25,26 @@ type ApiResponse = {
   clusteringEnabled: boolean;
 };
 
+type SavedList = {
+  id: string;
+  seed: string;
+  savedAt: number;
+  data: ApiResponse;
+};
+
+const STORAGE_KEY = "seo-engine:keyword-lists";
+
 const INTENT_TONE: Record<Intent, string> = {
   informational: "bg-paper-200/70 text-ink",
   navigational: "bg-clay/20 text-clay",
   commercial: "bg-sunset/25 text-sunset",
   transactional: "bg-teal-accent/25 text-teal-dark",
+};
+
+const DIFF_TONE: Record<DifficultyLabel, string> = {
+  easy: "bg-leaf/25 text-leaf-dark border-leaf/40",
+  medium: "bg-sunset/20 text-sunset border-sunset/40",
+  hard: "bg-clay/25 text-clay border-clay/40",
 };
 
 export default function KeywordsPage() {
@@ -30,6 +53,29 @@ export default function KeywordsPage() {
   const [error, setError] = useState<string | null>(null);
   const [result, setResult] = useState<ApiResponse | null>(null);
   const [filter, setFilter] = useState<"all" | Intent>("all");
+  const [longTailOnly, setLongTailOnly] = useState(false);
+  const [questionsOnly, setQuestionsOnly] = useState(false);
+  const [sortBy, setSortBy] = useState<"default" | "diffAsc" | "diffDesc" | "wordsDesc">("default");
+  const [saved, setSaved] = useState<SavedList[]>([]);
+  const [showSaved, setShowSaved] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) setSaved(JSON.parse(raw));
+    } catch {
+      /* ignore */
+    }
+  }, []);
+
+  function persist(next: SavedList[]) {
+    setSaved(next);
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
+    } catch {
+      /* ignore */
+    }
+  }
 
   async function run() {
     if (!seed.trim()) {
@@ -55,11 +101,59 @@ export default function KeywordsPage() {
     }
   }
 
-  const filtered = result
-    ? filter === "all"
-      ? result.keywords
-      : result.keywords.filter((k) => k.intent === filter)
-    : [];
+  function saveCurrent() {
+    if (!result) return;
+    const entry: SavedList = {
+      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+      seed: result.seed,
+      savedAt: Date.now(),
+      data: result,
+    };
+    persist([entry, ...saved].slice(0, 25));
+  }
+
+  function loadSaved(s: SavedList) {
+    setSeed(s.seed);
+    setResult(s.data);
+    setShowSaved(false);
+    setError(null);
+  }
+
+  function deleteSaved(id: string) {
+    persist(saved.filter((s) => s.id !== id));
+  }
+
+  function exportCsv() {
+    if (!result) return;
+    const header = ["keyword", "intent", "words", "question", "difficulty", "difficulty_label"];
+    const rows = result.keywords.map((k) => [
+      `"${k.keyword.replace(/"/g, '""')}"`,
+      k.intent,
+      String(k.words),
+      k.questionLike ? "yes" : "no",
+      String(k.difficulty),
+      k.difficultyLabel,
+    ]);
+    const csv = [header.join(","), ...rows.map((r) => r.join(","))].join("\n");
+    const blob = new Blob([csv], { type: "text/csv;charset=utf-8" });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = `keywords-${result.seed.replace(/\s+/g, "-")}-${Date.now()}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  const filtered = useMemo(() => {
+    if (!result) return [];
+    let list = filter === "all" ? result.keywords : result.keywords.filter((k) => k.intent === filter);
+    if (longTailOnly) list = list.filter((k) => k.words >= 4);
+    if (questionsOnly) list = list.filter((k) => k.questionLike);
+    if (sortBy === "diffAsc") list = [...list].sort((a, b) => a.difficulty - b.difficulty);
+    else if (sortBy === "diffDesc") list = [...list].sort((a, b) => b.difficulty - a.difficulty);
+    else if (sortBy === "wordsDesc") list = [...list].sort((a, b) => b.words - a.words);
+    return list;
+  }, [result, filter, longTailOnly, questionsOnly, sortBy]);
 
   const intentCounts = result
     ? result.keywords.reduce<Record<Intent, number>>(
@@ -68,12 +162,19 @@ export default function KeywordsPage() {
       )
     : null;
 
+  const diffCounts = result
+    ? result.keywords.reduce<Record<DifficultyLabel, number>>(
+        (acc, k) => ({ ...acc, [k.difficultyLabel]: (acc[k.difficultyLabel] || 0) + 1 }),
+        { easy: 0, medium: 0, hard: 0 },
+      )
+    : null;
+
   return (
     <div className="px-8 sm:px-12 py-10 max-w-6xl">
       <PageHeader
         kicker="keywords"
         title="Keyword ideas, fast and free."
-        subtitle="Google Autocomplete + question prefixes + Llama clustering. No DataForSEO bill, no API key required (beyond Groq for clusters)."
+        subtitle="Google Autocomplete + question prefixes + Llama clustering + heuristic difficulty. No DataForSEO bill, no API key required (beyond Groq for clusters)."
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
@@ -109,10 +210,70 @@ export default function KeywordsPage() {
             )}
           </button>
         </div>
+        <div className="mt-4 flex flex-wrap items-center gap-2">
+          <button
+            onClick={() => setShowSaved((v) => !v)}
+            className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+          >
+            <FolderOpen className="w-3.5 h-3.5" />
+            saved ({saved.length})
+          </button>
+          {result && (
+            <>
+              <button
+                onClick={saveCurrent}
+                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+              >
+                <Save className="w-3.5 h-3.5" />
+                save list
+              </button>
+              <button
+                onClick={exportCsv}
+                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+              >
+                <Download className="w-3.5 h-3.5" />
+                export CSV
+              </button>
+            </>
+          )}
+        </div>
         {error && (
           <div className="mt-4 flex items-start gap-2 text-[14px] text-sunset font-sans">
             <AlertCircle className="w-4 h-4 mt-0.5 shrink-0" />
             <span>{error}</span>
+          </div>
+        )}
+        {showSaved && (
+          <div className="mt-4 border-t-2 border-dashed border-ink/15 pt-4">
+            {saved.length === 0 ? (
+              <p className="font-sans text-[13px] text-ink-soft">No saved lists yet. Run an expansion, then hit “save list”.</p>
+            ) : (
+              <ul className="space-y-2">
+                {saved.map((s) => (
+                  <li
+                    key={s.id}
+                    className="flex items-center justify-between gap-3 p-2 rounded-md bg-paper-50/70 border border-ink/20"
+                  >
+                    <button
+                      onClick={() => loadSaved(s)}
+                      className="text-left flex-1"
+                    >
+                      <div className="font-hand text-[17px] text-ink leading-tight">{s.seed}</div>
+                      <div className="font-sans text-[11.5px] text-ink-soft">
+                        {s.data.total} ideas · saved {new Date(s.savedAt).toLocaleDateString()}
+                      </div>
+                    </button>
+                    <button
+                      onClick={() => deleteSaved(s.id)}
+                      aria-label={`delete ${s.seed}`}
+                      className="p-1.5 rounded-md border border-ink/30 hover:border-sunset hover:text-sunset text-ink-soft"
+                    >
+                      <Trash2 className="w-3.5 h-3.5" />
+                    </button>
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         )}
         <p className="mt-4 font-sans text-[12.5px] text-ink-soft leading-relaxed">
@@ -122,8 +283,12 @@ export default function KeywordsPage() {
 
       {result && (
         <>
-          <div className="grid grid-cols-2 sm:grid-cols-5 gap-3 mb-8">
-            <Stat label="Total ideas" value={String(result.total)} />
+          <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-3 mb-8">
+            <Stat label="total" value={String(result.total)} />
+            {diffCounts &&
+              (["easy", "medium", "hard"] as DifficultyLabel[]).map((d) => (
+                <Stat key={d} label={d} value={String(diffCounts[d])} />
+              ))}
             {intentCounts &&
               (["informational", "commercial", "navigational", "transactional"] as Intent[]).map((i) => (
                 <Stat key={i} label={i} value={String(intentCounts[i])} />
@@ -193,23 +358,66 @@ export default function KeywordsPage() {
                 )}
               </div>
             </div>
+            <div className="flex flex-wrap items-center gap-2 mb-4">
+              <button
+                onClick={() => setLongTailOnly((v) => !v)}
+                className={`font-hand text-[13px] px-3 py-1 rounded-full border-2 transition-colors ${
+                  longTailOnly
+                    ? "bg-paper border-ink text-ink"
+                    : "border-ink/40 text-ink-soft hover:border-ink"
+                }`}
+              >
+                long-tail only (4+ words)
+              </button>
+              <button
+                onClick={() => setQuestionsOnly((v) => !v)}
+                className={`font-hand text-[13px] px-3 py-1 rounded-full border-2 transition-colors ${
+                  questionsOnly
+                    ? "bg-paper border-ink text-ink"
+                    : "border-ink/40 text-ink-soft hover:border-ink"
+                }`}
+              >
+                questions only
+              </button>
+              <select
+                value={sortBy}
+                onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
+                className="font-hand text-[13px] px-3 py-1 rounded-full border-2 border-ink/40 bg-paper text-ink-soft hover:border-ink"
+              >
+                <option value="default">sort: default</option>
+                <option value="diffAsc">sort: easiest first</option>
+                <option value="diffDesc">sort: hardest first</option>
+                <option value="wordsDesc">sort: longest first</option>
+              </select>
+              <span className="font-sans text-[12.5px] text-ink-soft ml-auto">
+                showing {filtered.length} / {result.total}
+              </span>
+            </div>
             <ul className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2">
               {filtered.map((k) => (
                 <li
                   key={k.keyword}
-                  className="bg-paper-50/70 border border-ink/30 rounded-md p-3 flex items-start justify-between gap-2"
+                  className="bg-paper-50/70 border border-ink/30 rounded-md p-3 flex flex-col gap-1.5"
                 >
-                  <span className="font-sans text-[13px] text-ink truncate">{k.keyword}</span>
-                  <span
-                    className={`font-hand text-[11px] rounded-full px-2 py-0.5 shrink-0 ${INTENT_TONE[k.intent]}`}
-                  >
-                    {k.intent}
-                  </span>
+                  <div className="flex items-start justify-between gap-2">
+                    <span className="font-sans text-[13px] text-ink truncate">{k.keyword}</span>
+                    <span
+                      className={`font-hand text-[11px] rounded-full px-2 py-0.5 shrink-0 ${INTENT_TONE[k.intent]}`}
+                    >
+                      {k.intent}
+                    </span>
+                  </div>
+                  <div className="flex items-center justify-between text-[11px] font-sans">
+                    <span className={`px-1.5 py-0.5 rounded border ${DIFF_TONE[k.difficultyLabel]}`}>
+                      {k.difficultyLabel} · {k.difficulty}
+                    </span>
+                    <span className="text-ink-soft">{k.words} words{k.questionLike ? " · ?" : ""}</span>
+                  </div>
                 </li>
               ))}
             </ul>
             {filtered.length === 0 && (
-              <p className="font-sans text-[13px] text-ink-soft">No keywords match this filter.</p>
+              <p className="font-sans text-[13px] text-ink-soft">No keywords match these filters.</p>
             )}
           </section>
         </>
