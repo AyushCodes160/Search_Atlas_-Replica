@@ -170,7 +170,7 @@ export default function KeywordsPage() {
     : null;
 
   return (
-    <div className="px-8 sm:px-12 py-10 max-w-6xl">
+    <div className="px-5 sm:px-8 lg:px-12 pt-20 sm:pt-10 pb-10 max-w-6xl">
       <PageHeader
         kicker="keywords"
         title="Keyword ideas, fast and free."

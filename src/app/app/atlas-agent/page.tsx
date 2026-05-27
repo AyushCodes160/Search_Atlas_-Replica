@@ -95,8 +95,8 @@ export default function AtlasAgentPage() {
   }
 
   return (
-    <div className="flex flex-col h-screen">
-      <div className="px-8 sm:px-12 pt-10 pb-4 max-w-4xl w-full">
+    <div className="flex flex-col h-screen [@supports(height:100dvh)]:h-[100dvh]">
+      <div className="px-5 sm:px-8 lg:px-12 pt-20 sm:pt-10 pb-4 max-w-4xl w-full">
         <PageHeader
           kicker="atlas agent"
           title="An SEO assistant on call."
@@ -104,7 +104,7 @@ export default function AtlasAgentPage() {
         />
       </div>
 
-      <div className="flex-1 overflow-y-auto px-8 sm:px-12 max-w-4xl w-full">
+      <div className="flex-1 overflow-y-auto px-5 sm:px-8 lg:px-12 max-w-4xl w-full">
         {audit && (
           <div className="dotted-card p-4 mb-5 flex items-start gap-3">
             <Activity className="w-4 h-4 text-teal-accent mt-1 shrink-0" strokeWidth={2.2} />
@@ -178,7 +178,7 @@ export default function AtlasAgentPage() {
         </div>
       </div>
 
-      <div className="px-8 sm:px-12 pb-8 pt-3 max-w-4xl w-full border-t-2 border-dashed border-ink/15">
+      <div className="px-5 sm:px-8 lg:px-12 pb-8 pt-3 max-w-4xl w-full border-t-2 border-dashed border-ink/15">
         <form
           onSubmit={(e) => {
             e.preventDefault();

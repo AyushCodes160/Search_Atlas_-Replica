@@ -15,7 +15,7 @@ export function ComingSoon({
   needs: string[];
 }) {
   return (
-    <div className="px-8 sm:px-12 py-10 max-w-4xl">
+    <div className="px-5 sm:px-8 lg:px-12 pt-20 sm:pt-10 pb-10 max-w-4xl">
       <PageHeader kicker={kicker} title={title} subtitle={subtitle} />
 
       <div className="dotted-card p-6 relative mb-6">
