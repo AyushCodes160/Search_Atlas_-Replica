@@ -1,16 +1,29 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { Loader2, Send, Bot, User as UserIcon, Sparkles } from "lucide-react";
+import { Loader2, Send, Bot, User as UserIcon, Sparkles, Activity, X } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import {
+  readLastAudit,
+  clearLastAudit,
+  summariseForAgent,
+  type StoredAudit,
+} from "@/lib/auditContext";
 
 type Msg = { role: "user" | "assistant"; content: string };
 
-const STARTERS = [
+const STARTERS_GENERIC = [
   "Build me a 30-day SEO content plan for an indie yoga retreat business.",
   "Walk me through what LCP is and 3 ways to fix a 6s LCP.",
   "What's the difference between a Lighthouse SEO score of 100 and actually ranking?",
   "Generate a topical map for the keyword 'vibe coding'.",
+];
+
+const STARTERS_WITH_AUDIT = [
+  "Look at my last audit and give me the 5 most important fixes in priority order.",
+  "Why is my Lighthouse performance score what it is — break down the worst metric and how to fix it.",
+  "Suggest 10 internal-link improvements based on my heading + word-count data.",
+  "Write a 30-day plan to take my SEO score from where it is to 90+.",
 ];
 
 function mdToHtml(md: string): string {
@@ -37,11 +50,24 @@ export default function AtlasAgentPage() {
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [audit, setAudit] = useState<StoredAudit | null>(null);
+  const [useContext, setUseContext] = useState(true);
   const endRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setAudit(readLastAudit());
+  }, []);
 
   useEffect(() => {
     endRef.current?.scrollIntoView({ behavior: "smooth", block: "end" });
   }, [messages, loading]);
+
+  function dropAudit() {
+    clearLastAudit();
+    setAudit(null);
+  }
+
+  const STARTERS = audit ? STARTERS_WITH_AUDIT : STARTERS_GENERIC;
 
   async function send(text?: string) {
     const prompt = (text ?? input).trim();
@@ -52,10 +78,11 @@ export default function AtlasAgentPage() {
     setError(null);
     setLoading(true);
     try {
+      const context = audit && useContext ? summariseForAgent(audit) : undefined;
       const res = await fetch("/api/agent", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ messages: next }),
+        body: JSON.stringify({ messages: next, context }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Agent failed");
@@ -78,6 +105,43 @@ export default function AtlasAgentPage() {
       </div>
 
       <div className="flex-1 overflow-y-auto px-8 sm:px-12 max-w-4xl w-full">
+        {audit && (
+          <div className="dotted-card p-4 mb-5 flex items-start gap-3">
+            <Activity className="w-4 h-4 text-teal-accent mt-1 shrink-0" strokeWidth={2.2} />
+            <div className="flex-1 min-w-0">
+              <p className="font-hand text-[16px] text-ink leading-tight">
+                Context loaded — your last audit
+              </p>
+              <p className="font-sans text-[12.5px] text-ink-soft truncate">
+                {audit.url}
+                {audit.scores
+                  ? ` · perf ${audit.scores.performance} · seo ${audit.scores.seo} · a11y ${audit.scores.accessibility}`
+                  : ""}
+              </p>
+              <p className="font-sans text-[11.5px] text-ink-soft mt-1">
+                Atlas will reference these numbers when you ask. Toggle off to chat without context.
+              </p>
+            </div>
+            <div className="flex flex-col items-end gap-1 shrink-0">
+              <label className="font-hand text-[13px] text-ink-soft inline-flex items-center gap-1.5 cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={useContext}
+                  onChange={(e) => setUseContext(e.target.checked)}
+                  className="accent-teal-accent"
+                />
+                use context
+              </label>
+              <button
+                onClick={dropAudit}
+                aria-label="clear loaded audit"
+                className="p-1 rounded-md border border-ink/30 hover:border-sunset hover:text-sunset text-ink-soft"
+              >
+                <X className="w-3.5 h-3.5" />
+              </button>
+            </div>
+          </div>
+        )}
         {messages.length === 0 && (
           <div>
             <p className="font-hand text-clay text-[16px] mb-3">~ try a starter ~</p>

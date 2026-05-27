@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { AlertCircle, Globe, Loader2, ServerCog, FileCode } from "lucide-react";
+import { saveLastAudit, type StoredAudit } from "@/lib/auditContext";
 
 type Classification = {
   type: "api" | "web";
@@ -116,6 +117,41 @@ export default function AuditTool() {
       if (!res.ok) throw new Error(data.error || "Audit failed");
       setProgress(100);
       setTimeout(() => setResult(data), 250);
+      try {
+        const stored: StoredAudit = {
+          url: data.url,
+          sourceType: data.sourceType,
+          ranAt: Date.now(),
+          scores: data.sourceType === "web" ? data.scores : undefined,
+          vitals: data.sourceType === "web" ? data.metrics : undefined,
+          onPage:
+            data.sourceType === "web" && data.onPage
+              ? {
+                  words: data.onPage.words,
+                  flesch: data.onPage.readability.flesch,
+                  grade: data.onPage.readability.grade,
+                  h1Count: data.onPage.headings.h1.length,
+                  h2Count: data.onPage.headings.h2Count,
+                  h3Count: data.onPage.headings.h3Count,
+                  headingIssues: data.onPage.headings.issues,
+                  imagesTotal: data.onPage.images.total,
+                  imagesMissingAlt: data.onPage.images.missingAlt,
+                  internalLinks: data.onPage.links.internal,
+                  externalLinks: data.onPage.links.external,
+                  schemaTypes: data.onPage.schema.types,
+                  titleLength: data.onPage.meta.titleLength,
+                  descriptionLength: data.onPage.meta.descriptionLength,
+                }
+              : undefined,
+          topFixes:
+            data.sourceType === "web" && Array.isArray(data.issues)
+              ? data.issues.slice(0, 6).map((i: { title: string }) => i.title)
+              : undefined,
+        };
+        saveLastAudit(stored);
+      } catch {
+        /* persistence is best-effort */
+      }
     } catch (e: unknown) {
       setError(e instanceof Error ? e.message : "Something went wrong");
     } finally {

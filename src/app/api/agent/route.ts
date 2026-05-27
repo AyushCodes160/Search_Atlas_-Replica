@@ -24,7 +24,7 @@ type Msg = { role: "user" | "assistant"; content: string };
 
 export async function POST(req: NextRequest) {
   try {
-    const { messages } = (await req.json()) as { messages: Msg[] };
+    const { messages, context } = (await req.json()) as { messages: Msg[]; context?: string };
     if (!Array.isArray(messages) || messages.length === 0) {
       return NextResponse.json({ error: "messages required" }, { status: 400 });
     }
@@ -37,12 +37,16 @@ export async function POST(req: NextRequest) {
     }
 
     const trimmed = messages.slice(-16);
+    const systemContent = context?.trim()
+      ? `${SYSTEM_PROMPT}\n\n---\nProject context (from the user's recent activity in the SEO Engine app — treat as ground truth and reference specific numbers in your answers):\n\n${context.trim()}`
+      : SYSTEM_PROMPT;
+
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
       method: "POST",
       headers: { "Content-Type": "application/json", Authorization: `Bearer ${key}` },
       body: JSON.stringify({
         model: "llama-3.3-70b-versatile",
-        messages: [{ role: "system", content: SYSTEM_PROMPT }, ...trimmed],
+        messages: [{ role: "system", content: systemContent }, ...trimmed],
         temperature: 0.4,
         max_tokens: 1200,
       }),

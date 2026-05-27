@@ -9,6 +9,7 @@ import {
   Globe,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import { saveLastAudit, type StoredAudit } from "@/lib/auditContext";
 
 type WebAudit = {
   sourceType: "web";
@@ -103,6 +104,36 @@ export default function CompetitorAuditPage() {
       const [m, t] = await Promise.all([fetchAudit(mine), fetchAudit(theirs)]);
       setMineAudit(m);
       setTheirsAudit(t);
+
+      // Save "mine" as the last audit so Atlas Agent can pick up where the user left off.
+      if (m.sourceType === "web") {
+        const stored: StoredAudit = {
+          url: m.url,
+          sourceType: "web",
+          ranAt: Date.now(),
+          scores: m.scores,
+          vitals: m.metrics,
+          onPage: m.onPage
+            ? {
+                words: m.onPage.words,
+                flesch: m.onPage.readability.flesch,
+                grade: m.onPage.readability.grade,
+                h1Count: m.onPage.headings.h1.length,
+                h2Count: m.onPage.headings.h2Count,
+                h3Count: m.onPage.headings.h3Count,
+                headingIssues: m.onPage.headings.issues,
+                imagesTotal: m.onPage.images.total,
+                imagesMissingAlt: m.onPage.images.missingAlt,
+                internalLinks: m.onPage.links.internal,
+                externalLinks: m.onPage.links.external,
+                schemaTypes: m.onPage.schema.types,
+                titleLength: m.onPage.meta.titleLength,
+                descriptionLength: m.onPage.meta.descriptionLength,
+              }
+            : undefined,
+        };
+        saveLastAudit(stored);
+      }
 
       // Only run comparison if both are web audits with onPage data
       if (m.sourceType === "web" && t.sourceType === "web") {
