@@ -28,10 +28,13 @@ export type StoredAudit = {
 };
 
 export const LAST_AUDIT_KEY = "seo-engine:last-audit";
+export const AUDIT_HISTORY_KEY = "seo-engine:audit-history";
+export const HISTORY_LIMIT = 10;
 
 export function saveLastAudit(a: StoredAudit) {
   try {
     localStorage.setItem(LAST_AUDIT_KEY, JSON.stringify(a));
+    pushToHistory(a);
   } catch {
     /* ignore quota or private-mode errors */
   }
@@ -49,6 +52,35 @@ export function readLastAudit(): StoredAudit | null {
 export function clearLastAudit() {
   try {
     localStorage.removeItem(LAST_AUDIT_KEY);
+  } catch {
+    /* ignore */
+  }
+}
+
+export function pushToHistory(a: StoredAudit) {
+  try {
+    const existing = readHistory();
+    // Dedupe by URL — replace older entry with the newest run for the same URL.
+    const filtered = existing.filter((e) => e.url !== a.url);
+    const next = [a, ...filtered].slice(0, HISTORY_LIMIT);
+    localStorage.setItem(AUDIT_HISTORY_KEY, JSON.stringify(next));
+  } catch {
+    /* ignore */
+  }
+}
+
+export function readHistory(): StoredAudit[] {
+  try {
+    const raw = localStorage.getItem(AUDIT_HISTORY_KEY);
+    return raw ? (JSON.parse(raw) as StoredAudit[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+export function clearHistory() {
+  try {
+    localStorage.removeItem(AUDIT_HISTORY_KEY);
   } catch {
     /* ignore */
   }
