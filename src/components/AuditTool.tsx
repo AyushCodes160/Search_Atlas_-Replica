@@ -382,13 +382,16 @@ function WebResults({ result }: { result: WebAuditResult }) {
 
       {result.issues.length > 0 && (
         <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.4deg)" }}>
-          <PanelHeader kicker="lighthouse" title="Top issues" />
+          <PanelHeader kicker="lighthouse" title="Top issues — priority sorted" />
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {result.issues.map((issue, i) => (
+            {sortByImpact(result.issues).map((issue, i) => (
               <li key={i} className="bg-paper-50/70 border border-ink/30 rounded-md p-3 flex gap-3">
                 <span className="font-hand text-teal-accent text-[18px] shrink-0">{String(i + 1).padStart(2, "0")}</span>
-                <div>
-                  <div className="font-sans font-semibold text-[13.5px] text-ink mb-1">{issue.title}</div>
+                <div className="flex-1">
+                  <div className="flex items-start gap-2 mb-1">
+                    <div className="font-sans font-semibold text-[13.5px] text-ink flex-1">{issue.title}</div>
+                    <ImpactPill impact={issue.impact} />
+                  </div>
                   <div className="font-sans text-[12.5px] text-ink-soft leading-relaxed" dangerouslySetInnerHTML={{ __html: issue.description }} />
                 </div>
               </li>
@@ -698,5 +701,30 @@ function CountChip({ label, n }: { label: string; n: number }) {
       <div className="font-hand text-[22px] text-ink leading-none tabular-nums">{n}</div>
       <div className="font-hand text-[11px] text-clay">{label}</div>
     </div>
+  );
+}
+
+const IMPACT_ORDER: Record<string, number> = { high: 0, medium: 1, info: 2 };
+
+function sortByImpact<T extends { impact: string }>(items: T[]): T[] {
+  return [...items].sort(
+    (a, b) => (IMPACT_ORDER[a.impact] ?? 99) - (IMPACT_ORDER[b.impact] ?? 99),
+  );
+}
+
+function ImpactPill({ impact }: { impact: string }) {
+  const tone =
+    impact === "high"
+      ? { fg: "#c2412a", bg: "#fbe2dc", border: "#c2412a" }
+      : impact === "medium"
+        ? { fg: "#c2691b", bg: "#fceedd", border: "#e67e22" }
+        : { fg: "#5a4b32", bg: "#f4ecd8", border: "#8a7b5f" };
+  return (
+    <span
+      className="font-hand text-[11px] rounded-full px-2 py-0.5 border shrink-0 uppercase tracking-wide"
+      style={{ color: tone.fg, backgroundColor: tone.bg, borderColor: tone.border }}
+    >
+      {impact}
+    </span>
   );
 }
