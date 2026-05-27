@@ -36,10 +36,10 @@ export default function Home() {
 
             <div className="flex flex-wrap items-center gap-4">
               <Link
-                href="/audit"
+                href="/app"
                 className="btn-led inline-flex items-center gap-2 rounded-full px-6 py-3 font-hand text-[19px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)]"
               >
-                Run my first audit
+                Open dashboard
                 <span className="inline-block">→</span>
               </Link>
               <Link
