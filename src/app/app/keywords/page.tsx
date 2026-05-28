@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { Loader2, KeyRound, AlertCircle, Download, Save, Trash2, FolderOpen } from "lucide-react";
+import { useSession } from "next-auth/react";
+import { Loader2, KeyRound, AlertCircle, Download, Save, Trash2, FolderOpen, Cloud } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
 type Intent = "informational" | "navigational" | "commercial" | "transactional";
@@ -48,6 +49,8 @@ const DIFF_TONE: Record<DifficultyLabel, string> = {
 };
 
 export default function KeywordsPage() {
+  const { status } = useSession();
+  const authed = status === "authenticated";
   const [seed, setSeed] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -59,16 +62,46 @@ export default function KeywordsPage() {
   const [saved, setSaved] = useState<SavedList[]>([]);
   const [showSaved, setShowSaved] = useState(false);
 
+  // Load saved lists from the cloud when signed in, else from localStorage.
   useEffect(() => {
+    let cancelled = false;
+    async function load() {
+      if (status === "loading") return;
+      if (authed) {
+        try {
+          const res = await fetch("/api/me/keyword-lists");
+          const data = await res.json();
+          if (!cancelled && res.ok) setSaved(data.lists || []);
+        } catch {
+          /* ignore */
+        }
+      } else {
+        try {
+          const raw = localStorage.getItem(STORAGE_KEY);
+          if (!cancelled && raw) setSaved(JSON.parse(raw));
+        } catch {
+          /* ignore */
+        }
+      }
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, authed]);
+
+  async function refreshSaved() {
+    if (!authed) return;
     try {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) setSaved(JSON.parse(raw));
+      const res = await fetch("/api/me/keyword-lists");
+      const data = await res.json();
+      if (res.ok) setSaved(data.lists || []);
     } catch {
       /* ignore */
     }
-  }, []);
+  }
 
-  function persist(next: SavedList[]) {
+  function persistLocal(next: SavedList[]) {
     setSaved(next);
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(next));
@@ -101,15 +134,24 @@ export default function KeywordsPage() {
     }
   }
 
-  function saveCurrent() {
+  async function saveCurrent() {
     if (!result) return;
-    const entry: SavedList = {
-      id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-      seed: result.seed,
-      savedAt: Date.now(),
-      data: result,
-    };
-    persist([entry, ...saved].slice(0, 25));
+    if (authed) {
+      await fetch("/api/me/keyword-lists", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ seed: result.seed, total: result.total, data: result }),
+      }).catch(() => {});
+      refreshSaved();
+    } else {
+      const entry: SavedList = {
+        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+        seed: result.seed,
+        savedAt: Date.now(),
+        data: result,
+      };
+      persistLocal([entry, ...saved].slice(0, 25));
+    }
   }
 
   function loadSaved(s: SavedList) {
@@ -119,8 +161,13 @@ export default function KeywordsPage() {
     setError(null);
   }
 
-  function deleteSaved(id: string) {
-    persist(saved.filter((s) => s.id !== id));
+  async function deleteSaved(id: string) {
+    if (authed) {
+      await fetch(`/api/me/keyword-lists/${id}`, { method: "DELETE" }).catch(() => {});
+      refreshSaved();
+    } else {
+      persistLocal(saved.filter((s) => s.id !== id));
+    }
   }
 
   function exportCsv() {

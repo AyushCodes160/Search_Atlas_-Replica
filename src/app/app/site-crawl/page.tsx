@@ -1,6 +1,7 @@
 "use client";
 
 import { Fragment, useMemo, useRef, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Loader2,
   Globe,
@@ -108,6 +109,7 @@ export default function SiteCrawlPage() {
   const [summary, setSummary] = useState<string | null>(null);
   const cancelRef = useRef(false);
   const rowsRef = useRef<Row[]>([]);
+  const { status: authStatus } = useSession();
 
   const busy = phase === "discovering" || phase === "scanning" || phase === "summarising";
 
@@ -378,6 +380,23 @@ export default function SiteCrawlPage() {
         const entry = { id: `${Date.now()}`, origin: disc.origin, ranAt: Date.now(), pages: web.length, mode, healthScore, summary: sum };
         localStorage.setItem(CRAWL_STORE, JSON.stringify([entry, ...existing].slice(0, 20)));
       } catch { /* ignore */ }
+
+      // Mirror to the cloud when signed in (endpoint 401s for anon — ignored).
+      if (authStatus === "authenticated") {
+        fetch("/api/me/crawls", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            origin: disc.origin,
+            pages: web.length,
+            mode,
+            healthScore,
+            summary: sum,
+            data: { rows: rowsRef.current, rollup },
+          }),
+          keepalive: true,
+        }).catch(() => {});
+      }
     }
     setPhase("done");
   }
