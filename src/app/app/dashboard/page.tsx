@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useSession } from "next-auth/react";
 import { PageHeader } from "@/components/PageHeader";
 import { readHistory, type StoredAudit } from "@/lib/auditContext";
 import {
@@ -21,6 +22,7 @@ import {
   Clock,
   History,
   Network,
+  Cloud,
 } from "lucide-react";
 
 const QUICK_LINKS = [
@@ -42,6 +44,7 @@ const QUICK_LINKS = [
 ];
 
 const KEYWORD_LISTS_KEY = "seo-engine:keyword-lists";
+const CRAWL_STORE = "seo-engine:site-crawls";
 
 type SavedKeywordList = {
   id: string;
@@ -49,6 +52,26 @@ type SavedKeywordList = {
   savedAt: number;
   data: { total: number };
 };
+
+type CrawlSummary = { id: string };
+
+function readLocalKeywordLists(): SavedKeywordList[] {
+  try {
+    const raw = localStorage.getItem(KEYWORD_LISTS_KEY);
+    return raw ? (JSON.parse(raw) as SavedKeywordList[]) : [];
+  } catch {
+    return [];
+  }
+}
+
+function readLocalCrawls(): CrawlSummary[] {
+  try {
+    const raw = localStorage.getItem(CRAWL_STORE);
+    return raw ? (JSON.parse(raw) as CrawlSummary[]) : [];
+  } catch {
+    return [];
+  }
+}
 
 function avgPerformance(history: StoredAudit[]): number | null {
   const scored = history.filter((h) => h.scores).slice(0, 5);
@@ -75,20 +98,43 @@ function scoreColor(s: number): string {
 }
 
 export default function DashboardPage() {
+  const { status } = useSession();
+  const authed = status === "authenticated";
   const [history, setHistory] = useState<StoredAudit[]>([]);
   const [keywordLists, setKeywordLists] = useState<SavedKeywordList[]>([]);
+  const [crawls, setCrawls] = useState<CrawlSummary[]>([]);
   const [mounted, setMounted] = useState(false);
 
+  // Load from the cloud when signed in, else from localStorage.
   useEffect(() => {
-    setHistory(readHistory());
-    try {
-      const raw = localStorage.getItem(KEYWORD_LISTS_KEY);
-      if (raw) setKeywordLists(JSON.parse(raw));
-    } catch {
-      /* ignore */
+    let cancelled = false;
+    async function load() {
+      if (status === "loading") return;
+      if (authed) {
+        const [a, k, c] = await Promise.all([
+          fetch("/api/me/audits").then((r) => (r.ok ? r.json() : { audits: [] })).catch(() => ({ audits: [] })),
+          fetch("/api/me/keyword-lists").then((r) => (r.ok ? r.json() : { lists: [] })).catch(() => ({ lists: [] })),
+          fetch("/api/me/crawls").then((r) => (r.ok ? r.json() : { crawls: [] })).catch(() => ({ crawls: [] })),
+        ]);
+        if (!cancelled) {
+          setHistory(a.audits || []);
+          setKeywordLists(k.lists || []);
+          setCrawls(c.crawls || []);
+        }
+      } else {
+        if (!cancelled) {
+          setHistory(readHistory());
+          setKeywordLists(readLocalKeywordLists());
+          setCrawls(readLocalCrawls());
+        }
+      }
+      if (!cancelled) setMounted(true);
     }
-    setMounted(true);
-  }, []);
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, authed]);
 
   const avgPerf = avgPerformance(history);
   const totalKeywordIdeas = keywordLists.reduce((a, l) => a + (l.data?.total ?? 0), 0);
@@ -98,15 +144,33 @@ export default function DashboardPage() {
       <PageHeader
         kicker="dashboard"
         title="Welcome back."
-        subtitle="Pick a module from the sidebar or jump straight in from below. Modules tagged 'soon' need paid APIs or OAuth that aren't wired yet."
+        subtitle={
+          authed
+            ? "Synced to your account — stats and recent activity load from the cloud and follow you across devices."
+            : "Pick a module from the sidebar or jump straight in below. Sign in to sync your audits, keyword lists & crawls across devices."
+        }
       />
 
-      {/* Stats — pulled from localStorage. Empty state shows the placeholders until the user runs something. */}
+      {mounted && authed && (
+        <p className="font-sans text-[12.5px] text-ink-soft mb-6 -mt-2 inline-flex items-center gap-1.5">
+          <Cloud className="w-3.5 h-3.5 text-teal-accent" /> Signed in — showing your cloud data.
+        </p>
+      )}
+
+      {/* Stats — cloud when signed in, localStorage otherwise. */}
       <section className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-12">
         <Stat
           label="Audits run"
           value={mounted ? String(history.length) : "—"}
-          hint={history.length === 0 ? "run your first audit" : history.length < 10 ? "history (max 10)" : "history full — older drops off"}
+          hint={
+            history.length === 0
+              ? "run your first audit"
+              : authed
+                ? "synced (max 50)"
+                : history.length < 10
+                  ? "history (max 10)"
+                  : "history full — older drops off"
+          }
         />
         <Stat
           label="Avg performance"
@@ -123,7 +187,11 @@ export default function DashboardPage() {
               : `${totalKeywordIdeas.toLocaleString()} ideas saved`
           }
         />
-        <Stat label="LLM mentions" value="—" hint="needs LLM Visibility (soon)" />
+        <Stat
+          label="Sites crawled"
+          value={mounted ? String(crawls.length) : "—"}
+          hint={crawls.length === 0 ? "run a whole-site audit" : authed ? "synced (max 30)" : "saved locally (max 20)"}
+        />
       </section>
 
       {/* Recent audits — only shown when something exists. */}
