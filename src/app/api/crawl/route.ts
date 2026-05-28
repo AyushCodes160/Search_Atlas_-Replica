@@ -20,12 +20,37 @@ function sameSite(a: URL, b: URL): boolean {
   return stripWww(a.hostname) === stripWww(b.hostname);
 }
 
+// Query params that are tracking/session noise — strip them so the same page
+// with ?utm_... doesn't become a separate "page".
+const TRACKING_PARAM_RE = /^(utm_|fbclid|gclid|gbraid|wbraid|mc_|ref$|ref_|source$|_ga|igshid|si$|spm$)/i;
+
 function cleanUrl(u: URL): string {
-  // Drop hash + trailing slash noise so we don't audit dupes.
   u.hash = "";
+  // Strip tracking params but keep meaningful ones.
+  const keep = new URLSearchParams();
+  for (const [k, v] of u.searchParams) {
+    if (!TRACKING_PARAM_RE.test(k)) keep.append(k, v);
+  }
+  u.search = keep.toString();
   let s = u.toString();
   if (s.endsWith("/") && u.pathname !== "/") s = s.slice(0, -1);
   return s;
+}
+
+// Path patterns that aren't real content pages worth auditing.
+const NOISE_PATH_RE =
+  /\/(draft|preview|login|log-in|signin|sign-in|signup|sign-up|register|logout|account|admin|wp-admin|wp-login|cart|checkout|basket|wishlist|compare|thank-you|thankyou)(\/|$)/i;
+const ALLZERO_UUID_RE = /0{8}-0{4}-0{4}-0{4}-0{12}/;
+
+// Expects a URL that's already had tracking params stripped (via cleanUrl).
+// Any leftover query string is treated as a search/filter/faceted variant —
+// for an SEO audit we want canonical clean-path pages, not every filter combo.
+function isNoise(u: URL): boolean {
+  if (NOISE_PATH_RE.test(u.pathname)) return true;
+  if (ALLZERO_UUID_RE.test(u.pathname)) return true;
+  if (/\/(new|search|s)$/i.test(u.pathname)) return true;
+  if (u.search) return true;
+  return false;
 }
 
 async function fetchText(url: string, timeoutMs = 12_000): Promise<{ ok: boolean; text: string; contentType: string }> {
@@ -91,7 +116,9 @@ function extractLinks(html: string, base: URL, origin: URL): string[] {
       if (abs.protocol !== "http:" && abs.protocol !== "https:") return;
       if (!sameSite(abs, origin)) return;
       if (ASSET_RE.test(abs.pathname)) return;
-      out.push(cleanUrl(abs));
+      const c = cleanUrl(abs);
+      if (isNoise(new URL(c))) return;
+      out.push(c);
     } catch {
       /* skip bad href */
     }
@@ -177,6 +204,7 @@ export async function POST(req: NextRequest) {
         if (!sameSite(u, origin)) continue;
         if (ASSET_RE.test(u.pathname)) continue;
         const c = cleanUrl(u);
+        if (isNoise(new URL(c))) continue;
         if (seen.has(c)) continue;
         seen.add(c);
         clean.push(c);
