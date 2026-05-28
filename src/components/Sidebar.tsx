@@ -177,7 +177,7 @@ export function Sidebar() {
             </div>
           ) : (
             <button
-              onClick={() => signIn("google", { callbackUrl: path || "/app/dashboard" })}
+              onClick={() => signIn("google", { callbackUrl: "/" })}
               className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 font-hand text-[15px] bg-paper border-2 border-ink/80 shadow-[2px_2px_0_0_rgba(44,36,23,0.7)] hover:-translate-y-0.5 transition-transform"
             >
               <LogIn className="w-4 h-4 text-teal-accent" /> Sign in to save

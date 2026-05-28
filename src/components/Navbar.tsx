@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
-import { Menu, X } from "lucide-react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { Menu, X, LogIn, LogOut, UserPlus, ChevronDown } from "lucide-react";
 import { Logo } from "./Logo";
 
 const GITHUB_URL = "https://github.com/AyushCodes160/SEO_Engine";
@@ -18,6 +19,25 @@ const NAV_LINKS: { label: string; href: string; external?: boolean }[] = [
 export function Navbar() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
+  const user = session?.user;
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  // Close the account dropdown on outside click.
+  useEffect(() => {
+    if (!menuOpen) return;
+    function onClick(e: MouseEvent) {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) setMenuOpen(false);
+    }
+    document.addEventListener("mousedown", onClick);
+    return () => document.removeEventListener("mousedown", onClick);
+  }, [menuOpen]);
+
+  // Close dropdown on route change.
+  useEffect(() => {
+    setMenuOpen(false);
+  }, [path]);
 
   useEffect(() => {
     setOpen(false);
@@ -66,6 +86,66 @@ export function Navbar() {
                 {link.label}
               </Link>
             ),
+          )}
+        </div>
+
+        {/* Desktop auth control */}
+        <div className="hidden md:flex items-center">
+          {status === "loading" ? null : user ? (
+            <div className="relative" ref={menuRef}>
+              <button
+                onClick={() => setMenuOpen((v) => !v)}
+                aria-haspopup="menu"
+                aria-expanded={menuOpen}
+                className="flex items-center gap-2 bg-paper border-2 border-ink/80 rounded-full pl-1.5 pr-2.5 py-1 shadow-[2px_2px_0_0_rgba(44,36,23,0.8)] hover:-translate-y-0.5 transition-transform"
+              >
+                {user.image ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img src={user.image} alt={user.name || "you"} className="w-7 h-7 rounded-full border border-ink/70" />
+                ) : (
+                  <span className="w-7 h-7 rounded-full bg-paper-200 border border-ink/70 flex items-center justify-center font-hand text-[13px]">
+                    {(user.name || user.email || "?").charAt(0).toUpperCase()}
+                  </span>
+                )}
+                <span className="font-hand text-[17px] text-ink leading-none">
+                  {(user.name || user.email || "").split(" ")[0]}
+                </span>
+                <ChevronDown className={`w-3.5 h-3.5 text-ink-soft transition-transform ${menuOpen ? "rotate-180" : ""}`} />
+              </button>
+
+              {menuOpen && (
+                <div
+                  role="menu"
+                  className="absolute right-0 mt-2 w-56 bg-paper border-2 border-ink/80 rounded-lg shadow-[3px_3px_0_0_rgba(44,36,23,0.8)] overflow-hidden z-50"
+                >
+                  <div className="px-4 py-3 border-b-2 border-dashed border-ink/15">
+                    <div className="font-sans text-[13px] text-ink truncate">{user.name}</div>
+                    <div className="font-sans text-[11.5px] text-ink-soft truncate">{user.email}</div>
+                  </div>
+                  <button
+                    role="menuitem"
+                    onClick={() => signIn("google", { callbackUrl: "/" })}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 font-hand text-[16px] text-ink hover:bg-paper-50/70"
+                  >
+                    <UserPlus className="w-4 h-4 text-teal-accent" /> Use a different account
+                  </button>
+                  <button
+                    role="menuitem"
+                    onClick={() => signOut({ callbackUrl: "/" })}
+                    className="w-full flex items-center gap-2.5 px-4 py-2.5 font-hand text-[16px] text-ink hover:bg-paper-50/70 border-t-2 border-dashed border-ink/15"
+                  >
+                    <LogOut className="w-4 h-4 text-sunset" /> Sign out
+                  </button>
+                </div>
+              )}
+            </div>
+          ) : (
+            <button
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+              className="btn-led inline-flex items-center gap-2 rounded-full px-4 py-2 font-hand text-[18px] shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]"
+            >
+              <LogIn className="w-4 h-4" /> Sign in
+            </button>
           )}
         </div>
 
@@ -132,6 +212,38 @@ export function Navbar() {
             ),
           )}
         </nav>
+
+        {/* Mobile account section */}
+        <div className="px-5 py-4 mt-2 border-t-2 border-dashed border-ink/15">
+          {status === "loading" ? null : user ? (
+            <div className="flex items-center gap-3">
+              {user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={user.image} alt={user.name || "you"} className="w-9 h-9 rounded-full border-2 border-ink/80" />
+              ) : (
+                <span className="w-9 h-9 rounded-full bg-paper-200 border-2 border-ink/80 flex items-center justify-center font-hand text-[15px]">
+                  {(user.name || user.email || "?").charAt(0).toUpperCase()}
+                </span>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="font-sans text-[13px] text-ink truncate">{user.name || user.email}</div>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="font-hand text-[14px] text-ink-soft hover:text-sunset inline-flex items-center gap-1"
+                >
+                  <LogOut className="w-3.5 h-3.5" /> sign out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => signIn("google", { callbackUrl: "/" })}
+              className="btn-led w-full inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-hand text-[19px] shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]"
+            >
+              <LogIn className="w-4 h-4" /> Sign in with Google
+            </button>
+          )}
+        </div>
       </aside>
     </>
   );

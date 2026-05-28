@@ -8,7 +8,7 @@ import { Logo } from "@/components/Logo";
 
 function SignInInner() {
   const params = useSearchParams();
-  const callbackUrl = params.get("callbackUrl") || "/app/dashboard";
+  const callbackUrl = params.get("callbackUrl") || "/";
   const error = params.get("error");
 
   return (
