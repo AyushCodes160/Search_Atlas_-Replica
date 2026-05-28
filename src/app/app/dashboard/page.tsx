@@ -20,10 +20,12 @@ import {
   FileBarChart2,
   Clock,
   History,
+  Network,
 } from "lucide-react";
 
 const QUICK_LINKS = [
   { label: "Site Audit", href: "/app/site-audit", Icon: Activity, ready: true, note: "Lighthouse + Llama" },
+  { label: "Whole-Site Audit", href: "/app/site-crawl", Icon: Network, ready: true, note: "Crawl + audit every page" },
   { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true, note: "Up to 10 URLs · CSV export" },
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true, note: "You vs them, side by side" },
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true, note: "Free Autocomplete + Llama" },
@@ -192,7 +194,7 @@ export default function DashboardPage() {
       <section className="mb-12">
         <p className="font-hand text-clay text-[16px] mb-2">~ modules ~</p>
         <h2 className="font-hand text-[28px] text-ink leading-tight mb-6">
-          Fourteen tools, one toolkit.
+          Fifteen tools, one toolkit.
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {QUICK_LINKS.map((m) => (
