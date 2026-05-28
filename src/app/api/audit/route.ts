@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { analyzeOnPage, type OnPageAudit } from "@/lib/onPage";
+import { fetchPage, browserHeaders, type BlockResult } from "@/lib/fetchPage";
 
 export const runtime = "nodejs";
 export const maxDuration = 60;
@@ -20,6 +21,7 @@ type SourceProbe = {
   status: number;
   finalUrl: string;
   bodySample: string;
+  block: BlockResult;
 };
 
 const API_ALLOWED_METRICS = [
@@ -67,25 +69,16 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
   const target = new URL(rawUrl);
   const urlSignal = classifyUrlOnly(target);
 
-  const res = await fetch(rawUrl, {
-    method: "GET",
-    redirect: "follow",
-    cache: "no-store",
-    headers: {
-      // Use a realistic browser UA so sites don't redirect us to the home page
-      // or serve a stripped bot shell — that would make the on-page panel
-      // analyze the wrong content even though Lighthouse audits the right URL.
-      "User-Agent":
-        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
-      Accept:
-        "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.8,*/*;q=0.7",
-      "Accept-Language": "en-US,en;q=0.9",
-    },
+  // Realistic browser headers so sites don't redirect us to the home page or
+  // serve a stripped bot shell. Accept includes JSON so genuine APIs still
+  // classify correctly.
+  const r = await fetchPage(rawUrl, {
+    accept: "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.8,*/*;q=0.7",
+    maxBytes: 2_000_000,
   });
 
-  const contentType = (res.headers.get("content-type") || "").toLowerCase();
-  const text = await res.text();
-  const sample = text.length > 2_000_000 ? text.slice(0, 2_000_000) : text;
+  const contentType = r.contentType;
+  const sample = r.body;
 
   const isJsonCT =
     contentType.includes("application/json") ||
@@ -147,9 +140,10 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
   return {
     classification,
     contentType,
-    status: res.status,
-    finalUrl: res.url,
+    status: r.status,
+    finalUrl: r.finalUrl,
     bodySample: sample,
+    block: r.block,
   };
 }
 
@@ -305,7 +299,7 @@ async function timeRequests(url: string, samples = 3): Promise<{
     const t0 = Date.now();
     const r = await fetch(url, {
       cache: "no-store",
-      headers: { "User-Agent": "SEOEngine/1.0", Accept: "*/*" },
+      headers: browserHeaders("application/json,*/*;q=0.8"),
     });
     const text = await r.text();
     const ms = Date.now() - t0;
@@ -391,6 +385,19 @@ export async function POST(req: NextRequest) {
     }
 
     const probe = await classifySource(target.toString());
+
+    // Firewall / anti-bot block — report it honestly. Lighthouse would also
+    // get blocked, so there's nothing meaningful to score.
+    if (probe.block.blocked) {
+      return NextResponse.json({
+        sourceType: "blocked",
+        isBlockedByFirewall: true,
+        url: target.toString(),
+        finalUrl: probe.finalUrl,
+        blockStatus: probe.block.status,
+        blockVendor: probe.block.vendor,
+      });
+    }
 
     if (probe.classification.type === "api") {
       let parsed: unknown = null;

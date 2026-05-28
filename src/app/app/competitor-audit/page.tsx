@@ -66,6 +66,10 @@ async function fetchAudit(url: string): Promise<Audit> {
   });
   const data = await res.json();
   if (!res.ok) throw new Error(data.error || "Audit failed");
+  if (data.isBlockedByFirewall) {
+    const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+    throw new Error(`${url.replace(/^https?:\/\//, "")} is blocked by an anti-bot firewall${who} — HTTP ${data.blockStatus || "challenge"}. It can't be audited.`);
+  }
   return data;
 }
 

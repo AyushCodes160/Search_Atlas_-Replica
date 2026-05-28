@@ -7,8 +7,8 @@ import {
   CheckCircle2,
   XCircle,
   Download,
-  AlertCircle,
   Layers,
+  ShieldAlert,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 
@@ -24,6 +24,7 @@ type Row = {
   metrics?: { lcp: string; cls: string; fcp: string; tbt: string; speedIndex: string };
   sourceType?: "web" | "api";
   error?: string;
+  blocked?: boolean;
 };
 
 function parseUrls(text: string): string[] {
@@ -70,6 +71,10 @@ async function runAudit(url: string): Promise<Partial<Row>> {
     const data = await res.json();
     if (!res.ok) {
       return { status: "error", error: data.error || `HTTP ${res.status}` };
+    }
+    if (data.isBlockedByFirewall) {
+      const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+      return { status: "error", blocked: true, error: `Blocked by firewall${who} — HTTP ${data.blockStatus || "challenge"}` };
     }
     if (data.sourceType === "api") {
       return { status: "done", sourceType: "api", error: undefined };
@@ -303,7 +308,7 @@ export default function BulkAuditPage() {
                       {r.metrics?.tbt ?? "—"}
                     </td>
                     <td className="py-2.5 pr-3">
-                      <StatusBadge status={r.status} error={r.error} />
+                      <StatusBadge status={r.status} error={r.error} blocked={r.blocked} />
                     </td>
                   </tr>
                 ))}
@@ -331,7 +336,14 @@ function ScoreCell({ s }: { s: number | undefined }) {
   );
 }
 
-function StatusBadge({ status, error }: { status: RowStatus; error?: string }) {
+function StatusBadge({ status, error, blocked }: { status: RowStatus; error?: string; blocked?: boolean }) {
+  if (blocked) {
+    return (
+      <span className="inline-flex items-center gap-1 font-hand text-[12px] text-amber-700" title={error}>
+        <ShieldAlert className="w-3.5 h-3.5" /> blocked
+      </span>
+    );
+  }
   if (status === "done") {
     return (
       <span className="inline-flex items-center gap-1 font-hand text-[12px] text-leaf-dark">

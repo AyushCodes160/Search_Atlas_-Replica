@@ -175,6 +175,12 @@ export default function AuditTool() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Audit failed");
+      if (data.isBlockedByFirewall) {
+        const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+        throw new Error(
+          `Blocked by an anti-bot firewall${who} — HTTP ${data.blockStatus || "challenge"}. This site protects itself against automated audits, so it can't be scored. Try a site you own or one without enterprise bot protection.`,
+        );
+      }
       setProgress(100);
       setSharedView(false);
       sessionAuditCache = { url: auditUrl, result: data };

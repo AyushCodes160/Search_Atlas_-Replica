@@ -1,11 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
 import { load } from "cheerio";
+import { fetchPage, humanDelay } from "@/lib/fetchPage";
 
 export const runtime = "nodejs";
 export const maxDuration = 45;
-
-const BROWSER_UA =
-  "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36";
 
 // File extensions we never want to "audit" as pages.
 const ASSET_RE = /\.(jpg|jpeg|png|gif|webp|svg|ico|css|js|mjs|json|xml|pdf|zip|mp4|mp3|woff2?|ttf|eot|rss|txt)(\?|$)/i;
@@ -54,22 +52,9 @@ function isNoise(u: URL): boolean {
 }
 
 async function fetchText(url: string, timeoutMs = 12_000): Promise<{ ok: boolean; text: string; contentType: string }> {
-  try {
-    const ctrl = new AbortController();
-    const t = setTimeout(() => ctrl.abort(), timeoutMs);
-    const res = await fetch(url, {
-      headers: { "User-Agent": BROWSER_UA, Accept: "*/*" },
-      redirect: "follow",
-      cache: "no-store",
-      signal: ctrl.signal,
-    });
-    clearTimeout(t);
-    const contentType = (res.headers.get("content-type") || "").toLowerCase();
-    if (!res.ok) return { ok: false, text: "", contentType };
-    return { ok: true, text: await res.text(), contentType };
-  } catch {
-    return { ok: false, text: "", contentType: "" };
-  }
+  const r = await fetchPage(url, { timeoutMs });
+  if (!r.ok) return { ok: false, text: "", contentType: r.contentType };
+  return { ok: true, text: r.body, contentType: r.contentType };
 }
 
 // Pull <loc> entries out of a sitemap. Handles sitemap-index (nested sitemaps).
@@ -129,13 +114,22 @@ function extractLinks(html: string, base: URL, origin: URL): string[] {
 // Fallback when there's no sitemap: breadth-first crawl the site by following
 // internal links, level by level, time-boxed so the serverless function never
 // times out. Discovers the whole site structure, not just the homepage.
-async function fromLinkCrawl(origin: URL, limit: number): Promise<string[]> {
+async function fromLinkCrawl(origin: URL, limit: number, seedHtml?: string): Promise<string[]> {
   const deadline = Date.now() + 28_000; // stay inside the 45s function budget
   const home = cleanUrl(origin);
   const discovered = new Set<string>([home]);
   const visited = new Set<string>();
   let frontier: string[] = [home];
 
+  // If the caller already fetched the homepage (block probe), seed links from
+  // it instead of refetching — saves a request and a throttle cycle.
+  if (seedHtml) {
+    visited.add(home);
+    for (const link of extractLinks(seedHtml, origin, origin)) discovered.add(link);
+    frontier = Array.from(discovered).filter((u) => u !== home);
+  }
+
+  let firstBatch = true;
   while (frontier.length && discovered.size < limit && Date.now() < deadline) {
     // Fetch this level in parallel batches of 5.
     const batch = frontier.filter((u) => !visited.has(u)).slice(0, 12);
@@ -144,6 +138,10 @@ async function fromLinkCrawl(origin: URL, limit: number): Promise<string[]> {
 
     for (let i = 0; i < batch.length; i += 5) {
       if (Date.now() >= deadline) break;
+      // Throttle between batches to avoid tripping rate limits. Kept light
+      // (not the full 1-3s) because this discovery crawl is time-boxed to 28s.
+      if (!firstBatch) await humanDelay(300, 800);
+      firstBatch = false;
       const slice = batch.slice(i, i + 5);
       const results = await Promise.all(
         slice.map(async (u) => {
@@ -188,8 +186,26 @@ export async function POST(req: NextRequest) {
     let source: "sitemap" | "links" = "sitemap";
     let pages = await fromSitemap(origin, limit);
     if (!pages || pages.length === 0) {
+      // No usable sitemap. Probe the homepage so we can tell a genuinely small
+      // site apart from one that's blocking us behind a firewall — instead of
+      // silently returning just the homepage and reporting "1 page found".
+      const home = await fetchPage(origin.toString(), { timeoutMs: 12_000, maxBytes: 200_000 });
+      if (home.block.blocked) {
+        return NextResponse.json({
+          origin: origin.origin,
+          source: "blocked",
+          isBlockedByFirewall: true,
+          blockStatus: home.block.status,
+          blockVendor: home.block.vendor,
+          total: 0,
+          capped: false,
+          cap: limit,
+          pages: [],
+        });
+      }
       source = "links";
-      pages = await fromLinkCrawl(origin, limit);
+      const seed = home.ok && home.contentType.includes("text/html") ? home.body : undefined;
+      pages = await fromLinkCrawl(origin, limit, seed);
     }
 
     // Normalize, filter assets + cross-site, dedupe, ensure homepage is first.
