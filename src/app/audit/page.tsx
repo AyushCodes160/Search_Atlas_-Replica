@@ -51,7 +51,7 @@ export default function AuditPage() {
                 Built for indie operators.
               </h3>
               <p className="font-sans text-[13.5px] text-ink-soft leading-relaxed mb-3">
-                SEO Engine is open-source and free forever. No paywalls, no
+                GoToSEO is open-source and free forever. No paywalls, no
                 signup, no card. Use your own API keys, keep your data.
               </p>
               <Link

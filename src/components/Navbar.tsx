@@ -60,7 +60,7 @@ export function Navbar() {
             <Logo />
           </span>
           <span className="font-hand text-[20px] sm:text-[22px] text-ink leading-none mt-1">
-            SEO Engine
+            GoToSEO
           </span>
         </Link>
 
@@ -186,7 +186,7 @@ export function Navbar() {
 
         <div className="px-5 pt-6 pb-4 border-b-2 border-dashed border-ink/15">
           <span className="font-hand text-clay text-[15px]">~ menu ~</span>
-          <h2 className="font-hand text-[28px] text-ink leading-tight mt-1">SEO Engine</h2>
+          <h2 className="font-hand text-[28px] text-ink leading-tight mt-1">GoToSEO</h2>
         </div>
 
         <nav className="px-3 py-4 space-y-1">

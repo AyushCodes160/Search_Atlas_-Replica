@@ -114,7 +114,7 @@ export function Sidebar() {
             <span className="flex items-center justify-center w-9 h-9 rounded-full bg-paper border-2 border-ink/85 shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]">
               <Logo />
             </span>
-            <span className="font-hand text-[20px] leading-none mt-1">SEO Engine</span>
+            <span className="font-hand text-[20px] leading-none mt-1">GoToSEO</span>
           </Link>
         </div>
 

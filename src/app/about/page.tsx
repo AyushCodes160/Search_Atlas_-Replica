@@ -19,7 +19,7 @@ export default function AboutPage() {
             <span className="text-teal-accent hand-underline">built in the open.</span>
           </h1>
           <p className="font-sans text-[15px] text-ink-soft leading-relaxed max-w-2xl">
-            SEO Engine is what happens when an indie operator decides not to pay
+            GoToSEO is what happens when an indie operator decides not to pay
             three hundred dollars a month for an SEO dashboard and asks an
             LLM to do the heavy lifting instead.
           </p>

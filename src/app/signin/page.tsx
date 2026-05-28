@@ -22,7 +22,7 @@ function SignInInner() {
           <span className="flex items-center justify-center w-10 h-10 rounded-full bg-paper border-2 border-ink/85 shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]">
             <Logo />
           </span>
-          <span className="font-hand text-[24px] leading-none mt-1">SEO Engine</span>
+          <span className="font-hand text-[24px] leading-none mt-1">GoToSEO</span>
         </Link>
 
         <h1 className="font-hand text-[30px] text-ink leading-tight mb-2">

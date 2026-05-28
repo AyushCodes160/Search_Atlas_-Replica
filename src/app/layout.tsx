@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
-import { Fredericka_the_Great, Inter, Special_Elite } from "next/font/google";
+import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Providers } from "@/components/Providers";
 
-const hand = Fredericka_the_Great({
-  weight: "400",
+// Display font (headings) — matches the GoToStudio brand.
+const hand = Space_Grotesk({
+  weight: ["400", "500", "600", "700"],
   subsets: ["latin"],
   variable: "--font-hand",
   display: "swap",
@@ -14,16 +15,15 @@ const sans = Inter({
   variable: "--font-sans",
   display: "swap",
 });
-const mono = Special_Elite({
-  weight: "400",
+const mono = JetBrains_Mono({
   subsets: ["latin"],
   variable: "--font-mono",
   display: "swap",
 });
 
 export const metadata: Metadata = {
-  title: "SEO Engine — AI SEO Toolkit",
-  description: "Free AI-powered SEO audit & fix tool. Built for indie SEO.",
+  title: "GoToSEO — AI SEO Toolkit",
+  description: "AI-powered SEO audits, fixes & content. Part of the GoToStudio family.",
 };
 
 export default function RootLayout({

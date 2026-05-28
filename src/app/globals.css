@@ -3,22 +3,36 @@
 @tailwind utilities;
 
 :root {
-  --paper: #f4ecd8;
-  --paper-grain: #e8d9b4;
-  --ink: #2c2417;
-  --ink-soft: #5a4b32;
-  --leaf: #8a9a5b;
-  --clay: #8b6f47;
-  --teal: #1aa49a;
-  --sunset: #e67e22;
+  --paper: #eef6f2;       /* mint page background */
+  --paper-grain: #dce8e3;
+  --ink: #00403f;          /* deep teal text */
+  --ink-soft: #3f6b6b;     /* muted teal */
+  --leaf: #1b9e5f;         /* success green */
+  --clay: #5f8a8a;         /* muted teal-gray labels */
+  --teal: #006a6a;         /* primary brand teal */
+  --sunset: #e2b203;       /* gold secondary accent */
+  --card: #ffffff;
+  --border: rgba(13, 148, 148, 0.16);
 }
 
 html { scroll-behavior: smooth; }
 
 html, body {
-  background: var(--paper);
+  background-color: var(--paper);
   color: var(--ink);
   -webkit-font-smoothing: antialiased;
+}
+
+/* GoToStudio-style ambient background: mint glow up top, a faint gold wash,
+   and a barely-there teal grid. Fixed so it stays put while scrolling. */
+body {
+  background-image:
+    radial-gradient(ellipse 90% 70% at 50% -20%, rgba(170, 225, 215, 0.55) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 50% at 85% 8%, rgba(226, 178, 3, 0.06) 0%, transparent 55%),
+    linear-gradient(rgba(0, 64, 63, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 64, 63, 0.022) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 42px 42px, 42px 42px;
+  background-attachment: fixed;
 }
 
 [id] { scroll-margin-top: 6rem; }
@@ -26,43 +40,47 @@ html, body {
 .paper-bg {
   background-color: var(--paper);
   background-image:
-    repeating-linear-gradient(
-      to bottom,
-      transparent,
-      transparent 31px,
-      rgba(139, 111, 71, 0.08) 31px,
-      rgba(139, 111, 71, 0.08) 32px
-    ),
-    url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.2 0 0 0 0.12 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+    radial-gradient(ellipse 80% 60% at 50% -10%, rgba(170, 225, 215, 0.5) 0%, transparent 60%),
+    linear-gradient(rgba(0, 64, 63, 0.022) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(0, 64, 63, 0.022) 1px, transparent 1px);
+  background-size: 100% 100%, 42px 42px, 42px 42px;
 }
 
 .watercolor-teal {
-  background: radial-gradient(ellipse at center, rgba(26,164,154,0.22) 0%, rgba(26,164,154,0.08) 40%, transparent 70%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(14,154,160,0.20) 0%, rgba(14,154,160,0.06) 45%, transparent 70%);
+  filter: blur(10px);
 }
 .watercolor-sunset {
-  background: radial-gradient(ellipse at center, rgba(230,126,34,0.22) 0%, rgba(230,126,34,0.08) 40%, transparent 70%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(226,178,3,0.20) 0%, rgba(226,178,3,0.06) 45%, transparent 70%);
+  filter: blur(10px);
 }
 .watercolor-leaf {
-  background: radial-gradient(ellipse at center, rgba(138,154,91,0.22) 0%, rgba(138,154,91,0.08) 40%, transparent 70%);
-  filter: blur(6px);
+  background: radial-gradient(ellipse at center, rgba(27,158,95,0.18) 0%, rgba(27,158,95,0.06) 45%, transparent 70%);
+  filter: blur(10px);
 }
 
+/* Glass card — the GoToStudio look: frosted white, soft teal-tinted shadow,
+   barely-there border. Overrides any inline border/shadow utilities because it
+   is declared after @tailwind utilities. */
 .sticky-note {
-  background: #fffceb;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.5 0 0 0 0 0.4 0 0 0 0 0.2 0 0 0 0.06 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
-  box-shadow: 0 2px 4px rgba(44,36,23,0.10), 0 8px 16px rgba(44,36,23,0.08);
+  background: rgba(255, 255, 255, 0.92);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--border);
+  box-shadow: 0 1px 2px rgba(0,64,63,0.04), 0 14px 34px rgba(0,64,63,0.07);
+  border-radius: 16px;
   transition: transform 0.25s ease, box-shadow 0.25s ease;
 }
 .sticky-note:hover {
   transform: translateY(-4px) rotate(0deg) !important;
-  box-shadow: 0 4px 8px rgba(44,36,23,0.15), 0 16px 28px rgba(44,36,23,0.12);
+  box-shadow: 0 6px 14px rgba(0,64,63,0.08), 0 22px 44px rgba(0,64,63,0.11);
 }
 
 .dotted-card {
-  border: 2px dashed var(--ink);
-  background: rgba(255, 252, 235, 0.6);
+  border: 1.5px solid var(--border);
+  background: rgba(255, 255, 255, 0.7);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
   border-radius: 16px;
 }
 
@@ -77,26 +95,22 @@ html, body {
   right: -2px;
   bottom: -6px;
   height: 6px;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6'%3E%3Cpath d='M0 3 Q 25 0 50 3 T 100 3' stroke='%231aa49a' stroke-width='2' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 6'%3E%3Cpath d='M0 3 Q 25 0 50 3 T 100 3' stroke='%23e2b203' stroke-width='3' fill='none' stroke-linecap='round'/%3E%3C/svg%3E");
   background-repeat: no-repeat;
   background-size: 100% 100%;
 }
 
 .btn-led {
-  background: var(--teal);
-  color: #fffceb;
-  border: 2px solid var(--ink);
-  box-shadow: 0 0 0 0 rgba(26,164,154,0.5);
+  background: linear-gradient(135deg, var(--teal), #0a8585);
+  color: #ffffff;
+  border: 1px solid rgba(0,106,106,0.55);
+  box-shadow: 0 6px 18px rgba(0,106,106,0.26);
+  border-radius: 9999px;
   transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 .btn-led:hover {
   transform: translateY(-2px);
-  animation: led-pulse 1.2s infinite;
-}
-@keyframes led-pulse {
-  0%   { box-shadow: 0 0 0 0    rgba(26,164,154,0.55); }
-  70%  { box-shadow: 0 0 0 14px rgba(26,164,154,0);    }
-  100% { box-shadow: 0 0 0 0    rgba(26,164,154,0);    }
+  box-shadow: 0 10px 28px rgba(0,106,106,0.4);
 }
 
 @keyframes shake {
@@ -121,16 +135,16 @@ html, body {
 }
 
 .typewriter {
-  font-family: var(--font-mono), "Special Elite", ui-monospace, monospace;
+  font-family: var(--font-mono), ui-monospace, monospace;
 }
 .calligraphic {
-  font-family: var(--font-hand), "Fredericka the Great", cursive;
+  font-family: var(--font-hand), "Space Grotesk", sans-serif;
 }
 
 .ai-prose > *:first-child { margin-top: 0; }
 .ai-prose > *:last-child { margin-bottom: 0; }
 .ai-prose h1, .ai-prose h2 {
-  font-family: var(--font-hand), cursive;
+  font-family: var(--font-hand), "Space Grotesk", sans-serif;
   font-size: 22px;
   color: var(--ink);
   margin-top: 1.5rem;
@@ -138,7 +152,7 @@ html, body {
   letter-spacing: 0.5px;
 }
 .ai-prose h3 {
-  font-family: var(--font-hand), cursive;
+  font-family: var(--font-hand), "Space Grotesk", sans-serif;
   font-size: 18px;
   color: var(--ink);
   margin-top: 1.1rem;
@@ -176,10 +190,10 @@ html, body {
 .ai-prose code {
   font-family: var(--font-mono), monospace;
   font-size: 13px;
-  color: #6a5535;
-  background: rgba(139, 111, 71, 0.08);
+  color: var(--teal);
+  background: rgba(14, 154, 160, 0.10);
   padding: 0.0625rem 0.4rem;
-  border-radius: 3px;
+  border-radius: 5px;
 }
 .ai-prose pre {
   font-family: var(--font-mono), monospace;
@@ -201,7 +215,7 @@ html, body {
   color: var(--teal);
   text-decoration: underline;
   text-underline-offset: 3px;
-  text-decoration-style: wavy;
+  font-weight: 500;
 }
 
 .score-ring { transition: stroke-dashoffset 1s ease-out; }

@@ -3,7 +3,7 @@ import { NextRequest, NextResponse } from "next/server";
 export const runtime = "nodejs";
 export const maxDuration = 30;
 
-const SYSTEM_PROMPT = `You are Atlas Agent, an in-product SEO assistant inside the SEO Engine toolkit.
+const SYSTEM_PROMPT = `You are Atlas Agent, an in-product SEO assistant inside the GoToSEO toolkit.
 
 The toolkit is free, open-source, runs on Google PageSpeed (Lighthouse) and Llama 3.3 70B via Groq.
 You can advise on:
@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const trimmed = messages.slice(-16);
     const systemContent = context?.trim()
-      ? `${SYSTEM_PROMPT}\n\n---\nProject context (from the user's recent activity in the SEO Engine app — treat as ground truth and reference specific numbers in your answers):\n\n${context.trim()}`
+      ? `${SYSTEM_PROMPT}\n\n---\nProject context (from the user's recent activity in the GoToSEO app — treat as ground truth and reference specific numbers in your answers):\n\n${context.trim()}`
       : SYSTEM_PROMPT;
 
     const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
