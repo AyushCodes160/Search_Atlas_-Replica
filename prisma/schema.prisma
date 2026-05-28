@@ -1,0 +1,119 @@
+// SEO Engine — Postgres schema (Neon) for Auth.js v5 + per-user persistence.
+// Tools stay usable anonymously; signing in adds saved history that syncs.
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+// ---- Auth.js v5 models (required by @auth/prisma-adapter) ----
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  accounts      Account[]
+  sessions      Session[]
+
+  audits       Audit[]
+  keywordLists KeywordList[]
+  siteCrawls   SiteCrawl[]
+
+  createdAt DateTime @default(now())
+}
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ---- App models ----
+
+// One saved single-page audit (Site Audit or the "you" side of Competitor).
+model Audit {
+  id          String   @id @default(cuid())
+  userId      String
+  url         String
+  sourceType  String // "web" | "api"
+  performance Int?
+  seo         Int?
+  accessibility Int?
+  bestPractices Int?
+  lcp         String?
+  words       Int?
+  // Full audit payload (scores, vitals, on-page, issues, AI plan) for re-render.
+  data        Json?
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// A saved keyword expansion list.
+model KeywordList {
+  id        String   @id @default(cuid())
+  userId    String
+  seed      String
+  total     Int
+  data      Json // full keyword rows + clusters
+  createdAt DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+// A whole-site crawl summary (per-page rows + rollup + AI report).
+model SiteCrawl {
+  id          String   @id @default(cuid())
+  userId      String
+  origin      String
+  pages       Int
+  mode        String // "fast" | "deep"
+  healthScore Int?
+  summary     String?  @db.Text
+  data        Json // per-page rows + rollup
+  createdAt   DateTime @default(now())
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}

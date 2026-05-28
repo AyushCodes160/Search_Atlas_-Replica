@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fredericka_the_Great, Inter, Special_Elite } from "next/font/google";
 import "./globals.css";
+import { Providers } from "@/components/Providers";
 
 const hand = Fredericka_the_Great({
   weight: "400",
@@ -33,7 +34,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${hand.variable} ${sans.variable} ${mono.variable}`}>
       <body className="min-h-screen font-sans antialiased bg-paper text-ink">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );

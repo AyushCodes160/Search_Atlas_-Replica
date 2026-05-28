@@ -3,6 +3,8 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useSession, signIn, signOut } from "next-auth/react";
+import { LogIn, LogOut } from "lucide-react";
 import {
   LayoutDashboard,
   Wand2,
@@ -47,6 +49,7 @@ const NAV = [
 export function Sidebar() {
   const path = usePathname();
   const [open, setOpen] = useState(false);
+  const { data: session, status } = useSession();
 
   // Close drawer on route change.
   useEffect(() => {
@@ -142,7 +145,47 @@ export function Sidebar() {
           })}
         </nav>
 
-        <div className="px-5 py-4 border-t-2 border-dashed border-ink/15">
+        {/* Account */}
+        <div className="px-3 py-3 border-t-2 border-dashed border-ink/15">
+          {status === "loading" ? (
+            <div className="px-2 py-2 font-sans text-[12px] text-ink-soft">…</div>
+          ) : session?.user ? (
+            <div className="flex items-center gap-2.5 px-2 py-1.5">
+              {session.user.image ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img
+                  src={session.user.image}
+                  alt={session.user.name || "you"}
+                  className="w-8 h-8 rounded-full border-2 border-ink/85 shrink-0"
+                />
+              ) : (
+                <span className="w-8 h-8 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center font-hand text-[14px] shrink-0">
+                  {(session.user.name || session.user.email || "?").charAt(0).toUpperCase()}
+                </span>
+              )}
+              <div className="flex-1 min-w-0">
+                <div className="font-sans text-[12.5px] text-ink truncate leading-tight">
+                  {session.user.name || session.user.email}
+                </div>
+                <button
+                  onClick={() => signOut({ callbackUrl: "/" })}
+                  className="font-hand text-[12.5px] text-ink-soft hover:text-sunset inline-flex items-center gap-1"
+                >
+                  <LogOut className="w-3 h-3" /> sign out
+                </button>
+              </div>
+            </div>
+          ) : (
+            <button
+              onClick={() => signIn("google", { callbackUrl: path || "/app/dashboard" })}
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 font-hand text-[15px] bg-paper border-2 border-ink/80 shadow-[2px_2px_0_0_rgba(44,36,23,0.7)] hover:-translate-y-0.5 transition-transform"
+            >
+              <LogIn className="w-4 h-4 text-teal-accent" /> Sign in to save
+            </button>
+          )}
+        </div>
+
+        <div className="px-5 py-3 border-t-2 border-dashed border-ink/15">
           <Link
             href="/"
             className="font-hand text-[15px] text-ink-soft hover:text-teal-accent inline-flex items-center gap-1.5 group"
