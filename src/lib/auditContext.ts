@@ -38,6 +38,21 @@ export function saveLastAudit(a: StoredAudit) {
   } catch {
     /* ignore quota or private-mode errors */
   }
+  // Mirror to the cloud. The endpoint 401s for signed-out users — ignored.
+  syncAuditToCloud(a);
+}
+
+export function syncAuditToCloud(a: StoredAudit) {
+  try {
+    fetch("/api/me/audits", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify(a),
+      keepalive: true,
+    }).catch(() => {});
+  } catch {
+    /* best effort */
+  }
 }
 
 export function readLastAudit(): StoredAudit | null {

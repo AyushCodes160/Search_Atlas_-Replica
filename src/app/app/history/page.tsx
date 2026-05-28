@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useMemo, useState } from "react";
+import { useSession } from "next-auth/react";
 import {
   Activity,
   Clock,
@@ -9,6 +10,7 @@ import {
   ExternalLink,
   RotateCw,
   AlertCircle,
+  Cloud,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
 import {
@@ -18,6 +20,7 @@ import {
   type StoredAudit,
 } from "@/lib/auditContext";
 
+type HistoryItem = StoredAudit & { id?: string };
 type SourceFilter = "all" | "web" | "api";
 type SortKey = "newest" | "oldest" | "worstPerf" | "bestPerf";
 
@@ -39,35 +42,76 @@ function scoreColor(s: number): string {
 }
 
 export default function HistoryPage() {
-  const [history, setHistory] = useState<StoredAudit[]>([]);
+  const { status } = useSession();
+  const authed = status === "authenticated";
+  const [history, setHistory] = useState<HistoryItem[]>([]);
   const [mounted, setMounted] = useState(false);
   const [source, setSource] = useState<SourceFilter>("all");
   const [sort, setSort] = useState<SortKey>("newest");
   const [confirmClear, setConfirmClear] = useState(false);
 
+  // Load from the cloud when signed in, else from localStorage.
   useEffect(() => {
-    setHistory(readHistory());
-    setMounted(true);
-  }, []);
+    let cancelled = false;
+    async function load() {
+      if (status === "loading") return;
+      if (authed) {
+        try {
+          const res = await fetch("/api/me/audits");
+          const data = await res.json();
+          if (!cancelled && res.ok) setHistory(data.audits || []);
+        } catch {
+          if (!cancelled) setHistory([]);
+        }
+      } else {
+        if (!cancelled) setHistory(readHistory());
+      }
+      if (!cancelled) setMounted(true);
+    }
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [status, authed]);
 
-  function refresh() {
-    setHistory(readHistory());
+  async function refresh() {
+    if (authed) {
+      try {
+        const res = await fetch("/api/me/audits");
+        const data = await res.json();
+        if (res.ok) setHistory(data.audits || []);
+      } catch {
+        /* ignore */
+      }
+    } else {
+      setHistory(readHistory());
+    }
   }
 
-  function onDelete(url: string, ranAt: number) {
-    deleteFromHistory(url, ranAt);
-    refresh();
+  async function onDelete(item: HistoryItem) {
+    if (authed && item.id) {
+      await fetch(`/api/me/audits/${item.id}`, { method: "DELETE" }).catch(() => {});
+      refresh();
+    } else {
+      deleteFromHistory(item.url, item.ranAt);
+      setHistory(readHistory());
+    }
   }
 
-  function onClearAll() {
+  async function onClearAll() {
     if (!confirmClear) {
       setConfirmClear(true);
       setTimeout(() => setConfirmClear(false), 4000);
       return;
     }
-    clearHistory();
+    if (authed) {
+      await fetch("/api/me/audits", { method: "DELETE" }).catch(() => {});
+      refresh();
+    } else {
+      clearHistory();
+      setHistory(readHistory());
+    }
     setConfirmClear(false);
-    refresh();
   }
 
   const filtered = useMemo(() => {
@@ -86,7 +130,11 @@ export default function HistoryPage() {
       <PageHeader
         kicker="audit history"
         title="Everything you've audited."
-        subtitle="Last 10 audits, kept locally in your browser. Re-run any URL, share a link, or wipe the slate."
+        subtitle={
+          authed
+            ? "Synced to your account — your last 50 audits, available on any device. Re-run any URL, share a link, or wipe the slate."
+            : "Your last 10 audits, kept locally in this browser. Sign in to sync them to your account across devices."
+        }
       />
 
       <div className="dotted-card p-4 sm:p-5 relative mb-8">
@@ -131,8 +179,14 @@ export default function HistoryPage() {
             </button>
           )}
         </div>
-        <p className="font-sans text-[12.5px] text-ink-soft mt-3 leading-relaxed">
-          Saved to your browser as <code>seo-engine:audit-history</code>. Sign in (coming next phase) to sync across devices.
+        <p className="font-sans text-[12.5px] text-ink-soft mt-3 leading-relaxed inline-flex items-center gap-1.5">
+          {authed ? (
+            <>
+              <Cloud className="w-3.5 h-3.5 text-teal-accent" /> Synced to your account.
+            </>
+          ) : (
+            <>Saved to your browser as <code>seo-engine:audit-history</code>. Sign in to sync across devices.</>
+          )}
         </p>
       </div>
 
@@ -202,7 +256,7 @@ export default function HistoryPage() {
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
                 <button
-                  onClick={() => onDelete(a.url, a.ranAt)}
+                  onClick={() => onDelete(a)}
                   aria-label="remove from history"
                   title="remove"
                   className="p-2 rounded-md border-2 border-ink/40 text-ink-soft hover:border-sunset hover:text-sunset"
