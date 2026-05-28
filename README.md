@@ -40,7 +40,7 @@ Each ships a placeholder page that documents the exact dependency (paid API, OAu
 
 ## Auth & accounts (optional)
 
-Sign-in is **optional** — every tool works anonymously. Signing in with Google adds persistent, cross-device history (audits, keyword lists, site crawls). Sign-in is live; per-user persistence of saved data is in progress (see roadmap).
+Sign-in is **optional** — every tool works anonymously (data lives in `localStorage`). Signing in with Google persists your audits, keyword lists, and site crawls to your account and syncs them across devices. The same UI reads from the cloud when signed in and from `localStorage` when not.
 
 To enable auth locally you need a Neon Postgres database and a Google OAuth client (both free), then:
 
@@ -109,6 +109,9 @@ src/
       content/route.ts             # fourteen-format AI writer
       agent/route.ts               # Atlas Agent chat (accepts audit context)
       auth/[...nextauth]/route.ts  # Auth.js v5 handler (Google OAuth)
+      me/audits/                   # ┐ per-user persistence (CRUD, session-scoped)
+      me/keyword-lists/            # │ save/list/delete; 401 when signed out
+      me/crawls/                   # ┘ so anonymous users fall back to localStorage
     app/
       layout.tsx                   # dashboard shell (sidebar + main)
       page.tsx                     # redirect -> /app/dashboard
@@ -160,8 +163,9 @@ mcp-server/
 - [x] Audit History + share link + Export PDF
 - [x] Responsive sidebar + marketing nav (mobile drawer)
 - [x] Google sign-in (Auth.js v5 + Prisma + Neon Postgres)
-- [ ] Per-user persistence — save audits / keyword lists / crawls to your account (in progress)
+- [x] Per-user persistence — audits, keyword lists & site crawls sync to your account
 - [ ] Scheduled re-crawls + email alerts
+- [ ] Crawl-history browsing UI
 - [ ] OTTO-lite — JS snippet that auto-applies on-page SEO fixes
 - [ ] Rank Tracker — needs paid SerpAPI / DataForSEO
 - [ ] Local SEO + GBP — needs Google Business Profile OAuth
