@@ -208,9 +208,9 @@ export default function DashboardPage() {
               <Link
                 key={a.url + a.ranAt}
                 href="/app/site-audit"
-                className="sticky-note rounded-md p-3 border-2 border-ink/80 flex items-start gap-3 hover:-translate-y-0.5 transition-transform"
+                className="sticky-note rounded-md p-3 border border-ink/20 flex items-start gap-3 hover:-translate-y-0.5 transition-transform"
               >
-                <span className="w-9 h-9 shrink-0 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center">
+                <span className="w-9 h-9 shrink-0 rounded-full bg-paper border border-ink/20 flex items-center justify-center">
                   <Activity className="w-4 h-4 text-ink" strokeWidth={2} />
                 </span>
                 <div className="flex-1 min-w-0">
@@ -243,9 +243,9 @@ export default function DashboardPage() {
               <Link
                 key={l.id}
                 href="/app/keywords"
-                className="sticky-note rounded-md p-3 border-2 border-ink/80 flex items-start gap-3 hover:-translate-y-0.5 transition-transform"
+                className="sticky-note rounded-md p-3 border border-ink/20 flex items-start gap-3 hover:-translate-y-0.5 transition-transform"
               >
-                <span className="w-9 h-9 shrink-0 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center">
+                <span className="w-9 h-9 shrink-0 rounded-full bg-paper border border-ink/20 flex items-center justify-center">
                   <KeyRound className="w-4 h-4 text-ink" strokeWidth={2} />
                 </span>
                 <div className="flex-1 min-w-0">
@@ -288,7 +288,7 @@ function Stat({
   accent?: string;
 }) {
   return (
-    <div className="sticky-note rounded-md p-4 border-2 border-ink/80">
+    <div className="sticky-note rounded-md p-4 border border-ink/20">
       <div className="font-hand text-clay text-[13px] mb-1">{label}</div>
       <div
         className="font-hand text-[36px] leading-none mb-1.5"
@@ -332,10 +332,10 @@ function ModuleCard({
   return (
     <Link
       href={href}
-      className={`sticky-note rounded-md p-5 border-2 border-ink/80 flex flex-col gap-2 ${ready ? "" : "opacity-90"}`}
+      className={`sticky-note rounded-md p-5 border border-ink/20 flex flex-col gap-2 ${ready ? "" : "opacity-90"}`}
     >
       <div className="flex items-center justify-between">
-        <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-paper border-2 border-ink/85">
+        <span className="inline-flex items-center justify-center w-9 h-9 rounded-full bg-paper border border-ink/20">
           <Icon className="w-4 h-4 text-ink" strokeWidth={2} />
         </span>
         {!ready && (

@@ -438,7 +438,7 @@ export default function CompetitorCrawlPage() {
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">~ the matchup ~</span>
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">~ the matchup ~</span>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 mb-4">
           <ModeCard
@@ -471,7 +471,7 @@ export default function CompetitorCrawlPage() {
             <button
               onClick={run}
               disabled={!mineUrl.trim() || !theirsUrl.trim()}
-              className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-50 disabled:cursor-not-allowed"
+              className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
             >
               <Swords className="w-4 h-4" /> {mode === "deep" ? "Deep-compare sites" : "Compare sites"} →
             </button>
@@ -573,7 +573,7 @@ export default function CompetitorCrawlPage() {
 
       {/* Verdict */}
       {comparison && (
-        <section className="sticky-note rounded-lg p-6 sm:p-8 border-[2.5px] border-ink/85 mb-8" style={{ transform: "rotate(-0.3deg)" }}>
+        <section className="sticky-note rounded-lg p-6 sm:p-8 border border-ink/15 mb-8" style={{ transform: "rotate(-0.3deg)" }}>
           <p className="font-hand text-clay text-[15px] mb-1">~ llama 3.3 ~</p>
           <h2 className="font-hand text-[28px] text-ink leading-tight mb-4">How the matchup reads.</h2>
           <div className="ai-prose" dangerouslySetInnerHTML={{ __html: mdToHtml(comparison) }} />
@@ -603,7 +603,7 @@ function UrlField({ label, value, onChange, placeholder, disabled }: { label: st
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30 disabled:opacity-60"
+          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30 disabled:opacity-60"
         />
       </div>
     </label>
@@ -614,7 +614,7 @@ function ModeCard({ active, onClick, Icon, title, blurb }: { active: boolean; on
   return (
     <button
       onClick={onClick}
-      className={`text-left rounded-md p-4 border-2 transition-transform ${active ? "border-ink/85 bg-paper -translate-y-0.5 shadow-[3px_3px_0_0_rgba(44,36,23,0.6)]" : "border-ink/40 bg-paper-50/50 hover:border-ink"}`}
+      className={`text-left rounded-md p-4 border-2 transition-transform ${active ? "border-ink/85 bg-paper -translate-y-0.5 shadow-md" : "border-ink/40 bg-paper-50/50 hover:border-ink"}`}
     >
       <div className="flex items-center gap-2 mb-1.5">
         <Icon className={`w-4 h-4 ${active ? "text-teal-accent" : "text-ink-soft"}`} strokeWidth={2.2} />
@@ -628,7 +628,7 @@ function ModeCard({ active, onClick, Icon, title, blurb }: { active: boolean; on
 
 function SiteColumn({ label, origin, stats, other, tilt }: { label: string; origin?: string; stats: SiteStats | null; other: SiteStats | null; tilt: string }) {
   return (
-    <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: `rotate(${tilt})` }}>
+    <div className="sticky-note rounded-lg p-6 border border-ink/15" style={{ transform: `rotate(${tilt})` }}>
       <div className="font-hand text-clay text-[14px] mb-1">{label}</div>
       <h3 className="font-hand text-[18px] text-ink leading-tight mb-4 break-all">
         {origin ? origin.replace(/^https?:\/\//, "") : "…"}

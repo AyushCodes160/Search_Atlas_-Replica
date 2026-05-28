@@ -466,7 +466,7 @@ export default function SiteCrawlPage() {
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">~ the site ~</span>
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">~ the site ~</span>
 
         {/* Mode toggle */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-2 mb-4">
@@ -494,7 +494,7 @@ export default function SiteCrawlPage() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="example.com"
-              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30"
+              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30"
               onKeyDown={(e) => e.key === "Enter" && !busy && run()}
               disabled={busy}
             />
@@ -504,7 +504,7 @@ export default function SiteCrawlPage() {
               <Loader2 className="w-5 h-5 animate-spin" /> stop
             </button>
           ) : (
-            <button onClick={run} className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] self-start">
+            <button onClick={run} className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md self-start">
               <Network className="w-4 h-4" /> {mode === "deep" ? "Deep-audit site" : "Audit entire site"} →
             </button>
           )}
@@ -602,7 +602,7 @@ export default function SiteCrawlPage() {
 
       {/* AI summary */}
       {summary && (
-        <section className="sticky-note rounded-lg p-6 sm:p-8 border-[2.5px] border-ink/85 mb-8">
+        <section className="sticky-note rounded-lg p-6 sm:p-8 border border-ink/15 mb-8">
           <p className="font-hand text-clay text-[15px] mb-1">~ llama 3.3 ~</p>
           <h2 className="font-hand text-[28px] text-ink leading-tight mb-4">Site health report.</h2>
           <div className="ai-prose" dangerouslySetInnerHTML={{ __html: mdToHtml(summary) }} />
@@ -614,7 +614,7 @@ export default function SiteCrawlPage() {
         <section>
           <div className="flex items-center justify-between mb-3 flex-wrap gap-3">
             <p className="font-hand text-clay text-[16px]">~ per-page results ~</p>
-            <button onClick={exportCsv} className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink">
+            <button onClick={exportCsv} className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-ink/15 text-ink-soft hover:border-ink">
               <Download className="w-3.5 h-3.5" /> export CSV
             </button>
           </div>
@@ -686,7 +686,7 @@ function ModeCard({ active, onClick, Icon, title, blurb }: { active: boolean; on
   return (
     <button
       onClick={onClick}
-      className={`text-left rounded-md p-4 border-2 transition-transform ${active ? "border-ink/85 bg-paper -translate-y-0.5 shadow-[3px_3px_0_0_rgba(44,36,23,0.6)]" : "border-ink/40 bg-paper-50/50 hover:border-ink"}`}
+      className={`text-left rounded-md p-4 border-2 transition-transform ${active ? "border-ink/85 bg-paper -translate-y-0.5 shadow-md" : "border-ink/40 bg-paper-50/50 hover:border-ink"}`}
     >
       <div className="flex items-center gap-2 mb-1.5">
         <Icon className={`w-4 h-4 ${active ? "text-teal-accent" : "text-ink-soft"}`} strokeWidth={2.2} />
@@ -740,7 +740,7 @@ function UrlCell({ url, issues }: { url: string; issues?: string[] }) {
 
 function StatCard({ label, value, color }: { label: string; value: string; color?: string }) {
   return (
-    <div className="sticky-note rounded-md p-4 border-2 border-ink/80">
+    <div className="sticky-note rounded-md p-4 border border-ink/20">
       <div className="font-hand text-clay text-[13px] mb-1">{label}</div>
       <div className="font-hand text-[40px] leading-none" style={{ color: color ?? "#2c2417" }}>{value}</div>
     </div>
@@ -846,7 +846,7 @@ function impactStyle(impact: string): React.CSSProperties {
 
 function MiniScore({ label, v }: { label: string; v: number }) {
   return (
-    <div className="bg-paper-50/80 border-2 border-ink/40 rounded-md p-2.5 text-center">
+    <div className="bg-paper-50/80 border border-ink/15 rounded-md p-2.5 text-center">
       <div className="font-hand text-[28px] leading-none" style={{ color: scoreColor(v) }}>{v}</div>
       <div className="font-hand text-[11px] text-clay mt-1">{label}</div>
     </div>

@@ -176,7 +176,7 @@ export default function ContentPage() {
 
       {/* Form */}
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ brief ~
         </span>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -185,7 +185,7 @@ export default function ContentPage() {
               value={topic}
               onChange={(e) => setTopic(e.target.value)}
               placeholder="e.g. yoga retreats in Bali for beginners"
-              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
               onKeyDown={(e) => e.key === "Enter" && run()}
             />
           </Field>
@@ -194,7 +194,7 @@ export default function ContentPage() {
               value={audience}
               onChange={(e) => setAudience(e.target.value)}
               placeholder="e.g. first-time travellers, 25-40, on a budget"
-              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
             />
           </Field>
           <Field label="Tone">
@@ -202,7 +202,7 @@ export default function ContentPage() {
               value={tone}
               onChange={(e) => setTone(e.target.value)}
               placeholder="e.g. casual, witty, expert, urgent"
-              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
             />
           </Field>
           {kind === "blog" && (
@@ -254,7 +254,7 @@ export default function ContentPage() {
             <select
               value={language}
               onChange={(e) => setLanguage(e.target.value)}
-              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans"
             >
               {LANGUAGES.map((l) => (
                 <option key={l} value={l}>
@@ -287,7 +287,7 @@ export default function ContentPage() {
             onChange={(e) => setBrandVoice(e.target.value)}
             rows={3}
             placeholder="e.g. We write in short sentences. We avoid jargon. We never call ourselves 'leaders'. We use 'you' more than 'we'."
-            className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans resize-y"
+            className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] focus:ring-2 focus:ring-teal-accent/30 font-sans resize-y"
           />
         </Field>
 
@@ -295,7 +295,7 @@ export default function ContentPage() {
           <button
             onClick={run}
             disabled={loading}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-60 disabled:cursor-not-allowed"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-60 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -325,7 +325,7 @@ export default function ContentPage() {
 
       {/* Result */}
       {result && (
-        <section className="sticky-note rounded-lg p-6 sm:p-8 border-[2.5px] border-ink/85">
+        <section className="sticky-note rounded-lg p-6 sm:p-8 border border-ink/15">
           <div className="flex items-center justify-between flex-wrap gap-3 mb-5">
             <div>
               <p className="font-hand text-clay text-[15px] mb-1">~ llama 3.3 ~</p>
@@ -336,7 +336,7 @@ export default function ContentPage() {
             <div className="flex flex-wrap gap-2">
               <button
                 onClick={() => copy(result.content, "raw")}
-                className="font-hand text-[15px] text-ink border-2 border-ink/70 rounded-full px-3 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5"
+                className="font-hand text-[15px] text-ink border border-ink/20 rounded-full px-3 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5"
               >
                 {copied === "raw" ? <Check className="w-4 h-4 text-teal-accent" /> : <Copy className="w-4 h-4" />}
                 Copy Markdown

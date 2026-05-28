@@ -153,13 +153,13 @@ export default function CrawlHistoryPage() {
       />
 
       <div className="dotted-card p-4 sm:p-5 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ saved crawls ~
         </span>
         <div className="flex flex-wrap items-center gap-2 mt-2">
           <Link
             href="/app/site-crawl"
-            className="font-hand text-[14px] px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink hover:text-ink inline-flex items-center gap-1.5"
+            className="font-hand text-[14px] px-3 py-1 rounded-full border border-ink/15 text-ink-soft hover:border-ink hover:text-ink inline-flex items-center gap-1.5"
           >
             <Network className="w-3.5 h-3.5" /> new whole-site audit
           </Link>
@@ -197,7 +197,7 @@ export default function CrawlHistoryPage() {
           </p>
           <Link
             href="/app/site-crawl"
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-hand text-[16px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)]"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-hand text-[16px] shadow-md"
           >
             Crawl your first site →
           </Link>
@@ -207,10 +207,10 @@ export default function CrawlHistoryPage() {
           {crawls.map((c) => (
             <li
               key={c.id}
-              className="sticky-note rounded-md p-4 border-2 border-ink/80 flex flex-col gap-3"
+              className="sticky-note rounded-md p-4 border border-ink/20 flex flex-col gap-3"
             >
               <div className="flex items-start gap-3">
-                <span className="w-10 h-10 shrink-0 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center">
+                <span className="w-10 h-10 shrink-0 rounded-full bg-paper border border-ink/20 flex items-center justify-center">
                   <Network className="w-4 h-4 text-ink" strokeWidth={2} />
                 </span>
                 <div className="flex-1 min-w-0">
@@ -243,7 +243,7 @@ export default function CrawlHistoryPage() {
                     onClick={() => onDelete(c)}
                     aria-label="remove crawl"
                     title="remove"
-                    className="p-2 rounded-md border-2 border-ink/40 text-ink-soft hover:border-sunset hover:text-sunset"
+                    className="p-2 rounded-md border border-ink/15 text-ink-soft hover:border-sunset hover:text-sunset"
                   >
                     <Trash2 className="w-3.5 h-3.5" />
                   </button>

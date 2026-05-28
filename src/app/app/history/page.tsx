@@ -138,7 +138,7 @@ export default function HistoryPage() {
       />
 
       <div className="dotted-card p-4 sm:p-5 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ filters ~
         </span>
         <div className="flex flex-wrap gap-2 mt-2">
@@ -158,7 +158,7 @@ export default function HistoryPage() {
           <select
             value={sort}
             onChange={(e) => setSort(e.target.value as SortKey)}
-            className="font-hand text-[14px] px-3 py-1 rounded-full border-2 border-ink/40 bg-paper text-ink-soft hover:border-ink ml-auto"
+            className="font-hand text-[14px] px-3 py-1 rounded-full border border-ink/15 bg-paper text-ink-soft hover:border-ink ml-auto"
           >
             <option value="newest">sort: newest first</option>
             <option value="oldest">sort: oldest first</option>
@@ -204,7 +204,7 @@ export default function HistoryPage() {
           {history.length === 0 && (
             <Link
               href="/app/site-audit"
-              className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-hand text-[16px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)]"
+              className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 font-hand text-[16px] shadow-md"
             >
               Run your first audit →
             </Link>
@@ -215,9 +215,9 @@ export default function HistoryPage() {
           {filtered.map((a) => (
             <li
               key={`${a.url}-${a.ranAt}`}
-              className="sticky-note rounded-md p-4 border-2 border-ink/80 flex flex-col sm:flex-row sm:items-center gap-3"
+              className="sticky-note rounded-md p-4 border border-ink/20 flex flex-col sm:flex-row sm:items-center gap-3"
             >
-              <span className="w-10 h-10 shrink-0 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center">
+              <span className="w-10 h-10 shrink-0 rounded-full bg-paper border border-ink/20 flex items-center justify-center">
                 <Activity className="w-4 h-4 text-ink" strokeWidth={2} />
               </span>
               <div className="flex-1 min-w-0">
@@ -241,7 +241,7 @@ export default function HistoryPage() {
                   href={`/app/site-audit?url=${encodeURIComponent(a.url)}`}
                   aria-label="re-run audit"
                   title="re-run audit"
-                  className="p-2 rounded-md border-2 border-ink/40 text-ink-soft hover:border-ink hover:text-ink"
+                  className="p-2 rounded-md border border-ink/15 text-ink-soft hover:border-ink hover:text-ink"
                 >
                   <RotateCw className="w-3.5 h-3.5" />
                 </Link>
@@ -251,7 +251,7 @@ export default function HistoryPage() {
                   rel="noopener noreferrer"
                   aria-label="open URL"
                   title="open URL"
-                  className="p-2 rounded-md border-2 border-ink/40 text-ink-soft hover:border-ink hover:text-ink"
+                  className="p-2 rounded-md border border-ink/15 text-ink-soft hover:border-ink hover:text-ink"
                 >
                   <ExternalLink className="w-3.5 h-3.5" />
                 </a>
@@ -259,7 +259,7 @@ export default function HistoryPage() {
                   onClick={() => onDelete(a)}
                   aria-label="remove from history"
                   title="remove"
-                  className="p-2 rounded-md border-2 border-ink/40 text-ink-soft hover:border-sunset hover:text-sunset"
+                  className="p-2 rounded-md border border-ink/15 text-ink-soft hover:border-sunset hover:text-sunset"
                 >
                   <Trash2 className="w-3.5 h-3.5" />
                 </button>

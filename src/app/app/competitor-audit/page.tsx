@@ -165,7 +165,7 @@ export default function CompetitorAuditPage() {
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ the matchup ~
         </span>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mt-2">
@@ -189,7 +189,7 @@ export default function CompetitorAuditPage() {
           <button
             onClick={run}
             disabled={loading || !mine.trim() || !theirs.trim()}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <>
@@ -223,7 +223,7 @@ export default function CompetitorAuditPage() {
       )}
 
       {comparison && (
-        <section className="sticky-note rounded-lg p-6 sm:p-8 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.3deg)" }}>
+        <section className="sticky-note rounded-lg p-6 sm:p-8 border border-ink/15" style={{ transform: "rotate(-0.3deg)" }}>
           <div className="flex items-center gap-2 mb-5">
             <p className="font-hand text-clay text-[15px]">~ llama 3.3 ~</p>
           </div>
@@ -261,7 +261,7 @@ function UrlField({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           disabled={disabled}
-          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30 disabled:opacity-60"
+          className="w-full pl-10 pr-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30 disabled:opacity-60"
         />
       </div>
     </label>
@@ -282,7 +282,7 @@ function SidePanel({
   if (!audit) {
     return (
       <div
-        className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85 text-center"
+        className="sticky-note rounded-lg p-6 border border-ink/15 text-center"
         style={{ transform: `rotate(${tilt})` }}
       >
         <Loader2 className="w-6 h-6 animate-spin text-teal-accent mx-auto mb-2" />
@@ -293,7 +293,7 @@ function SidePanel({
   if (audit.sourceType === "api") {
     return (
       <div
-        className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85"
+        className="sticky-note rounded-lg p-6 border border-ink/15"
         style={{ transform: `rotate(${tilt})` }}
       >
         <div className="font-hand text-clay text-[14px] mb-1">{label}</div>
@@ -309,7 +309,7 @@ function SidePanel({
   const otherWeb = other?.sourceType === "web" ? other : null;
   return (
     <div
-      className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85"
+      className="sticky-note rounded-lg p-6 border border-ink/15"
       style={{ transform: `rotate(${tilt})` }}
     >
       <div className="font-hand text-clay text-[14px] mb-1">{label}</div>

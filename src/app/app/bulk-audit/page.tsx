@@ -206,7 +206,7 @@ export default function BulkAuditPage() {
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ urls (max 10) ~
         </span>
         <textarea
@@ -215,13 +215,13 @@ export default function BulkAuditPage() {
           disabled={running}
           rows={6}
           placeholder={"https://example.com\nhttps://example.com/blog/something\nhttps://api.example.com/v1/items"}
-          className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[13px] font-mono focus:ring-2 focus:ring-teal-accent/30 mt-2 resize-y"
+          className="w-full px-3 py-2.5 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[13px] font-mono focus:ring-2 focus:ring-teal-accent/30 mt-2 resize-y"
         />
         <div className="flex flex-wrap items-center gap-3 mt-4">
           <button
             onClick={start}
             disabled={running || parseUrls(text).length === 0}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {running ? (
               <>
@@ -237,7 +237,7 @@ export default function BulkAuditPage() {
           {rows.length > 0 && !running && stats.done > 0 && (
             <button
               onClick={exportCsv}
-              className="font-hand text-[16px] text-ink border-2 border-ink/70 rounded-full px-4 py-2 hover:bg-paper-50 inline-flex items-center gap-1.5"
+              className="font-hand text-[16px] text-ink border border-ink/20 rounded-full px-4 py-2 hover:bg-paper-50 inline-flex items-center gap-1.5"
             >
               <Download className="w-4 h-4" /> Export CSV
             </button>
@@ -249,7 +249,7 @@ export default function BulkAuditPage() {
       </div>
 
       {rows.length > 0 && (
-        <section className="sticky-note rounded-lg p-5 sm:p-6 border-[2.5px] border-ink/85">
+        <section className="sticky-note rounded-lg p-5 sm:p-6 border border-ink/15">
           <div className="flex flex-wrap items-center justify-between gap-3 mb-5">
             <div>
               <p className="font-hand text-clay text-[15px] mb-1">~ progress ~</p>

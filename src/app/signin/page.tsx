@@ -14,12 +14,12 @@ function SignInInner() {
   return (
     <div className="min-h-screen flex items-center justify-center px-5 py-10 bg-paper">
       <div className="dotted-card p-8 sm:p-10 max-w-md w-full relative">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-6 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-6 bg-paper-50 px-2">
           ~ sign in ~
         </span>
 
         <Link href="/" className="flex items-center gap-2.5 mb-6">
-          <span className="flex items-center justify-center w-10 h-10 rounded-full bg-paper border-2 border-ink/85 shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]">
+          <span className="flex items-center justify-center w-10 h-10 rounded-full bg-paper border border-ink/20 shadow-sm">
             <Logo />
           </span>
           <span className="font-hand text-[24px] leading-none mt-1">GoToSEO</span>
@@ -41,7 +41,7 @@ function SignInInner() {
 
         <button
           onClick={() => signIn("google", { callbackUrl })}
-          className="w-full inline-flex items-center justify-center gap-3 rounded-full px-6 py-3 font-hand text-[19px] bg-paper border-2 border-ink/85 shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] hover:-translate-y-0.5 transition-transform"
+          className="w-full inline-flex items-center justify-center gap-3 rounded-full px-6 py-3 font-hand text-[19px] bg-paper border border-ink/20 shadow-md hover:-translate-y-0.5 transition-transform"
         >
           <GoogleMark />
           Continue with Google

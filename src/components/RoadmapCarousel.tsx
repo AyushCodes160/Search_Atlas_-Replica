@@ -86,7 +86,7 @@ export default function RoadmapCarousel() {
           return (
             <div
               key={p.n}
-              className={`absolute top-0 left-1/2 w-[280px] sm:w-[340px] h-full -ml-[140px] sm:-ml-[170px] sticky-note rounded-lg border-[2.5px] border-ink/85 p-6 flex flex-col transition-all duration-500 ease-out`}
+              className={`absolute top-0 left-1/2 w-[280px] sm:w-[340px] h-full -ml-[140px] sm:-ml-[170px] sticky-note rounded-lg border border-ink/15 p-6 flex flex-col transition-all duration-500 ease-out`}
               style={{
                 zIndex: z,
                 transform: `translate(${translateX}px, ${translateY}px) rotate(${rotate}deg) scale(${scale})`,
@@ -96,7 +96,7 @@ export default function RoadmapCarousel() {
             >
               <div className="flex items-center justify-between mb-2">
                 <span className="font-hand text-teal-accent text-[22px]">{p.n}</span>
-                <span className="font-hand text-[14px] uppercase tracking-wide text-clay border-2 border-ink/70 rounded-full px-2.5 py-0.5">
+                <span className="font-hand text-[14px] uppercase tracking-wide text-clay border border-ink/20 rounded-full px-2.5 py-0.5">
                   {p.status}
                 </span>
               </div>
@@ -120,7 +120,7 @@ export default function RoadmapCarousel() {
             key={i}
             onClick={() => setActive(i)}
             aria-label={`Go to page ${i + 1}`}
-            className={`w-3 h-3 rounded-full border-2 border-ink transition-colors ${i === active ? "bg-teal-accent" : "bg-paper-50"}`}
+            className={`w-3 h-3 rounded-full border border-ink/20 transition-colors ${i === active ? "bg-teal-accent" : "bg-paper-50"}`}
           />
         ))}
       </div>

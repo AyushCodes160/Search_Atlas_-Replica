@@ -150,7 +150,7 @@ export default function AtlasAgentPage() {
                 <button
                   key={s}
                   onClick={() => send(s)}
-                  className="sticky-note rounded-md p-4 border-2 border-ink/80 text-left"
+                  className="sticky-note rounded-md p-4 border border-ink/20 text-left"
                   style={{ transform: `rotate(${i % 2 === 0 ? -1 : 1}deg)` }}
                 >
                   <Sparkles className="w-4 h-4 text-teal-accent mb-2" />
@@ -178,7 +178,7 @@ export default function AtlasAgentPage() {
         </div>
       </div>
 
-      <div className="px-5 sm:px-8 lg:px-12 pb-8 pt-3 max-w-4xl w-full border-t-2 border-dashed border-ink/15">
+      <div className="px-5 sm:px-8 lg:px-12 pb-8 pt-3 max-w-4xl w-full border-t border-ink/10">
         <form
           onSubmit={(e) => {
             e.preventDefault();
@@ -190,13 +190,13 @@ export default function AtlasAgentPage() {
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask Atlas anything about SEO..."
-            className="flex-1 px-4 py-3 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30"
+            className="flex-1 px-4 py-3 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] font-sans focus:ring-2 focus:ring-teal-accent/30"
             disabled={loading}
           />
           <button
             type="submit"
             disabled={loading || !input.trim()}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-hand text-[18px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-50 disabled:cursor-not-allowed"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-5 py-3 font-hand text-[18px] shadow-md disabled:opacity-50 disabled:cursor-not-allowed"
           >
             <Send className="w-4 h-4" /> send
           </button>
@@ -210,12 +210,12 @@ function ChatBubble({ role, content }: { role: "user" | "assistant"; content: st
   if (role === "user") {
     return (
       <div className="flex gap-3 justify-end">
-        <div className="max-w-[80%] bg-paper-200/80 border-2 border-ink/80 rounded-lg p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.45)]">
+        <div className="max-w-[80%] bg-paper-200/80 border border-ink/20 rounded-lg p-4 shadow-sm">
           <p className="font-sans text-[14px] text-ink leading-relaxed whitespace-pre-wrap">
             {content}
           </p>
         </div>
-        <span className="w-9 h-9 shrink-0 rounded-full bg-paper-50 border-2 border-ink/85 flex items-center justify-center">
+        <span className="w-9 h-9 shrink-0 rounded-full bg-paper-50 border border-ink/20 flex items-center justify-center">
           <UserIcon className="w-4 h-4 text-ink" strokeWidth={2} />
         </span>
       </div>
@@ -223,10 +223,10 @@ function ChatBubble({ role, content }: { role: "user" | "assistant"; content: st
   }
   return (
     <div className="flex gap-3">
-      <span className="w-9 h-9 shrink-0 rounded-full bg-teal-accent/15 border-2 border-ink/85 flex items-center justify-center">
+      <span className="w-9 h-9 shrink-0 rounded-full bg-teal-accent/15 border border-ink/20 flex items-center justify-center">
         <Bot className="w-4 h-4 text-teal-dark" strokeWidth={2} />
       </span>
-      <div className="max-w-[80%] sticky-note rounded-lg p-4 border-2 border-ink/80">
+      <div className="max-w-[80%] sticky-note rounded-lg p-4 border border-ink/20">
         <div className="ai-prose" dangerouslySetInnerHTML={{ __html: mdToHtml(content) }} />
       </div>
     </div>

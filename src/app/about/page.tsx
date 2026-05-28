@@ -26,7 +26,7 @@ export default function AboutPage() {
         </header>
 
         <section className="mb-16 grid grid-cols-1 md:grid-cols-2 gap-6 relative">
-          <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(-1deg)" }}>
+          <div className="sticky-note rounded-lg p-6 border border-ink/15" style={{ transform: "rotate(-1deg)" }}>
             <p className="font-hand text-clay text-[15px] mb-1">~ story ~</p>
             <h2 className="font-hand text-[28px] text-ink leading-tight mb-3">Why this exists.</h2>
             <p className="font-sans text-[14px] text-ink-soft leading-relaxed mb-3">
@@ -42,7 +42,7 @@ export default function AboutPage() {
             </p>
           </div>
 
-          <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(1.2deg)" }}>
+          <div className="sticky-note rounded-lg p-6 border border-ink/15" style={{ transform: "rotate(1.2deg)" }}>
             <p className="font-hand text-clay text-[15px] mb-1">~ principles ~</p>
             <h2 className="font-hand text-[28px] text-ink leading-tight mb-3">House rules.</h2>
             <ul className="space-y-2 font-sans text-[14px] text-ink-soft leading-relaxed">
@@ -76,7 +76,7 @@ export default function AboutPage() {
             href="https://github.com/AyushCodes160/SEO_Engine"
             target="_blank"
             rel="noreferrer"
-            className="btn-shake inline-flex items-center gap-3 bg-ink text-paper-50 border-2 border-ink rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(26,164,154,0.85)] hover:bg-teal-dark transition-colors"
+            className="btn-shake inline-flex items-center gap-3 bg-ink text-paper-50 border border-ink/20 rounded-full px-6 py-3 font-hand text-[20px] shadow-md hover:bg-teal-dark transition-colors"
           >
             <Github className="w-5 h-5" strokeWidth={2} />
             View on GitHub
@@ -123,10 +123,10 @@ function RoadmapGraphic() {
         {items.map((it) => (
           <div
             key={it.n}
-            className="sticky-note rounded-md p-5 border-[2.5px] border-ink/85 relative"
+            className="sticky-note rounded-md p-5 border border-ink/15 relative"
             style={{ transform: `rotate(${it.tilt}deg)` }}
           >
-            <div className="absolute -top-3 -right-3 w-9 h-9 rounded-full border-2 border-ink bg-paper-50 flex items-center justify-center font-hand text-[14px] text-ink shadow-[2px_2px_0_0_rgba(44,36,23,0.7)]">
+            <div className="absolute -top-3 -right-3 w-9 h-9 rounded-full border border-ink/20 bg-paper-50 flex items-center justify-center font-hand text-[14px] text-ink shadow-sm">
               {it.status === "Live" ? "✓" : it.status === "Next" ? "→" : "…"}
             </div>
             <div className="font-hand text-teal-accent text-[20px] mb-1">{it.n}</div>

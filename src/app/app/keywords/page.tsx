@@ -225,7 +225,7 @@ export default function KeywordsPage() {
       />
 
       <div className="dotted-card p-5 sm:p-6 relative mb-8">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ seed ~
         </span>
         <div className="flex flex-col sm:flex-row gap-3 mt-2">
@@ -239,14 +239,14 @@ export default function KeywordsPage() {
               value={seed}
               onChange={(e) => setSeed(e.target.value)}
               placeholder="e.g. yoga retreat, ai content writer, vibe coding"
-              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] text-ink placeholder:text-ink/40 focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] text-ink placeholder:text-ink/40 focus:ring-2 focus:ring-teal-accent/30 font-sans"
               onKeyDown={(e) => e.key === "Enter" && run()}
             />
           </div>
           <button
             onClick={run}
             disabled={loading}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-60 disabled:cursor-not-allowed self-start"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-60 disabled:cursor-not-allowed self-start"
           >
             {loading ? (
               <>
@@ -260,7 +260,7 @@ export default function KeywordsPage() {
         <div className="mt-4 flex flex-wrap items-center gap-2">
           <button
             onClick={() => setShowSaved((v) => !v)}
-            className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+            className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-ink/15 text-ink-soft hover:border-ink"
           >
             <FolderOpen className="w-3.5 h-3.5" />
             saved ({saved.length})
@@ -269,14 +269,14 @@ export default function KeywordsPage() {
             <>
               <button
                 onClick={saveCurrent}
-                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-ink/15 text-ink-soft hover:border-ink"
               >
                 <Save className="w-3.5 h-3.5" />
                 save list
               </button>
               <button
                 onClick={exportCsv}
-                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border-2 border-ink/40 text-ink-soft hover:border-ink"
+                className="font-hand text-[14px] inline-flex items-center gap-1.5 px-3 py-1 rounded-full border border-ink/15 text-ink-soft hover:border-ink"
               >
                 <Download className="w-3.5 h-3.5" />
                 export CSV
@@ -291,7 +291,7 @@ export default function KeywordsPage() {
           </div>
         )}
         {showSaved && (
-          <div className="mt-4 border-t-2 border-dashed border-ink/15 pt-4">
+          <div className="mt-4 border-t border-ink/10 pt-4">
             {saved.length === 0 ? (
               <p className="font-sans text-[13px] text-ink-soft">No saved lists yet. Run an expansion, then hit “save list”.</p>
             ) : (
@@ -352,7 +352,7 @@ export default function KeywordsPage() {
                 {result.clusters.map((c, i) => (
                   <div
                     key={c.name + i}
-                    className="sticky-note rounded-md p-4 border-2 border-ink/80"
+                    className="sticky-note rounded-md p-4 border border-ink/20"
                     style={{ transform: `rotate(${i % 2 === 0 ? -1 : 1}deg)` }}
                   >
                     <h3 className="font-hand text-[22px] text-ink leading-tight mb-2">
@@ -429,7 +429,7 @@ export default function KeywordsPage() {
               <select
                 value={sortBy}
                 onChange={(e) => setSortBy(e.target.value as typeof sortBy)}
-                className="font-hand text-[13px] px-3 py-1 rounded-full border-2 border-ink/40 bg-paper text-ink-soft hover:border-ink"
+                className="font-hand text-[13px] px-3 py-1 rounded-full border border-ink/15 bg-paper text-ink-soft hover:border-ink"
               >
                 <option value="default">sort: default</option>
                 <option value="diffAsc">sort: easiest first</option>
@@ -475,7 +475,7 @@ export default function KeywordsPage() {
 
 function Stat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="sticky-note rounded-md p-3 border-2 border-ink/80">
+    <div className="sticky-note rounded-md p-3 border border-ink/20">
       <div className="font-hand text-clay text-[12px] capitalize">{label}</div>
       <div className="font-hand text-[28px] text-ink leading-none mt-1">{value}</div>
     </div>

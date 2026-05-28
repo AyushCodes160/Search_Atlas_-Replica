@@ -78,7 +78,7 @@ export function Sidebar() {
         onClick={() => setOpen(true)}
         aria-label="Open menu"
         aria-expanded={open}
-        className="md:hidden fixed top-3 left-3 z-50 w-11 h-11 rounded-full bg-paper border-2 border-ink/85 shadow-[2px_2px_0_0_rgba(44,36,23,0.85)] flex items-center justify-center"
+        className="md:hidden fixed top-3 left-3 z-50 w-11 h-11 rounded-full bg-paper-50 border border-ink/15 shadow-sm flex items-center justify-center"
       >
         <Menu className="w-5 h-5 text-ink" strokeWidth={2.2} />
       </button>
@@ -94,7 +94,7 @@ export function Sidebar() {
 
       {/* Sidebar panel — drawer on mobile, static on md+ */}
       <aside
-        className={`w-64 sm:w-72 md:w-60 shrink-0 border-r-2 border-dashed border-ink/15 bg-paper md:bg-paper-100/30 backdrop-blur-sm flex flex-col
+        className={`w-64 sm:w-72 md:w-60 shrink-0 border-r border-ink/10 bg-paper-50/90 md:bg-paper-50/55 backdrop-blur-md flex flex-col
           fixed md:static inset-y-0 left-0 z-50
           transition-transform duration-300 ease-out
           ${open ? "translate-x-0" : "-translate-x-full"} md:translate-x-0`}
@@ -104,14 +104,14 @@ export function Sidebar() {
           type="button"
           onClick={() => setOpen(false)}
           aria-label="Close menu"
-          className="md:hidden absolute top-3 right-3 w-9 h-9 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center"
+          className="md:hidden absolute top-3 right-3 w-9 h-9 rounded-full bg-paper-50 border border-ink/15 flex items-center justify-center"
         >
           <X className="w-4 h-4 text-ink" strokeWidth={2.2} />
         </button>
 
-        <div className="px-5 py-5 border-b-2 border-dashed border-ink/15">
+        <div className="px-5 py-5 border-b border-ink/10">
           <Link href="/" className="flex items-center gap-2.5">
-            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-paper border-2 border-ink/85 shadow-[2px_2px_0_0_rgba(44,36,23,0.85)]">
+            <span className="flex items-center justify-center w-9 h-9 rounded-full bg-paper-50 border border-ink/15 shadow-sm">
               <Logo />
             </span>
             <span className="font-hand text-[20px] leading-none mt-1">GoToSEO</span>
@@ -127,7 +127,7 @@ export function Sidebar() {
                 href={href}
                 className={`group flex items-center gap-3 px-3 py-2 rounded-lg text-[14px] transition-colors ${
                   active
-                    ? "bg-paper border-2 border-ink/80 shadow-[2px_2px_0_0_rgba(44,36,23,0.65)]"
+                    ? "bg-paper-50 border border-teal-dark/25 shadow-sm"
                     : "border-2 border-transparent hover:bg-paper-50/60"
                 }`}
                 aria-current={active ? "page" : undefined}
@@ -150,7 +150,7 @@ export function Sidebar() {
         </nav>
 
         {/* Account */}
-        <div className="px-3 py-3 border-t-2 border-dashed border-ink/15">
+        <div className="px-3 py-3 border-t border-ink/10">
           {status === "loading" ? (
             <div className="px-2 py-2 font-sans text-[12px] text-ink-soft">…</div>
           ) : session?.user ? (
@@ -160,10 +160,10 @@ export function Sidebar() {
                 <img
                   src={session.user.image}
                   alt={session.user.name || "you"}
-                  className="w-8 h-8 rounded-full border-2 border-ink/85 shrink-0"
+                  className="w-8 h-8 rounded-full border border-ink/15 shrink-0"
                 />
               ) : (
-                <span className="w-8 h-8 rounded-full bg-paper border-2 border-ink/85 flex items-center justify-center font-hand text-[14px] shrink-0">
+                <span className="w-8 h-8 rounded-full bg-paper-50 border border-ink/15 flex items-center justify-center font-hand text-[14px] shrink-0">
                   {(session.user.name || session.user.email || "?").charAt(0).toUpperCase()}
                 </span>
               )}
@@ -182,14 +182,14 @@ export function Sidebar() {
           ) : (
             <button
               onClick={() => signIn("google", { callbackUrl: "/" })}
-              className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 font-hand text-[15px] bg-paper border-2 border-ink/80 shadow-[2px_2px_0_0_rgba(44,36,23,0.7)] hover:-translate-y-0.5 transition-transform"
+              className="w-full inline-flex items-center justify-center gap-2 rounded-lg px-3 py-2 font-hand text-[15px] bg-paper-50 border border-teal-dark/25 shadow-sm hover:-translate-y-0.5 transition-transform"
             >
               <LogIn className="w-4 h-4 text-teal-accent" /> Sign in to save
             </button>
           )}
         </div>
 
-        <div className="px-5 py-3 border-t-2 border-dashed border-ink/15">
+        <div className="px-5 py-3 border-t border-ink/10">
           <Link
             href="/"
             className="font-hand text-[15px] text-ink-soft hover:text-teal-accent inline-flex items-center gap-1.5 group"

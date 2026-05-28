@@ -19,7 +19,7 @@ export function ComingSoon({
       <PageHeader kicker={kicker} title={title} subtitle={subtitle} />
 
       <div className="dotted-card p-6 relative mb-6">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ coming next ~
         </span>
         <p className="font-sans text-[14px] text-ink-soft leading-relaxed mb-5 mt-2">

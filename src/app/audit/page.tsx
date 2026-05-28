@@ -106,7 +106,7 @@ function Sticky({
 }) {
   return (
     <div
-      className="sticky-note rounded-md p-4 border-2 border-ink/80"
+      className="sticky-note rounded-md p-4 border border-ink/20"
       style={{ transform: `rotate(${tilt})` }}
     >
       <div className="font-hand text-teal-accent text-[18px] mb-1">{kicker}</div>

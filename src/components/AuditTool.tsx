@@ -230,7 +230,7 @@ export default function AuditTool() {
   return (
     <div className="space-y-6">
       <div className="dotted-card p-5 sm:p-6 relative" data-print-hide="true">
-        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper px-2">
+        <span className="font-hand text-clay text-[18px] absolute -top-3 left-5 bg-paper-50 px-2">
           ~ audit form ~
         </span>
 
@@ -246,7 +246,7 @@ export default function AuditTool() {
               value={url}
               onChange={(e) => setUrl(e.target.value)}
               placeholder="https://example.com  or  https://api.example.com/v1/items"
-              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border-2 border-ink/80 outline-none text-[14px] text-ink placeholder:text-ink/40 focus:ring-2 focus:ring-teal-accent/30 font-sans"
+              className="w-full pl-10 pr-3 py-3 rounded-lg bg-paper-50 border border-ink/20 outline-none text-[14px] text-ink placeholder:text-ink/40 focus:ring-2 focus:ring-teal-accent/30 font-sans"
               onKeyDown={(e) => e.key === "Enter" && runAudit()}
             />
           </div>
@@ -254,7 +254,7 @@ export default function AuditTool() {
           <button
             onClick={() => runAudit()}
             disabled={loading}
-            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-[3px_3px_0_0_rgba(44,36,23,0.85)] disabled:opacity-60 disabled:cursor-not-allowed self-start"
+            className="btn-led inline-flex items-center justify-center gap-2 rounded-full px-6 py-3 font-hand text-[20px] shadow-md disabled:opacity-60 disabled:cursor-not-allowed self-start"
           >
             {loading ? (
               <>
@@ -277,7 +277,7 @@ export default function AuditTool() {
                 runAudit(s.url);
               }}
               disabled={loading}
-              className="font-hand text-[15px] text-ink hover:text-teal-accent border-2 border-ink/70 rounded-full px-3 py-1 hover:rotate-[-2deg] transition-transform disabled:opacity-50 shadow-[2px_2px_0_0_rgba(44,36,23,0.7)]"
+              className="font-hand text-[15px] text-ink hover:text-teal-accent border border-ink/20 rounded-full px-3 py-1 hover:rotate-[-2deg] transition-transform disabled:opacity-50 shadow-sm"
             >
               {s.label} →
             </button>
@@ -302,7 +302,7 @@ export default function AuditTool() {
               {progress >= 30 && progress < 70 && "running Lighthouse..."}
               {progress >= 70 && "asking Llama for the fix plan..."}
             </div>
-            <div className="relative h-3 bg-paper-200 border-2 border-ink/80 rounded-full overflow-hidden">
+            <div className="relative h-3 bg-paper-200 border border-ink/20 rounded-full overflow-hidden">
               <div
                 className="progress-watercolor h-full transition-[width] duration-300"
                 style={{ width: `${progress}%` }}
@@ -330,20 +330,20 @@ export default function AuditTool() {
       {result && (
         <div className="flex flex-wrap items-center gap-3 -mb-2" data-print-hide="true">
           {sharedView && (
-            <span className="font-hand text-[14px] text-clay inline-flex items-center gap-1.5 border-2 border-ink/40 bg-paper-50 rounded-full px-3 py-1">
+            <span className="font-hand text-[14px] text-clay inline-flex items-center gap-1.5 border border-ink/15 bg-paper-50 rounded-full px-3 py-1">
               <LinkIcon className="w-3.5 h-3.5" /> loaded from shared link
             </span>
           )}
           <button
             onClick={shareCurrent}
-            className="font-hand text-[15px] text-ink border-2 border-ink/70 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(44,36,23,0.6)]"
+            className="font-hand text-[15px] text-ink border border-ink/20 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-sm"
           >
             {shareCopied ? <Check className="w-4 h-4 text-teal-accent" /> : <Share2 className="w-4 h-4" />}
             {shareCopied ? "link copied" : "share this audit"}
           </button>
           <button
             onClick={() => window.print()}
-            className="font-hand text-[15px] text-ink border-2 border-ink/70 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-[2px_2px_0_0_rgba(44,36,23,0.6)]"
+            className="font-hand text-[15px] text-ink border border-ink/20 rounded-full px-4 py-1.5 hover:bg-paper-50 inline-flex items-center gap-1.5 shadow-sm"
           >
             <Printer className="w-4 h-4" />
             export PDF
@@ -380,10 +380,10 @@ function SourceBanner({
   const Icon = classification.type === "api" ? ServerCog : FileCode;
   const label = classification.type === "api" ? "JSON API source" : "Web page source";
   return (
-    <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.8deg)" }}>
+    <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(-0.8deg)" }}>
       <div className="flex flex-col sm:flex-row sm:items-center gap-3 mb-3">
         <div className="flex items-center gap-3 shrink-0">
-          <span className="w-10 h-10 rounded-full bg-teal-accent/20 border-2 border-ink/80 flex items-center justify-center text-teal-dark">
+          <span className="w-10 h-10 rounded-full bg-teal-accent/20 border border-ink/20 flex items-center justify-center text-teal-dark">
             <Icon className="w-4 h-4" strokeWidth={2.2} />
           </span>
           <div>
@@ -403,7 +403,7 @@ function SourceBanner({
       {classification.signals.length > 0 && (
         <div className="flex flex-wrap gap-1.5 mb-4">
           {classification.signals.map((s) => (
-            <span key={s} className="font-hand text-[14px] text-ink border-2 border-ink/70 rounded-full px-2.5 py-0.5 bg-paper-50">
+            <span key={s} className="font-hand text-[14px] text-ink border border-ink/20 rounded-full px-2.5 py-0.5 bg-paper-50">
               {s}
             </span>
           ))}
@@ -444,7 +444,7 @@ function WebResults({ result }: { result: WebAuditResult }) {
         status={result.probe.status}
       />
 
-      <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.6deg)" }}>
+      <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(0.6deg)" }}>
         <PanelHeader kicker="lighthouse" title="Audit scores" />
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3">
           <ScoreCard label="Performance" score={result.scores.performance} />
@@ -454,7 +454,7 @@ function WebResults({ result }: { result: WebAuditResult }) {
         </div>
       </div>
 
-      <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.5deg)" }}>
+      <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(-0.5deg)" }}>
         <PanelHeader kicker="core metrics" title="Speed & layout" />
         <div className="grid grid-cols-2 sm:grid-cols-5 gap-3">
           <MetricCard label="LCP" value={result.metrics.lcp} />
@@ -467,13 +467,13 @@ function WebResults({ result }: { result: WebAuditResult }) {
 
       {result.onPage && <OnPagePanel onPage={result.onPage} />}
 
-      <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.4deg)" }}>
+      <div className="sticky-note rounded-lg p-6 border border-ink/15" style={{ transform: "rotate(0.4deg)" }}>
         <PanelHeader kicker="llama 3.3" title="AI fix plan" />
         <div className="ai-prose" dangerouslySetInnerHTML={{ __html: result.aiSuggestions }} />
       </div>
 
       {result.issues.length > 0 && (
-        <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.4deg)" }}>
+        <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(-0.4deg)" }}>
           <PanelHeader kicker="lighthouse" title="Top issues — priority sorted" />
           <ul className="grid grid-cols-1 md:grid-cols-2 gap-3">
             {sortByImpact(result.issues).map((issue, i) => (
@@ -501,7 +501,7 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
   const circ = 2 * Math.PI * radius;
   const offset = circ - (score / 100) * circ;
   return (
-    <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 flex items-center gap-3 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+    <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 flex items-center gap-3 shadow-sm">
       <div className="relative w-12 h-12 shrink-0">
         <svg className="w-12 h-12 -rotate-90" viewBox="0 0 56 56">
           <circle cx="28" cy="28" r={radius} stroke="#e8d9b4" strokeWidth="5" fill="none" />
@@ -531,7 +531,7 @@ function ScoreCard({ label, score }: { label: string; score: number }) {
 
 function MetricCard({ label, value }: { label: string; value: string }) {
   return (
-    <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-3 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+    <div className="bg-paper-50/80 border border-ink/20 rounded-md p-3 shadow-sm">
       <div className="font-hand text-[14px] text-clay">{label}</div>
       <div className="typewriter text-[15px] text-ink mt-0.5">{value}</div>
     </div>
@@ -548,7 +548,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
         status={result.probe.status}
       />
 
-      <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.5deg)" }}>
+      <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(0.5deg)" }}>
         <PanelHeader kicker="response time" title="Latency profile" />
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
           <MetricCard label="Avg" value={`${result.timing.avgMs} ms`} />
@@ -558,10 +558,10 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
         </div>
       </div>
 
-      <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.5deg)" }}>
+      <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(-0.5deg)" }}>
         <PanelHeader kicker="schema" title="Response shape" />
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
-          <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+          <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
             <div className="font-hand text-[14px] text-clay">Root type</div>
             <div className="font-hand text-[20px] text-ink capitalize mb-3">{result.schema.rootType}</div>
             <div className="font-hand text-[14px] text-clay">Max depth</div>
@@ -579,7 +579,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
       </div>
 
       {result.completeness.totalChecked > 0 && (
-        <div className="sticky-note rounded-lg p-5 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.4deg)" }}>
+        <div className="sticky-note rounded-lg p-5 border border-ink/15" style={{ transform: "rotate(0.4deg)" }}>
           <PanelHeader kicker="data quality" title="Completeness" />
           <p className="font-hand text-[14px] text-clay mb-3">
             sampled {result.completeness.totalChecked} items
@@ -589,7 +589,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
           ) : (
             <ul className="grid grid-cols-1 sm:grid-cols-2 gap-2">
               {result.completeness.nullFields.map((f) => (
-                <li key={f.field} className="bg-paper-50/80 border-2 border-ink/60 rounded-md p-3 flex items-center justify-between">
+                <li key={f.field} className="bg-paper-50/80 border border-ink/15 rounded-md p-3 flex items-center justify-between">
                   <span className="font-sans font-semibold text-[13.5px] text-ink truncate">{f.field}</span>
                   <span className="typewriter text-[12px] text-clay shrink-0 ml-3">
                     {f.nullCount} null / {result.completeness.totalChecked}
@@ -601,7 +601,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
         </div>
       )}
 
-      <div className="sticky-note rounded-lg p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(-0.3deg)" }}>
+      <div className="sticky-note rounded-lg p-6 border border-ink/15" style={{ transform: "rotate(-0.3deg)" }}>
         <PanelHeader kicker="llama 3.3" title="Backend review" />
         <div className="ai-prose" dangerouslySetInnerHTML={{ __html: result.aiSuggestions }} />
       </div>
@@ -611,7 +611,7 @@ function ApiResults({ result }: { result: ApiAuditResult }) {
 
 function KeyChips({ label, keys }: { label: string; keys: string[] }) {
   return (
-    <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+    <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
       <div className="font-hand text-[14px] text-clay mb-2">{label}</div>
       {keys.length === 0 ? (
         <div className="font-sans text-[13px] text-ink-soft">(none)</div>
@@ -645,7 +645,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
         ? "text-sunset"
         : "text-ink";
   return (
-    <div className="sticky-note rounded-lg p-5 sm:p-6 border-[2.5px] border-ink/85" style={{ transform: "rotate(0.3deg)" }}>
+    <div className="sticky-note rounded-lg p-5 sm:p-6 border border-ink/15" style={{ transform: "rotate(0.3deg)" }}>
       <PanelHeader kicker="on-page" title="What's on the page" />
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-3 mb-4">
@@ -660,7 +660,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-3 mb-4">
         {/* Meta tags */}
-        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+        <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
           <div className="font-hand text-[14px] text-clay mb-2">Meta tags</div>
           <div className="space-y-2 font-sans text-[13px] text-ink-soft">
             <div>
@@ -694,7 +694,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
         </div>
 
         {/* Headings */}
-        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+        <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
           <div className="font-hand text-[14px] text-clay mb-2">Headings</div>
           <div className="flex gap-4 mb-2">
             <CountChip label="H1" n={onPage.headings.h1.length} />
@@ -723,7 +723,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-3">
         {/* Images */}
-        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+        <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
           <div className="font-hand text-[14px] text-clay mb-2">Images</div>
           <div className="font-hand text-[28px] text-ink leading-none">
             {onPage.images.missingAlt}
@@ -744,7 +744,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
         </div>
 
         {/* Links */}
-        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+        <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
           <div className="font-hand text-[14px] text-clay mb-2">Links</div>
           <div className="flex gap-4 mb-2">
             <CountChip label="internal" n={onPage.links.internal} />
@@ -756,7 +756,7 @@ function OnPagePanel({ onPage }: { onPage: OnPageAudit }) {
         </div>
 
         {/* Schema */}
-        <div className="bg-paper-50/80 border-2 border-ink/70 rounded-md p-4 shadow-[2px_2px_0_0_rgba(44,36,23,0.5)]">
+        <div className="bg-paper-50/80 border border-ink/20 rounded-md p-4 shadow-sm">
           <div className="font-hand text-[14px] text-clay mb-2">Schema (JSON-LD)</div>
           {onPage.schema.types.length === 0 ? (
             <div className="font-sans text-[12.5px] text-sunset mb-2">No schema detected</div>
