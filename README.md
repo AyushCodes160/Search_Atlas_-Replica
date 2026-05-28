@@ -35,7 +35,19 @@ Each ships a placeholder page that documents the exact dependency (paid API, OAu
 - Google Autocomplete (free, unofficial)
 - Groq + Llama 3.3 70B Versatile (free tier — 14,400 calls/day)
 - Cheerio for server-side HTML parsing (on-page scan + crawl link extraction)
+- Auth.js v5 (Google OAuth) + Prisma + Neon Postgres — optional sign-in for saved/synced history
 - MCP server (`mcp-server/`) for loading project context into Claude desktop clients
+
+## Auth & accounts (optional)
+
+Sign-in is **optional** — every tool works anonymously. Signing in with Google adds persistent, cross-device history (audits, keyword lists, site crawls). Sign-in is live; per-user persistence of saved data is in progress (see roadmap).
+
+To enable auth locally you need a Neon Postgres database and a Google OAuth client (both free), then:
+
+```bash
+# create the tables in your Neon DB
+npm run db:push
+```
 
 ## Getting Started
 
@@ -61,6 +73,13 @@ Then visit http://localhost:3000 (marketing) or http://localhost:3000/app (dashb
 | --- | --- | --- |
 | `GROQ_API_KEY` | Required | Powers the AI fix plan, Atlas Agent, Content Writer, Keyword clustering, Competitor comparison, and the whole-site report. |
 | `PAGESPEED_API_KEY` | Optional | Higher PageSpeed quota. Works without a key for casual use. |
+| `DATABASE_URL` | Auth only | Neon Postgres **pooled** connection string (host contains `-pooler`). Runtime queries. |
+| `DIRECT_URL` | Auth only | Neon **direct** connection (no `-pooler`). Used by Prisma for migrations. |
+| `AUTH_SECRET` | Auth only | Auth.js session secret. Generate with `openssl rand -base64 32`. |
+| `GOOGLE_CLIENT_ID` | Auth only | Google OAuth web client ID. Redirect URI: `/api/auth/callback/google`. |
+| `GOOGLE_CLIENT_SECRET` | Auth only | Google OAuth client secret. |
+
+The `Auth only` keys are needed solely for sign-in. Leave them blank and the app runs fully — sign-in just won't be available.
 
 ## How the whole-site audit works
 
@@ -79,6 +98,7 @@ src/
     page.tsx                       # marketing landing (video hero)
     audit/page.tsx                 # public audit + features + about + roadmap
     about/page.tsx                 # standalone about narrative
+    signin/page.tsx                # Google sign-in screen
     api/
       audit/route.ts               # source classifier + Lighthouse + on-page + AI pipeline
       scan/route.ts                # fast Lighthouse-free HTML SEO scan (whole-site fast mode)
@@ -88,6 +108,7 @@ src/
       keywords/route.ts            # Autocomplete + Llama clustering + difficulty
       content/route.ts             # fourteen-format AI writer
       agent/route.ts               # Atlas Agent chat (accepts audit context)
+      auth/[...nextauth]/route.ts  # Auth.js v5 handler (Google OAuth)
     app/
       layout.tsx                   # dashboard shell (sidebar + main)
       page.tsx                     # redirect -> /app/dashboard
@@ -110,13 +131,19 @@ src/
   components/
     AuditTool.tsx                  # URL input + results (web + api branches), share + PDF
     RoadmapCarousel.tsx            # marketing roadmap carousel
-    Sidebar.tsx                    # responsive sidebar (hamburger on mobile)
-    Navbar.tsx                     # responsive marketing nav (hamburger on mobile)
+    Sidebar.tsx                    # responsive sidebar (hamburger on mobile) + account block
+    Navbar.tsx                     # responsive marketing nav + sign-in/account dropdown
+    Providers.tsx                  # SessionProvider wrapper (Auth.js)
     Logo.tsx, PageHeader.tsx       # shared chrome
     ComingSoon.tsx                 # placeholder template for gated modules
   lib/
     onPage.ts                      # cheerio on-page parser (words, readability, headings, etc.)
     auditContext.ts                # localStorage audit context + rolling history helpers
+    prisma.ts                      # PrismaClient singleton
+  auth.ts                          # Auth.js v5 config (Google provider + Prisma adapter)
+  types/next-auth.d.ts             # session.user.id type augmentation
+prisma/
+  schema.prisma                    # Auth.js tables + Audit / KeywordList / SiteCrawl models
 mcp-server/
   index.js                         # MCP server exposing project context to Claude chats
 ```
@@ -132,7 +159,9 @@ mcp-server/
 - [x] Atlas Agent (context-aware Llama chat)
 - [x] Audit History + share link + Export PDF
 - [x] Responsive sidebar + marketing nav (mobile drawer)
-- [ ] Auth + database (per-user saved audits, scheduled re-crawls)
+- [x] Google sign-in (Auth.js v5 + Prisma + Neon Postgres)
+- [ ] Per-user persistence — save audits / keyword lists / crawls to your account (in progress)
+- [ ] Scheduled re-crawls + email alerts
 - [ ] OTTO-lite — JS snippet that auto-applies on-page SEO fixes
 - [ ] Rank Tracker — needs paid SerpAPI / DataForSEO
 - [ ] Local SEO + GBP — needs Google Business Profile OAuth
