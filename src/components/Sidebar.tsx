@@ -25,6 +25,7 @@ import {
   History,
   Network,
   Globe,
+  GitCompare,
 } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -37,6 +38,7 @@ const NAV = [
   { label: "Crawl History", href: "/app/crawl-history", Icon: Globe, ready: true },
   { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true },
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true },
+  { label: "Competitor Site Audit", href: "/app/competitor-crawl", Icon: GitCompare, ready: true },
   { label: "History", href: "/app/history", Icon: History, ready: true },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: false },

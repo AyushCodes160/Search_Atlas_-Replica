@@ -23,6 +23,7 @@ import {
   History,
   Network,
   Cloud,
+  GitCompare,
 } from "lucide-react";
 
 const QUICK_LINKS = [
@@ -30,6 +31,7 @@ const QUICK_LINKS = [
   { label: "Whole-Site Audit", href: "/app/site-crawl", Icon: Network, ready: true, note: "Crawl + audit every page" },
   { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true, note: "Up to 10 URLs · CSV export" },
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true, note: "You vs them, side by side" },
+  { label: "Competitor Site Audit", href: "/app/competitor-crawl", Icon: GitCompare, ready: true, note: "Whole site vs whole site" },
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true, note: "Free Autocomplete + Llama" },
   { label: "Atlas Agent", href: "/app/atlas-agent", Icon: Bot, ready: true, note: "Llama chat" },
   { label: "Audit History", href: "/app/history", Icon: History, ready: true, note: "Last 10 audits, locally stored" },
@@ -262,7 +264,7 @@ export default function DashboardPage() {
       <section className="mb-12">
         <p className="font-hand text-clay text-[16px] mb-2">~ modules ~</p>
         <h2 className="font-hand text-[28px] text-ink leading-tight mb-6">
-          Fifteen tools, one toolkit.
+          Sixteen tools, one toolkit.
         </h2>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           {QUICK_LINKS.map((m) => (

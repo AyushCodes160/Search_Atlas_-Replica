@@ -16,6 +16,7 @@ import {
   ChevronRight,
 } from "lucide-react";
 import { PageHeader } from "@/components/PageHeader";
+import { humanDelay } from "@/lib/fetchPage";
 
 type Mode = "fast" | "deep";
 type ScanStatus = "queued" | "running" | "done" | "error" | "skipped";
@@ -66,6 +67,10 @@ type Row = {
 const CRAWL_STORE = "seo-engine:site-crawls";
 const SCAN_CONCURRENCY = 6;
 const DEEP_CONCURRENCY = 2;
+// Default number of pages Lighthouse runs on in deep mode. A site's average
+// performance/SEO stabilizes well before this, so auditing every page is rarely
+// worth the time — the "audit all" toggle lifts it to the full discovery cap.
+const DEEP_CAP = 30;
 const IMPACT_ORDER: Record<string, number> = { high: 0, medium: 1, info: 2 };
 
 function scoreColor(s?: number): string {
@@ -102,6 +107,8 @@ function mdToHtml(md: string): string {
 export default function SiteCrawlPage() {
   const [url, setUrl] = useState("");
   const [mode, setMode] = useState<Mode>("fast");
+  const [auditAll, setAuditAll] = useState(false);
+  const [deepening, setDeepening] = useState(false);
   const [phase, setPhase] = useState<"idle" | "discovering" | "scanning" | "summarising" | "done">("idle");
   const [error, setError] = useState<string | null>(null);
   const [discovery, setDiscovery] = useState<{ total: number; capped: boolean; cap: number; source: string; origin: string } | null>(null);
@@ -184,6 +191,10 @@ export default function SiteCrawlPage() {
     });
     const data = await res.json();
     if (!res.ok) throw new Error(data.error || "scan failed");
+    if (data.isBlockedByFirewall) {
+      const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+      return { scan: "error", scanError: `blocked by firewall${who}` };
+    }
     if (data.sourceType !== "web") return { scan: "skipped" };
     const op = data.onPage;
     return {
@@ -246,8 +257,13 @@ export default function SiteCrawlPage() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ url: row.url }),
       });
-      const data = (await res.json()) as FullAudit & { error?: string };
+      const data = (await res.json()) as FullAudit & { error?: string; isBlockedByFirewall?: boolean; blockVendor?: string | null };
       if (!res.ok) throw new Error(data.error || "audit failed");
+      if (data.isBlockedByFirewall) {
+        const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+        patchRow(idx, { scan: "error", scanError: `blocked by firewall${who}`, deep: "error", deepError: "blocked" });
+        return;
+      }
       if (data.sourceType === "api") {
         patchRow(idx, { deep: "error", deepError: "JSON API — no Lighthouse" });
         return;
@@ -280,6 +296,14 @@ export default function SiteCrawlPage() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "crawl failed");
+      if (data.isBlockedByFirewall) {
+        const who = data.blockVendor ? ` (${data.blockVendor})` : "";
+        setError(
+          `This site is protected by an anti-bot firewall${who} — HTTP ${data.blockStatus || "challenge"}. It blocks automated crawling, so we can't audit its pages. Try a site you own or one without enterprise bot protection.`,
+        );
+        setPhase("idle");
+        return;
+      }
       pages = Array.from(new Set<string>(data.pages || []));
       disc = { total: data.total, capped: data.capped, cap: data.cap, source: data.source, origin: data.origin };
       setDiscovery(disc);
@@ -296,50 +320,58 @@ export default function SiteCrawlPage() {
 
     const initial: Row[] = pages.map((p) => ({ url: p, scan: "queued", deep: "idle" }));
     setRowsBoth(initial);
+    setDeepening(false);
     setPhase("scanning");
 
-    const queue = [...pages.keys()];
-    const concurrency = mode === "deep" ? DEEP_CONCURRENCY : SCAN_CONCURRENCY;
-
-    async function worker() {
-      while (queue.length && !cancelRef.current) {
-        const idx = queue.shift()!;
-        patchRow(idx, { scan: "running", ...(mode === "deep" ? { deep: "running" } : {}) });
+    // Phase 1 — fast-scan EVERY page (cheap SEO hygiene on the whole site, fast).
+    const scanQueue = [...pages.keys()];
+    async function scanWorker() {
+      let first = true;
+      while (scanQueue.length && !cancelRef.current) {
+        const idx = scanQueue.shift()!;
+        if (!first) await humanDelay(1000, 3000);
+        first = false;
+        if (cancelRef.current) break;
+        patchRow(idx, { scan: "running" });
         try {
-          if (mode === "deep") {
-            const res = await fetch("/api/audit", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({ url: rowsRef.current[idx].url }),
-            });
-            const data = (await res.json()) as FullAudit & { error?: string };
-            if (!res.ok) throw new Error(data.error || "audit failed");
-            if (data.sourceType === "api") {
-              patchRow(idx, { scan: "skipped", deep: "error", deepError: "JSON API" });
-            } else {
-              patchRow(idx, fullToRow(data));
-            }
-          } else {
-            const partial = await scanOne(rowsRef.current[idx].url);
-            patchRow(idx, partial);
-          }
+          patchRow(idx, await scanOne(rowsRef.current[idx].url));
         } catch (e: unknown) {
-          patchRow(idx, {
-            scan: "error",
-            scanError: e instanceof Error ? e.message : "failed",
-            ...(mode === "deep" ? { deep: "error" } : {}),
-          });
+          patchRow(idx, { scan: "error", scanError: e instanceof Error ? e.message : "failed" });
         }
       }
     }
-    await Promise.all(Array.from({ length: concurrency }, () => worker()));
+    await Promise.all(Array.from({ length: SCAN_CONCURRENCY }, () => scanWorker()));
     if (cancelRef.current) {
       setPhase("done");
       return;
     }
 
-    // In fast mode, still give at least one Lighthouse score (homepage).
-    if (mode === "fast") deepAuditRow(0);
+    // Phase 2 — Lighthouse. Fast mode: just the homepage (background, for a perf
+    // signal). Deep mode: the top DEEP_CAP pages, or all of them if "audit all".
+    if (mode === "deep") {
+      const deepCount = auditAll ? pages.length : Math.min(DEEP_CAP, pages.length);
+      const deepQueue = Array.from({ length: deepCount }, (_, i) => i);
+      setDeepening(true);
+      async function deepWorker() {
+        let first = true;
+        while (deepQueue.length && !cancelRef.current) {
+          const idx = deepQueue.shift()!;
+          if (!first) await humanDelay(1000, 3000);
+          first = false;
+          if (cancelRef.current) break;
+          await deepAuditRow(idx);
+        }
+      }
+      await Promise.all(Array.from({ length: DEEP_CONCURRENCY }, () => deepWorker()));
+      setDeepening(false);
+      if (cancelRef.current) {
+        setPhase("done");
+        return;
+      }
+    } else {
+      // Fast mode: one homepage Lighthouse run for a perf signal (background).
+      deepAuditRow(0);
+    }
 
     setPhase("summarising");
     const web = rowsRef.current.filter((r) => r.scan === "done");
@@ -420,8 +452,10 @@ export default function SiteCrawlPage() {
   const errCount = rows.filter((r) => r.scan === "error").length;
   const skipCount = rows.filter((r) => r.scan === "skipped").length;
   const runningCount = rows.filter((r) => r.scan === "running").length;
-  const remaining = rows.length - doneCount - errCount - skipCount;
-  const etaMin = mode === "deep" ? Math.ceil((remaining * 25) / DEEP_CONCURRENCY / 60) : 0;
+  const deepTarget = mode === "deep" ? (auditAll ? rows.length : Math.min(DEEP_CAP, rows.length)) : 0;
+  const deepDoneCount = rows.filter((r) => r.deep === "done").length;
+  const deepRemaining = Math.max(0, deepTarget - deepDoneCount);
+  const etaMin = deepening ? Math.ceil((deepRemaining * 25) / DEEP_CONCURRENCY / 60) : 0;
 
   return (
     <div className="px-5 sm:px-8 lg:px-12 pt-20 sm:pt-10 pb-10 max-w-6xl">
@@ -441,14 +475,14 @@ export default function SiteCrawlPage() {
             onClick={() => !busy && setMode("fast")}
             Icon={Zap}
             title="Fast scan"
-            blurb="HTML skim on every page — title, meta, headings, alt, links, schema, issues. ~1s/page. Whole site in under a minute. (Homepage still gets one deep Lighthouse run.)"
+            blurb="HTML skim on every page — title, meta, headings, alt, links, schema, issues. A polite 1-3s gap between requests keeps you under rate limits. (Homepage still gets one deep Lighthouse run.)"
           />
           <ModeCard
             active={mode === "deep"}
             onClick={() => !busy && setMode("deep")}
             Icon={Gauge}
             title="Deep audit"
-            blurb="Full Lighthouse + Core Web Vitals + AI fix plan on every page — same detail as Site Audit. ~25s/page, 2 at a time. Thorough but slow on big sites."
+            blurb="Every page gets a fast SEO scan, then full Lighthouse + Core Web Vitals run on the top pages (~25s/page, 2 at a time). Toggle below to audit every page."
           />
         </div>
 
@@ -482,9 +516,23 @@ export default function SiteCrawlPage() {
           </div>
         )}
         {mode === "deep" && (
-          <p className="mt-3 font-sans text-[12.5px] text-sunset leading-relaxed">
-            Deep mode runs a full Lighthouse audit on every page (~25s each, 2 at a time). A 20-page site takes ~4 min; large sites can take 30+ min. Use the stop button anytime — results so far are kept.
-          </p>
+          <div className="mt-3 space-y-2">
+            <label className="flex items-start gap-2 cursor-pointer">
+              <input
+                type="checkbox"
+                checked={auditAll}
+                onChange={(e) => setAuditAll(e.target.checked)}
+                disabled={busy}
+                className="mt-1 accent-teal-accent"
+              />
+              <span className="font-sans text-[12.5px] text-ink leading-relaxed">
+                <strong>Audit every discovered page with Lighthouse</strong> (up to 150). Off by default — we Lighthouse the top {DEEP_CAP} pages, which is plenty for an accurate site average. Turn on for exhaustive per-page performance (much slower).
+              </span>
+            </label>
+            <p className="font-sans text-[12px] text-sunset leading-relaxed">
+              Every page gets a fast SEO scan; Lighthouse (~25s/page, 2 at a time) runs on {auditAll ? "all discovered pages — large sites can take 30+ min" : `the top ${DEEP_CAP}`}. Stop anytime — results so far are kept.
+            </p>
+          </div>
         )}
       </div>
 
@@ -495,7 +543,7 @@ export default function SiteCrawlPage() {
             <span className="text-[16px] text-ink inline-flex items-center gap-2">
               {busy && <Loader2 className="w-4 h-4 animate-spin text-teal-accent" />}
               {phase === "discovering" && "finding pages..."}
-              {phase === "scanning" && (mode === "deep" ? "deep-auditing pages..." : "scanning pages...")}
+              {phase === "scanning" && (deepening ? `running Lighthouse on top ${deepTarget} pages...` : "scanning all pages...")}
               {phase === "summarising" && "writing site summary..."}
               {phase === "done" && "done"}
             </span>
@@ -505,7 +553,7 @@ export default function SiteCrawlPage() {
                 {discovery.capped && ` — auditing first ${discovery.cap}`}
               </span>
             )}
-            {phase === "scanning" && mode === "deep" && etaMin > 0 && (
+            {deepening && etaMin > 0 && (
               <span className="text-[14px] text-sunset">~{etaMin} min left</span>
             )}
             {rows.length > 0 && (
