@@ -1,9 +1,34 @@
-export function Logo({ size = 18 }: { size?: number }) {
+// GoToSEO mark — a magnifying glass (search) with an upward trend arrow
+// (ranking growth) inside. Brand teal lens/handle, gold accent arrow.
+export function Logo({ size = 20 }: { size?: number }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 256 256" fill="none">
+    <svg width={size} height={size} viewBox="0 0 256 256" fill="none" aria-hidden="true">
+      {/* lens */}
+      <circle cx="104" cy="104" r="66" stroke="#006a6a" strokeWidth="22" fill="none" />
+      {/* handle */}
+      <line
+        x1="151"
+        y1="151"
+        x2="214"
+        y2="214"
+        stroke="#006a6a"
+        strokeWidth="26"
+        strokeLinecap="round"
+      />
+      {/* upward trend arrow (gold) */}
       <path
-        fill="#006a6a"
-        d="M 160 88 L 194 34 L 216 0 L 256 0 L 256 40 L 221.5 93.5 L 200 128 L 256 128 L 256 256 L 96 256 L 96 168 L 64.246 220 L 40 256 L 0 256 L 0 216 L 34 162 L 56 128 L 0 128 L 0 0 L 160 0 Z"
+        d="M78 130 L130 78"
+        stroke="#e2b203"
+        strokeWidth="16"
+        strokeLinecap="round"
+      />
+      <path
+        d="M104 78 L130 78 L130 104"
+        stroke="#e2b203"
+        strokeWidth="16"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        fill="none"
       />
     </svg>
   );
