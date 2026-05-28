@@ -28,6 +28,16 @@ export async function GET() {
   return NextResponse.json({ crawls });
 }
 
+// Wipe all of the signed-in user's saved site crawls.
+export async function DELETE() {
+  const session = await auth();
+  if (!session?.user?.id) {
+    return NextResponse.json({ error: "unauthorized" }, { status: 401 });
+  }
+  await prisma.siteCrawl.deleteMany({ where: { userId: session.user.id } });
+  return NextResponse.json({ ok: true });
+}
+
 // Save a site crawl summary.
 export async function POST(req: NextRequest) {
   const session = await auth();

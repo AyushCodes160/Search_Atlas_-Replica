@@ -24,6 +24,7 @@ import {
   X,
   History,
   Network,
+  Globe,
 } from "lucide-react";
 import { Logo } from "./Logo";
 
@@ -33,6 +34,7 @@ const NAV = [
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true },
   { label: "Site Audit", href: "/app/site-audit", Icon: Activity, ready: true },
   { label: "Whole-Site Audit", href: "/app/site-crawl", Icon: Network, ready: true },
+  { label: "Crawl History", href: "/app/crawl-history", Icon: Globe, ready: true },
   { label: "Bulk Audit", href: "/app/bulk-audit", Icon: Layers, ready: true },
   { label: "Competitor Audit", href: "/app/competitor-audit", Icon: Swords, ready: true },
   { label: "History", href: "/app/history", Icon: History, ready: true },
