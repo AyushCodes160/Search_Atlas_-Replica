@@ -74,6 +74,11 @@ const QUICK_SITES = [
   { label: "hn.algolia.com (API)", url: "https://hn.algolia.com/api/v1/search?query=seo" },
 ];
 
+// In-memory cache of the last audit so the result survives in-app navigation
+// (component unmount/remount). Lives as long as the JS bundle is loaded, so a
+// full page refresh clears it — exactly the "keep it until I refresh" behaviour.
+let sessionAuditCache: { url: string; result: AuditResult } | null = null;
+
 export default function AuditTool() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
@@ -103,6 +108,13 @@ export default function AuditTool() {
     if (preset) {
       setUrl(preset);
       runAudit(preset);
+      return;
+    }
+    // Restore the last audit from this session so navigating away and back
+    // doesn't force a re-run.
+    if (sessionAuditCache) {
+      setResult(sessionAuditCache.result);
+      setUrl(sessionAuditCache.url);
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
@@ -164,6 +176,8 @@ export default function AuditTool() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || "Audit failed");
       setProgress(100);
+      setSharedView(false);
+      sessionAuditCache = { url: auditUrl, result: data };
       setTimeout(() => setResult(data), 250);
       try {
         const stored: StoredAudit = {
