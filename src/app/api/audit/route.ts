@@ -72,9 +72,14 @@ async function classifySource(rawUrl: string): Promise<SourceProbe> {
     redirect: "follow",
     cache: "no-store",
     headers: {
+      // Use a realistic browser UA so sites don't redirect us to the home page
+      // or serve a stripped bot shell — that would make the on-page panel
+      // analyze the wrong content even though Lighthouse audits the right URL.
       "User-Agent":
-        "Mozilla/5.0 (compatible; SEOEngine/1.0; +https://github.com/AyushCodes160/SEO_Engine)",
-      Accept: "*/*",
+        "Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36",
+      Accept:
+        "text/html,application/xhtml+xml,application/xml;q=0.9,application/json;q=0.8,*/*;q=0.7",
+      "Accept-Language": "en-US,en;q=0.9",
     },
   });
 

@@ -136,11 +136,21 @@ export default function AuditTool() {
   }, [loading]);
 
   async function runAudit(target?: string) {
-    const auditUrl = target ?? url;
-    if (!auditUrl) {
+    const raw = (target ?? url).trim();
+    if (!raw) {
       setError("Drop a URL on the page first.");
       return;
     }
+    // Prepend https:// when the user types a bare domain or path so deep URLs
+    // like "example.com/blog/post" are audited as-is instead of being rejected.
+    let auditUrl: string;
+    try {
+      auditUrl = new URL(/^https?:\/\//i.test(raw) ? raw : `https://${raw}`).toString();
+    } catch {
+      setError("That doesn't look like a valid URL.");
+      return;
+    }
+    if (auditUrl !== url) setUrl(auditUrl);
     setLoading(true);
     setError(null);
     setResult(null);
