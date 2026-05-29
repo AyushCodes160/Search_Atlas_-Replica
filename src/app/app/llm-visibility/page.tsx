@@ -396,16 +396,27 @@ export default function LlmVisibilityPage() {
               {history.length === 0 ? (
                 <p className="text-[12.5px] text-ink-soft font-sans italic text-center mt-6">No previous queries run.</p>
               ) : (
-                history.map((item) => (
-                  <button
+                 history.map((item) => (
+                  <div
                     key={item.savedAt}
+                    role="button"
+                    tabIndex={0}
                     onClick={() => {
                       setActiveResult(item);
                       setQuery(item.query);
                       setBrandName(item.brandName);
                       setCompetitors(item.competitors.join(", "));
                     }}
-                    className={`text-left p-3 rounded-lg border-2 transition-all flex items-start justify-between gap-2 group ${
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" || e.key === " ") {
+                        e.preventDefault();
+                        setActiveResult(item);
+                        setQuery(item.query);
+                        setBrandName(item.brandName);
+                        setCompetitors(item.competitors.join(", "));
+                      }
+                    }}
+                    className={`text-left p-3 rounded-lg border-2 transition-all flex items-start justify-between gap-2 group cursor-pointer ${
                       activeResult?.savedAt === item.savedAt
                         ? "bg-paper-50 border-ink/80 shadow-sm"
                         : "border-transparent hover:bg-paper-50/50 hover:border-ink/20"
@@ -426,7 +437,7 @@ export default function LlmVisibilityPage() {
                     >
                       <Trash2 className="w-3.5 h-3.5" />
                     </button>
-                  </button>
+                  </div>
                 ))
               )}
             </div>
