@@ -1,53 +1,46 @@
 # SEO Engine
 
-A free, AI-powered SEO toolkit — a lightweight, open-source take on enterprise SEO platforms (Search Atlas, Ahrefs, SEMrush). Built on Google PageSpeed + Llama 3.3 70B via Groq, with zero paid APIs.
+A free, AI-powered SEO toolkit — a lightweight, open-source alternative to enterprise SEO platforms (Search Atlas, Ahrefs, SEMrush). Built on Google PageSpeed + Llama 3.3 70B via Groq + SerpAPI, with zero paid APIs required.
 
-The product is split into two halves:
+**All 18 modules are fully live.** No placeholders, no coming-soon pages.
 
-- **Marketing site** at `/`, `/audit`, `/about` — sketchpad / hand-drawn aesthetic, introduces the project.
-- **Dashboard** at `/app/*` — sidebar-driven app. 9 modules ship working, 7 are scaffolded placeholders that document exactly what each one needs (paid APIs / OAuth) to ship.
+- **Marketing site** at `/`, `/audit`, `/about` — sketchpad / hand-drawn aesthetic.
+- **Dashboard** at `/app/*` — sidebar-driven app with 18 working modules.
 
-## Live modules
+## Modules
 
-| Route | What it does |
-| --- | --- |
-| `/app/dashboard` | Overview with real stats pulled from `localStorage` (audits run, avg performance, saved keyword lists) + recent-activity cards. |
-| `/app/site-audit` | Real Lighthouse audit + Llama-written fix plan + deep on-page parser (words, readability, headings, alt text, links, schema, meta). Issues are impact-sorted. Share-by-URL link + one-click Export PDF. Auto-detects JSON APIs and switches to a backend review (timing, schema, completeness). |
-| `/app/site-crawl` | **Whole-site audit.** Auto-discovers every page (sitemap first, deep BFS link-crawl as fallback, noise-filtered, capped at 150). Fast mode: HTML SEO scan on all pages in seconds. Deep mode: full Lighthouse + AI fix plan per page. Site SEO health score, site-wide rollup, Llama site report, expandable per-page detail, CSV export. |
-| `/app/bulk-audit` | Audit up to 10 URLs at once (concurrency 2), live progress, sortable result table, CSV export. |
-| `/app/competitor-audit` | Side-by-side audit of your URL vs a competitor with per-metric deltas + a Llama-written comparison (where they win, where you win, what to copy). |
-| `/app/keywords` | Google Autocomplete expansion (~200 ideas) + Llama topic clustering + heuristic intent classification + heuristic difficulty + long-tail/question filters + CSV export + saved lists. No paid keyword API needed. |
-| `/app/content` | Fourteen-format AI writer: blog, buyer's guide, landing page, LinkedIn, YouTube script, TikTok script, Instagram caption, email, cold outreach, Google Ad, press release, Amazon listing, product description, meta tags. Plus point-of-view, 8 output languages, and 1–3 variations per draft. |
-| `/app/atlas-agent` | Llama 3.3 chat with an SEO system prompt. Auto-loads your last audit from `localStorage` and injects it as context, so answers reference your real numbers. Adaptive starter prompts. |
-| `/app/history` | Last 10 audits stored locally — filter (all / web / api), sort (newest, oldest, worst/best perf), one-tap re-run, open-in-tab, delete. |
-
-## Scaffolded modules
-
-Each ships a placeholder page that documents the exact dependency (paid API, OAuth, infra) needed to make it live:
-
-`/app/otto-seo` · `/app/rank-tracker` · `/app/local-seo` · `/app/backlinks` · `/app/llm-visibility` · `/app/smart-ads` · `/app/reports`
+| Route | Module | What it does |
+| --- | --- | --- |
+| `/app/dashboard` | Dashboard | Overview with stats, recent audits, recent keyword lists. |
+| `/app/site-audit` | Site Audit | Lighthouse audit + Llama fix plan + deep on-page parser. Share link + PDF export. |
+| `/app/site-crawl` | Whole-Site Audit | Auto-crawl entire sites. Fast mode (HTML scan) or Deep mode (full Lighthouse per page). |
+| `/app/bulk-audit` | Bulk Audit | Audit up to 10 URLs at once with CSV export. |
+| `/app/competitor-audit` | Competitor Audit | Side-by-side single-page comparison with AI analysis. |
+| `/app/competitor-crawl` | Competitor Site Audit | Whole-site vs whole-site comparison. |
+| `/app/keywords` | Keywords | Google Autocomplete + Llama clustering. ~200 keyword ideas with intent + difficulty. |
+| `/app/otto-seo` | OTTO SEO | Auto-apply metadata fixes. Generates JS injection script for CMS override. |
+| `/app/content` | Content Editor | 14-format AI writer + real-time SEO Grader scoring on every keystroke. |
+| `/app/rank-tracker` | Rank Tracker | Track Google keyword rankings via SerpAPI. Volume/CPC estimated by Groq. |
+| `/app/local-seo` | Local SEO | NAP audit, schema validation, Maps embed check, 5×5 grid heatmap. |
+| `/app/llm-visibility` | LLM Visibility | Track brand mentions in ChatGPT, Claude, Gemini, Perplexity. |
+| `/app/backlinks` | Backlinks | AI-estimated backlink profile, anchor text, toxic risk, competitor gap analysis. |
+| `/app/smart-ads` | Smart Ads | AI ad copy for Google, Meta, LinkedIn. 3 A/B variants with preview cards. |
+| `/app/reports` | Reports | Aggregate all module data into branded SEO report with AI summary + PDF export. |
+| `/app/atlas-agent` | Atlas Agent | Llama 3.3 chat with SEO context from your audits. |
+| `/app/history` | Audit History | Browse past single-page audits. |
+| `/app/crawl-history` | Crawl History | Browse past whole-site crawls. |
 
 ## Tech Stack
 
 - Next.js 16 (App Router) + React 19 + TypeScript
-- Tailwind CSS (custom hand-drawn sketchpad design tokens)
+- Vanilla CSS (custom hand-drawn sketchpad design tokens)
 - Google PageSpeed Insights API (free)
-- Google Autocomplete (free, unofficial)
+- Google Autocomplete (free)
 - Groq + Llama 3.3 70B Versatile (free tier — 14,400 calls/day)
-- Cheerio for server-side HTML parsing (on-page scan + crawl link extraction)
-- Auth.js v5 (Google OAuth) + Prisma + Neon Postgres — optional sign-in for saved/synced history
-- MCP server (`mcp-server/`) for loading project context into Claude desktop clients
-
-## Auth & accounts (optional)
-
-Sign-in is **optional** — every tool works anonymously (data lives in `localStorage`). Signing in with Google persists your audits, keyword lists, and site crawls to your account and syncs them across devices. The same UI reads from the cloud when signed in and from `localStorage` when not.
-
-To enable auth locally you need a Neon Postgres database and a Google OAuth client (both free), then:
-
-```bash
-# create the tables in your Neon DB
-npm run db:push
-```
+- SerpAPI (free tier — 100 searches/month)
+- Cheerio for server-side HTML parsing
+- Auth.js v5 (GitHub + Google OAuth) + Prisma + Neon Postgres
+- MCP server (`mcp-server/`) for loading project context into AI desktop clients
 
 ## Getting Started
 
@@ -58,8 +51,8 @@ npm install --legacy-peer-deps
 # 2. Add API keys to .env.local
 #    Get free keys at:
 #    - Groq:      https://console.groq.com/keys
+#    - SerpAPI:   https://serpapi.com/manage-api-key (100 free/month)
 #    - PageSpeed: https://developers.google.com/speed/docs/insights/v5/get-started
-#                 (optional — works without a key, but rate-limited)
 
 # 3. Run the dev server
 npm run dev
@@ -71,105 +64,102 @@ Then visit http://localhost:3000 (marketing) or http://localhost:3000/app (dashb
 
 | Key | Required | Purpose |
 | --- | --- | --- |
-| `GROQ_API_KEY` | Required | Powers the AI fix plan, Atlas Agent, Content Writer, Keyword clustering, Competitor comparison, and the whole-site report. |
+| `GROQ_API_KEY` | Required | Powers all AI features (fix plans, content, keywords, rank tracker, backlinks, smart ads, reports, OTTO, local SEO, LLM visibility, Atlas Agent). |
+| `SERPAPI_API_KEY` | Optional | Real Google SERP data for Rank Tracker (100 free searches/month). Falls back to Groq simulation without it. |
 | `PAGESPEED_API_KEY` | Optional | Higher PageSpeed quota. Works without a key for casual use. |
-| `DATABASE_URL` | Auth only | Neon Postgres **pooled** connection string (host contains `-pooler`). Runtime queries. |
-| `DIRECT_URL` | Auth only | Neon **direct** connection (no `-pooler`). Used by Prisma for migrations. |
+| `DATABASE_URL` | Auth only | Neon Postgres pooled connection string. |
+| `DIRECT_URL` | Auth only | Neon direct connection (for Prisma migrations). |
 | `AUTH_SECRET` | Auth only | Auth.js session secret. Generate with `openssl rand -base64 32`. |
-| `GOOGLE_CLIENT_ID` | Auth only | Google OAuth web client ID. Redirect URI: `/api/auth/callback/google`. |
+| `GITHUB_ID` | Auth only | GitHub OAuth app client ID. |
+| `GITHUB_SECRET` | Auth only | GitHub OAuth app client secret. |
+| `GOOGLE_CLIENT_ID` | Auth only | Google OAuth web client ID. |
 | `GOOGLE_CLIENT_SECRET` | Auth only | Google OAuth client secret. |
 
-The `Auth only` keys are needed solely for sign-in. Leave them blank and the app runs fully — sign-in just won't be available.
+Auth keys are optional. Without them the app runs fully — sign-in just won't be available and data stays in localStorage.
 
-## How the whole-site audit works
+## Auth & Accounts (optional)
 
-The hard constraint is Vercel's 60-second function timeout — you can't audit a whole site in one server call — so the browser orchestrates, calling small API routes per page:
+Sign-in is **optional** — every tool works anonymously (data in `localStorage`). Signing in with GitHub or Google persists audits, keyword lists, rank tracker data, and crawls to your account across devices.
 
-1. **`/api/crawl`** discovers pages: tries `sitemap.xml` / `sitemap_index.xml` first, falls back to a time-boxed breadth-first link crawl. Strips tracking params and filters out search/filter/admin/draft noise URLs, deduped and capped at 150.
-2. **Fast mode** calls **`/api/scan`** (HTML skim, ~1s/page, no Lighthouse) on every page at concurrency 6 — title, meta, headings, alt, links, schema, derived issues.
-3. **Deep mode** calls **`/api/audit`** (full Lighthouse + on-page + AI plan, ~25s/page) on every page at concurrency 2.
-4. **`/api/site-summary`** makes one Groq call to write the site-wide health report.
+```bash
+# Create the tables in your Neon DB
+npm run db:push
+```
+
+## How the Whole-Site Audit Works
+
+The browser orchestrates multiple small API calls to stay within Vercel's 60-second function timeout:
+
+1. **`/api/crawl`** discovers pages: tries sitemap first, falls back to BFS link crawl. Capped at 150 pages.
+2. **Fast mode** calls `/api/scan` (~1s/page) on all pages at concurrency 6.
+3. **Deep mode** calls `/api/audit` (~25s/page) with full Lighthouse + AI fix plan.
+4. **`/api/site-summary`** generates a Groq-powered site-wide health report.
 
 ## Project Structure
 
 ```
 src/
   app/
-    page.tsx                       # marketing landing (video hero)
-    audit/page.tsx                 # public audit + features + about + roadmap
-    about/page.tsx                 # standalone about narrative
-    signin/page.tsx                # Google sign-in screen
+    page.tsx                    # marketing landing
+    audit/page.tsx              # public audit page
+    about/page.tsx              # about page
     api/
-      audit/route.ts               # source classifier + Lighthouse + on-page + AI pipeline
-      scan/route.ts                # fast Lighthouse-free HTML SEO scan (whole-site fast mode)
-      crawl/route.ts               # page discovery (sitemap + BFS link crawl + noise filter)
-      site-summary/route.ts        # Llama whole-site health report
-      compare/route.ts             # Llama competitor comparison
-      keywords/route.ts            # Autocomplete + Llama clustering + difficulty
-      content/route.ts             # fourteen-format AI writer
-      agent/route.ts               # Atlas Agent chat (accepts audit context)
-      auth/[...nextauth]/route.ts  # Auth.js v5 handler (Google OAuth)
-      me/audits/                   # ┐ per-user persistence (CRUD, session-scoped)
-      me/keyword-lists/            # │ save/list/delete; 401 when signed out
-      me/crawls/                   # ┘ so anonymous users fall back to localStorage
+      audit/route.ts            # Lighthouse + on-page + AI pipeline
+      scan/route.ts             # fast HTML SEO scan
+      crawl/route.ts            # page discovery
+      site-summary/route.ts     # AI site health report
+      compare/route.ts          # competitor comparison
+      keywords/route.ts         # Autocomplete + clustering
+      content/route.ts          # 14-format AI writer
+      agent/route.ts            # Atlas Agent chat
+      rank-tracker/route.ts     # SerpAPI + Groq volume estimation
+      smart-ads/generate/       # AI ad copy generator
+      backlinks/analyze/        # AI backlink profile analyzer
+      reports/summary/          # AI executive summary for reports
+      otto/                     # OTTO SEO fix generation
+      local-seo/                # Local SEO analysis
+      llm-visibility/           # LLM brand tracking
+      me/                       # per-user CRUD (audits, keywords, crawls, etc.)
     app/
-      layout.tsx                   # dashboard shell (sidebar + main)
-      page.tsx                     # redirect -> /app/dashboard
-      dashboard/page.tsx           # overview + real localStorage stats + recent activity
-      site-audit/page.tsx          # single-page audit
-      site-crawl/page.tsx          # whole-site audit (fast/deep modes)
-      bulk-audit/page.tsx          # up to 10 URLs
-      competitor-audit/page.tsx    # you vs them
-      keywords/page.tsx            # keyword research UI
-      content/page.tsx             # content writer UI
-      atlas-agent/page.tsx         # context-aware chat UI
-      history/page.tsx             # audit history
-      otto-seo/                    # ┐
-      rank-tracker/                # │
-      local-seo/                   # │
-      backlinks/                   # │ placeholder pages with what each
-      llm-visibility/              # │ module needs to ship
-      smart-ads/                   # │
-      reports/                     # ┘
+      layout.tsx                # dashboard shell (sidebar + main)
+      dashboard/                # overview
+      site-audit/               # single-page audit
+      site-crawl/               # whole-site audit
+      bulk-audit/               # up to 10 URLs
+      competitor-audit/         # you vs them
+      competitor-crawl/         # site vs site
+      keywords/                 # keyword research
+      otto-seo/                 # auto-apply fixes
+      content/                  # AI content writer
+      rank-tracker/             # SERP tracking
+      local-seo/                # NAP + heatmap
+      llm-visibility/           # AI brand tracking
+      backlinks/                # backlink analysis
+      smart-ads/                # ad copy generator
+      reports/                  # aggregated reports
+      atlas-agent/              # AI chat
+      history/                  # audit history
+      crawl-history/            # crawl history
   components/
-    AuditTool.tsx                  # URL input + results (web + api branches), share + PDF
-    RoadmapCarousel.tsx            # marketing roadmap carousel
-    Sidebar.tsx                    # responsive sidebar (hamburger on mobile) + account block
-    Navbar.tsx                     # responsive marketing nav + sign-in/account dropdown
-    Providers.tsx                  # SessionProvider wrapper (Auth.js)
-    Logo.tsx, PageHeader.tsx       # shared chrome
-    ComingSoon.tsx                 # placeholder template for gated modules
+    Sidebar.tsx                 # responsive sidebar
+    AuditTool.tsx               # audit UI (web + API branches)
+    PageHeader.tsx, Logo.tsx    # shared chrome
   lib/
-    onPage.ts                      # cheerio on-page parser (words, readability, headings, etc.)
-    auditContext.ts                # localStorage audit context + rolling history helpers
-    prisma.ts                      # PrismaClient singleton
-  auth.ts                          # Auth.js v5 config (Google provider + Prisma adapter)
-  types/next-auth.d.ts             # session.user.id type augmentation
+    onPage.ts                   # cheerio on-page parser
+    auditContext.ts             # localStorage audit helpers
+    prisma.ts                   # PrismaClient singleton
 prisma/
-  schema.prisma                    # Auth.js tables + Audit / KeywordList / SiteCrawl models
+  schema.prisma                 # DB schema
 mcp-server/
-  index.js                         # MCP server exposing project context to Claude chats
+  index.js                      # MCP server for AI desktop clients
 ```
 
 ## Roadmap
 
-- [x] Site Audit + AI fix plan + deep on-page parser
-- [x] Whole-site audit (auto-crawl, fast + deep modes)
-- [x] Bulk Audit (up to 10 URLs)
-- [x] Competitor Audit (side-by-side + AI comparison)
-- [x] AI Content Writer (fourteen formats, POV, languages, variations)
-- [x] Keyword research (Autocomplete + clustering + difficulty + saved lists)
-- [x] Atlas Agent (context-aware Llama chat)
-- [x] Audit History + share link + Export PDF
-- [x] Responsive sidebar + marketing nav (mobile drawer)
-- [x] Google sign-in (Auth.js v5 + Prisma + Neon Postgres)
-- [x] Per-user persistence — audits, keyword lists & site crawls sync to your account
+All 18 modules are live. Future enhancements:
+
 - [ ] Scheduled re-crawls + email alerts
-- [ ] Crawl-history browsing UI
-- [ ] OTTO-lite — JS snippet that auto-applies on-page SEO fixes
-- [ ] Rank Tracker — needs paid SerpAPI / DataForSEO
-- [ ] Local SEO + GBP — needs Google Business Profile OAuth
-- [ ] Backlinks — needs Ahrefs / Majestic
-- [ ] LLM Visibility (ChatGPT / Claude / Gemini / Perplexity tracking)
-- [ ] Smart Ads (Google Ads automation)
-- [ ] Reports (white-label PDF export)
+- [ ] Real backlink data via DataForSEO or Ahrefs API
+- [ ] Google Ads API integration for Smart Ads
+- [ ] More export formats (CSV, XLSX)
+- [ ] Team/agency multi-user accounts
