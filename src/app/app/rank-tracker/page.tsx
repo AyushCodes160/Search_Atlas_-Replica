@@ -101,75 +101,81 @@ export default function RankTrackerPage() {
   const [selectedKeywordId, setSelectedKeywordId] = useState<string | null>(null);
   const [isSignedIn, setIsSignedIn] = useState(false);
 
+  const loadRealData = async () => {
+    try {
+      const res = await fetch("/api/me/rank-tracker");
+      if (res.ok) {
+        const data = await res.json();
+        const dbKeywords = (data.keywords || []).map((k: any) => ({
+          id: k.id,
+          keyword: k.keyword,
+          domain: k.domain,
+          createdAt: new Date(k.createdAt).getTime(),
+          history: (k.history || []).map((h: any) => ({
+            date: new Date(h.date).getTime(),
+            position: h.position,
+            searchVolume: h.searchVolume,
+            cpc: h.cpc,
+            serpFeatures: h.serpFeatures || [],
+          })).sort((a: any, b: any) => a.date - b.date),
+        }));
+
+        setHistory(dbKeywords);
+        if (dbKeywords.length > 0) {
+          setSelectedKeywordId(dbKeywords[0].id || null);
+          setDomain(dbKeywords[0].domain);
+        } else {
+          setHistory([]);
+          setSelectedKeywordId(null);
+          setDomain("");
+        }
+        setIsSignedIn(true);
+        return dbKeywords.length > 0;
+      }
+    } catch {
+      // fallback
+    }
+
+    // Fallback to local
+    const local = localStorage.getItem("seo-engine:tracked-keywords");
+    if (local) {
+      const parsed = JSON.parse(local) as TrackedKeyword[];
+      setHistory(parsed);
+      if (parsed.length > 0) {
+        setSelectedKeywordId(parsed[0].id || parsed[0].keyword);
+        setDomain(parsed[0].domain);
+        return true;
+      }
+    }
+
+    setHistory([]);
+    setSelectedKeywordId(null);
+    setDomain("");
+    return false;
+  };
+
   // Load history on mount
   useEffect(() => {
-    async function loadData() {
-      try {
-        const res = await fetch("/api/me/rank-tracker");
-        if (res.ok) {
-          const data = await res.json();
-          const dbKeywords = (data.keywords || []).map((k: any) => ({
-            id: k.id,
-            keyword: k.keyword,
-            domain: k.domain,
-            createdAt: new Date(k.createdAt).getTime(),
-            history: (k.history || []).map((h: any) => ({
-              date: new Date(h.date).getTime(),
-              position: h.position,
-              searchVolume: h.searchVolume,
-              cpc: h.cpc,
-              serpFeatures: h.serpFeatures || [],
-            })).sort((a: any, b: any) => a.date - b.date),
-          }));
-
-          if (dbKeywords.length > 0) {
-            setHistory(dbKeywords);
-            setSelectedKeywordId(dbKeywords[0].id || null);
-            setDomain(dbKeywords[0].domain);
-            setIsSandbox(false);
-          } else {
-            // Load sandbox default
-            loadSandboxDefaults();
-          }
-          setIsSignedIn(true);
-        } else {
-          loadLocalHistory();
-        }
-      } catch {
-        loadLocalHistory();
+    let mounted = true;
+    async function init() {
+      const hasData = await loadRealData();
+      if (!hasData && mounted) {
+        // It's empty. Let's load sandbox so they see a pretty demo by default.
+        const defaults = SANDBOX_KEYWORDS.map(kw => generateMockHistory(kw, "github.com"));
+        setHistory(defaults);
+        setSelectedKeywordId(defaults[0].id || null);
+        setDomain("github.com");
+        setIsSandbox(true);
+      } else if (mounted) {
+        setIsSandbox(false);
       }
     }
-
-    function loadLocalHistory() {
-      const local = localStorage.getItem("seo-engine:tracked-keywords");
-      if (local) {
-        const parsed = JSON.parse(local) as TrackedKeyword[];
-        if (parsed.length > 0) {
-          setHistory(parsed);
-          setSelectedKeywordId(parsed[0].id || parsed[0].keyword);
-          setDomain(parsed[0].domain);
-          setIsSandbox(false);
-        } else {
-          loadSandboxDefaults();
-        }
-      } else {
-        loadSandboxDefaults();
-      }
-    }
-
-    function loadSandboxDefaults() {
-      const defaults = SANDBOX_KEYWORDS.map(kw => generateMockHistory(kw, "github.com"));
-      setHistory(defaults);
-      setSelectedKeywordId(defaults[0].id || null);
-      setDomain("github.com");
-      setIsSandbox(true);
-    }
-
-    loadData();
-  }, [isSignedIn]);
+    init();
+    return () => { mounted = false; };
+  }, []);
 
   // Handle Sandbox mode toggling
-  const handleSandboxToggle = (val: boolean) => {
+  const handleSandboxToggle = async (val: boolean) => {
     setIsSandbox(val);
     setError(null);
     if (val) {
@@ -178,14 +184,8 @@ export default function RankTrackerPage() {
       setSelectedKeywordId(defaults[0].id || null);
       setDomain("github.com");
     } else {
-      if (isSignedIn) {
-        // Refetch database contents
-        setIsSignedIn(false); // triggers useEffect refetch
-      } else {
-        // Empty local storage list
-        setHistory([]);
-        setSelectedKeywordId(null);
-      }
+      // User explicitly turned sandbox OFF. Load real data (even if empty).
+      await loadRealData();
     }
   };
 
