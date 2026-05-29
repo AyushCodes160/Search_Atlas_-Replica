@@ -35,7 +35,7 @@ async function querySerpApi(keyword: string, location: string, apiKey: string): 
   cpc: number;
 }> {
   const url = `https://serpapi.com/search.json?engine=google&q=${encodeURIComponent(keyword)}&location=${encodeURIComponent(location)}&api_key=${apiKey}`;
-  const res = await fetch(url);
+  const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) throw new Error(`SerpAPI failed: ${res.statusText}`);
   const data = await res.json();
 
@@ -76,6 +76,7 @@ async function querySerpApi(keyword: string, location: string, apiKey: string): 
 async function estimateKeywordMetrics(keyword: string, apiKey: string): Promise<{ searchVolume: number; cpc: number }> {
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
@@ -140,6 +141,7 @@ Instructions:
 
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
+    cache: "no-store",
     headers: {
       "Content-Type": "application/json",
       Authorization: `Bearer ${apiKey}`,
