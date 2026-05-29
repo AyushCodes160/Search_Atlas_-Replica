@@ -27,6 +27,7 @@ model User {
   siteCrawls   SiteCrawl[]
   llmQueries   LlmQuery[]
   trackedKeywords TrackedKeyword[]
+  ottoFixes    OttoFix[]
 
   createdAt DateTime @default(now())
 }
@@ -168,4 +169,21 @@ model RankHistory {
   trackedKeyword   TrackedKeyword @relation(fields: [trackedKeywordId], references: [id], onDelete: Cascade)
 
   @@index([trackedKeywordId, date])
+}
+
+model OttoFix {
+  id             String    @id @default(cuid())
+  userId         String
+  url            String
+  domain         String
+  fixType        String    // "meta_title" | "meta_description" | "img_alt" | "schema"
+  originalValue  String?   @db.Text
+  optimizedValue String    @db.Text
+  status         String    // "pending" | "applied" | "failed"
+  createdAt      DateTime  @default(now())
+  appliedAt      DateTime?
+
+  user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, domain, url])
 }

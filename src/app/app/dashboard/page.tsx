@@ -35,7 +35,7 @@ const QUICK_LINKS = [
   { label: "Keywords", href: "/app/keywords", Icon: KeyRound, ready: true, note: "Free Autocomplete + Llama" },
   { label: "Atlas Agent", href: "/app/atlas-agent", Icon: Bot, ready: true, note: "Llama chat" },
   { label: "Audit History", href: "/app/history", Icon: History, ready: true, note: "Last 10 audits, locally stored" },
-  { label: "OTTO SEO", href: "/app/otto-seo", Icon: Wand2, ready: false, note: "Needs OAuth" },
+  { label: "OTTO SEO", href: "/app/otto-seo", Icon: Wand2, ready: true, note: "Auto-apply metadata fixes" },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true, note: "Llama-powered writer" },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: true, note: "Pulls Google positions" },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: false, note: "Needs GBP OAuth" },
