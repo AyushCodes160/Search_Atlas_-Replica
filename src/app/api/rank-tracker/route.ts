@@ -54,11 +54,64 @@ async function querySerpApi(keyword: string, location: string, apiKey: string): 
   if (data.inline_images || data.images_results) serpFeatures.push("images");
   if (data.shopping_results) serpFeatures.push("shopping");
 
-  // SerpAPI doesn't return volume/cpc directly in standard search. We'll generate realistic estimates based on keyword length/signals.
-  const volume = Math.floor((Math.random() * 50 + 10) * 100);
-  const cpc = Math.round((Math.random() * 3 + 0.2) * 100) / 100;
+  // SerpAPI's standard search endpoint doesn't return volume/CPC.
+  // Use Groq to estimate realistic monthly search volume + CPC for this keyword.
+  let searchVolume = 0;
+  let cpc = 0;
+  const groqKey = process.env.GROQ_API_KEY;
+  if (groqKey && groqKey !== "PLACEHOLDER_GROQ_KEY") {
+    try {
+      const est = await estimateKeywordMetrics(keyword, groqKey);
+      searchVolume = est.searchVolume;
+      cpc = est.cpc;
+    } catch {
+      // If Groq fails, leave as 0 (unknown) rather than fake numbers
+    }
+  }
 
-  return { organicResults, serpFeatures, searchVolume: volume, cpc };
+  return { organicResults, serpFeatures, searchVolume, cpc };
+}
+
+// Use Groq to estimate realistic monthly search volume & CPC for a keyword
+async function estimateKeywordMetrics(keyword: string, apiKey: string): Promise<{ searchVolume: number; cpc: number }> {
+  const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      Authorization: `Bearer ${apiKey}`,
+    },
+    body: JSON.stringify({
+      model: "llama-3.3-70b-versatile",
+      messages: [
+        {
+          role: "system",
+          content: `You are a keyword research data estimator. Given a keyword, estimate the approximate MONTHLY global Google search volume and average CPC (cost per click in USD).
+
+Rules:
+- Use your training data knowledge of real keyword volumes from tools like Google Keyword Planner, Ahrefs, SEMrush.
+- Common head terms (e.g. "python", "javascript", "seo") should have volumes in the hundreds of thousands or millions.
+- Long-tail keywords (e.g. "best python ide for mac 2024") should have volumes in the hundreds to low thousands.
+- Typos and misspellings should have MUCH LOWER volume than the correctly spelled version.
+- CPC should reflect real advertiser competition for the keyword.
+- Return ONLY a JSON object: { "search_volume": 123000, "cpc": 1.45 }
+- Do NOT add any text outside the JSON.`,
+        },
+        { role: "user", content: `Keyword: "${keyword}"` },
+      ],
+      temperature: 0.2,
+      max_tokens: 100,
+      response_format: { type: "json_object" },
+    }),
+  });
+
+  if (!res.ok) throw new Error("Groq estimation failed");
+  const data = await res.json();
+  const content = data?.choices?.[0]?.message?.content ?? "";
+  const parsed = JSON.parse(content);
+  return {
+    searchVolume: Number(parsed.search_volume) || 0,
+    cpc: Number(parsed.cpc) || 0,
+  };
 }
 
 // Use Groq to simulate Google search results
