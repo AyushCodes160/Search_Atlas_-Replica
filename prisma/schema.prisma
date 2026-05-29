@@ -28,6 +28,7 @@ model User {
   llmQueries   LlmQuery[]
   trackedKeywords TrackedKeyword[]
   ottoFixes    OttoFix[]
+  localSeoAudits LocalSeoAudit[]
 
   createdAt DateTime @default(now())
 }
@@ -186,4 +187,21 @@ model OttoFix {
   user           User      @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, domain, url])
+}
+
+model LocalSeoAudit {
+  id            String   @id @default(cuid())
+  userId        String
+  businessName  String
+  url           String
+  city          String
+  napScore      Int      // 0-100
+  schemaScore   Int      // 0-100
+  localScore    Int      // 0-100 overall
+  data          Json     // Full audit breakdown + grid heatmap data + keywords
+  createdAt     DateTime @default(now())
+
+  user          User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
 }
