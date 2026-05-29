@@ -56,16 +56,24 @@ async function querySerpApi(keyword: string, location: string, apiKey: string): 
 
   // SerpAPI's standard search endpoint doesn't return volume/CPC.
   // Use Groq to estimate realistic monthly search volume + CPC for this keyword.
+  // Retry once on failure to handle transient rate limits / timeouts.
   let searchVolume = 0;
   let cpc = 0;
   const groqKey = process.env.GROQ_API_KEY;
   if (groqKey && groqKey !== "PLACEHOLDER_GROQ_KEY") {
-    try {
-      const est = await estimateKeywordMetrics(keyword, groqKey);
-      searchVolume = est.searchVolume;
-      cpc = est.cpc;
-    } catch {
-      // If Groq fails, leave as 0 (unknown) rather than fake numbers
+    for (let attempt = 0; attempt < 2; attempt++) {
+      try {
+        const est = await estimateKeywordMetrics(keyword, groqKey);
+        searchVolume = est.searchVolume;
+        cpc = est.cpc;
+        break; // Success — stop retrying
+      } catch {
+        if (attempt === 0) {
+          // Wait 500ms before retry
+          await new Promise(r => setTimeout(r, 500));
+        }
+        // On final attempt failure, leave as 0
+      }
     }
   }
 
