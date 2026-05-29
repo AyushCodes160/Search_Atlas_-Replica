@@ -25,6 +25,7 @@ model User {
   audits       Audit[]
   keywordLists KeywordList[]
   siteCrawls   SiteCrawl[]
+  llmQueries   LlmQuery[]
 
   createdAt DateTime @default(now())
 }
@@ -116,4 +117,28 @@ model SiteCrawl {
   user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@index([userId, createdAt])
+}
+
+model LlmQuery {
+  id          String                  @id @default(cuid())
+  userId      String
+  query       String
+  brandName   String
+  competitors String                  // Comma-separated list
+  createdAt   DateTime                @default(now())
+  snapshots   LlmVisibilitySnapshot[]
+  user        User                    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId, createdAt])
+}
+
+model LlmVisibilitySnapshot {
+  id         String   @id @default(cuid())
+  queryId    String
+  date       DateTime @default(now())
+  score      Int      // 0 to 100 visibility grade
+  data       Json     // Details of LLM scans { openai: { mentioned: bool, snippet: string }, ... }
+  query      LlmQuery @relation(fields: [queryId], references: [id], onDelete: Cascade)
+
+  @@index([queryId, date])
 }
