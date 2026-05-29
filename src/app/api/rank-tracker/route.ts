@@ -74,6 +74,9 @@ async function querySerpApi(keyword: string, location: string, apiKey: string): 
 
 // Use Groq to estimate realistic monthly search volume & CPC for a keyword
 async function estimateKeywordMetrics(keyword: string, apiKey: string): Promise<{ searchVolume: number; cpc: number }> {
+  // Add a unique seed per call to break LLM determinism across sequential keywords
+  const seed = `${keyword}-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
   const res = await fetch("https://api.groq.com/openai/v1/chat/completions", {
     method: "POST",
     cache: "no-store",
@@ -86,20 +89,33 @@ async function estimateKeywordMetrics(keyword: string, apiKey: string): Promise<
       messages: [
         {
           role: "system",
-          content: `You are a keyword research data estimator. Given a keyword, estimate the approximate MONTHLY global Google search volume and average CPC (cost per click in USD).
+          content: `You are an expert keyword research analyst with deep knowledge of real Google Keyword Planner, Ahrefs, and SEMrush data. Your job is to estimate the MONTHLY global Google search volume and average CPC for a SPECIFIC keyword.
+
+CRITICAL: Every keyword has a UNIQUE search volume. Do NOT default to the same number for different keywords. Think carefully about what makes THIS specific keyword different.
+
+Reference volumes to calibrate your estimates:
+- "facebook" → 1,200,000,000/mo
+- "youtube" → 800,000,000/mo  
+- "python" → 1,500,000/mo
+- "javascript" → 823,000/mo
+- "react" → 410,000/mo
+- "seo" → 350,000/mo
+- "next.js" → 90,500/mo
+- "tailwind css" → 74,000/mo
+- "best python ide" → 12,000/mo
+- "how to center a div css" → 8,100/mo
+- "javascirpt" (typo) → 1,200/mo
 
 Rules:
-- Use your training data knowledge of real keyword volumes from tools like Google Keyword Planner, Ahrefs, SEMrush.
-- Common head terms (e.g. "python", "javascript", "seo") should have volumes in the hundreds of thousands or millions.
-- Long-tail keywords (e.g. "best python ide for mac 2024") should have volumes in the hundreds to low thousands.
-- Typos and misspellings should have MUCH LOWER volume than the correctly spelled version.
-- CPC should reflect real advertiser competition for the keyword.
-- Return ONLY a JSON object: { "search_volume": 123000, "cpc": 1.45 }
-- Do NOT add any text outside the JSON.`,
+- Base your estimate on the keyword's actual popularity, competition, and niche.
+- Different keywords MUST return different volumes — even similar ones (e.g., "python" ≠ "javascript").
+- Typos and misspellings must have drastically lower volume than the correct spelling.
+- CPC should reflect real advertiser bid competition for this specific keyword.
+- Return ONLY: { "search_volume": NUMBER, "cpc": NUMBER }`,
         },
-        { role: "user", content: `Keyword: "${keyword}"` },
+        { role: "user", content: `Estimate metrics for keyword: "${keyword}" [seed: ${seed}]` },
       ],
-      temperature: 0.2,
+      temperature: 0.4,
       max_tokens: 100,
       response_format: { type: "json_object" },
     }),
