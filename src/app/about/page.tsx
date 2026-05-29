@@ -56,9 +56,9 @@ export default function AboutPage() {
         </section>
 
         <section className="mb-16 relative">
-          <p className="font-hand text-clay text-[18px] mb-2">~ the roadmap ~</p>
+          <p className="font-hand text-clay text-[18px] mb-2">~ the toolkit ~</p>
           <h2 className="font-hand text-[2.5rem] sm:text-[3rem] text-ink leading-[1] mb-6">
-            Four tools, one notebook.
+            Eighteen tools, one notebook.
           </h2>
           <RoadmapGraphic />
         </section>
@@ -100,10 +100,14 @@ export default function AboutPage() {
 
 function RoadmapGraphic() {
   const items = [
-    { n: "01", title: "Site Audit", status: "Live", tilt: -3, body: "Lighthouse + Llama fix plan." },
-    { n: "02", title: "AI Content Writer", status: "Next", tilt: 2, body: "Drafts tuned to intent + snippet shape." },
-    { n: "03", title: "Keyword Research", status: "Soon", tilt: -2, body: "Autocomplete + Trends, LLM-clustered." },
-    { n: "04", title: "OTTO-lite", status: "Soon", tilt: 3, body: "Script tag → one-click on-page fixes." },
+    { n: "01", title: "Site Audit", status: "Live", tilt: -3, body: "Lighthouse + Llama fix plan + share link + PDF export." },
+    { n: "02", title: "Whole-Site Audit", status: "Live", tilt: 2, body: "Auto-crawl every page. Fast + deep modes." },
+    { n: "03", title: "Keywords", status: "Live", tilt: -2, body: "Autocomplete + Llama clustering. 200+ ideas." },
+    { n: "04", title: "Rank Tracker", status: "Live", tilt: 3, body: "SerpAPI positions + Groq volume estimates." },
+    { n: "05", title: "Content Editor", status: "Live", tilt: -1, body: "14-format AI writer + real-time SEO Grader." },
+    { n: "06", title: "Backlinks", status: "Live", tilt: 2, body: "AI backlink profile + competitor gap analysis." },
+    { n: "07", title: "Smart Ads", status: "Live", tilt: -2, body: "Google, Meta, LinkedIn ad copy generator." },
+    { n: "08", title: "Reports", status: "Live", tilt: 1, body: "Aggregate all data into branded PDF reports." },
   ];
 
   return (
@@ -127,7 +131,7 @@ function RoadmapGraphic() {
             style={{ transform: `rotate(${it.tilt}deg)` }}
           >
             <div className="absolute -top-3 -right-3 w-9 h-9 rounded-full border border-ink/20 bg-paper-50 flex items-center justify-center font-hand text-[14px] text-ink shadow-sm">
-              {it.status === "Live" ? "✓" : it.status === "Next" ? "→" : "…"}
+              {it.status === "Live" ? "✓" : "✓"}
             </div>
             <div className="font-hand text-teal-accent text-[20px] mb-1">{it.n}</div>
             <h3 className="font-hand text-[24px] text-ink leading-tight mb-2">{it.title}</h3>

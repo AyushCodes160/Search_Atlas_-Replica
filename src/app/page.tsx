@@ -31,9 +31,8 @@ export default function Home() {
               <span className="text-teal-dark hand-underline">AI-powered fixes.</span>
             </h1>
             <p className="font-sans text-[15px] sm:text-[17px] text-ink-soft leading-relaxed max-w-xl mb-8">
-              Drop a URL, get the same Lighthouse data Chrome uses, and a fix plan
-              written by Llama 3.3 in plain language — all on free APIs, all in about
-              forty seconds.
+              18 SEO tools — audits, rank tracking, keywords, AI content, ad copy,
+              backlinks, reports — all on free APIs, all open source.
             </p>
 
             <div className="flex flex-wrap items-center gap-5">
