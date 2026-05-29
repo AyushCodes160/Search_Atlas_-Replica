@@ -42,7 +42,7 @@ const QUICK_LINKS = [
   { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: false, note: "Needs Ahrefs" },
   { label: "LLM Visibility", href: "/app/llm-visibility", Icon: Eye, ready: true, note: "Track brand in AI answers" },
   { label: "Smart Ads", href: "/app/smart-ads", Icon: Megaphone, ready: false, note: "Needs Google Ads OAuth" },
-  { label: "Reports", href: "/app/reports", Icon: FileBarChart2, ready: false, note: "Pulls all sources" },
+  { label: "Reports", href: "/app/reports", Icon: FileBarChart2, ready: true, note: "Aggregate all data · PDF" },
 ];
 
 const KEYWORD_LISTS_KEY = "seo-engine:keyword-lists";
