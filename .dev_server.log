@@ -1,0 +1,91 @@
+
+> seo-engine@0.1.0 dev
+> next dev
+
+▲ Next.js 16.2.6 (Turbopack)
+- Local:         http://localhost:3000
+- Network:       http://192.168.1.3:3000
+- Environments: .env.local
+✓ Ready in 382ms
+
+ GET /app/crawl-history 200 in 591ms (next.js: 329ms, application-code: 261ms)
+ GET /app/local-seo 200 in 578ms (next.js: 481ms, application-code: 97ms)
+ GET /api/me/local-seo 200 in 2.3s (next.js: 121ms, application-code: 2.1s)
+ GET /api/auth/session 200 in 3.1s (next.js: 663ms, application-code: 2.4s)
+ GET /api/auth/session 200 in 159ms (next.js: 9ms, application-code: 150ms)
+ GET /api/auth/session 200 in 150ms (next.js: 1196µs, application-code: 149ms)
+ GET /api/auth/session 200 in 149ms (next.js: 1035µs, application-code: 148ms)
+ GET /api/auth/session 200 in 151ms (next.js: 2ms, application-code: 149ms)
+ GET /api/auth/session 200 in 148ms (next.js: 3ms, application-code: 145ms)
+ GET /api/me/crawls 200 in 2.4s (next.js: 82ms, application-code: 2.3s)
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+prisma:error Error in PostgreSQL connection: Error { kind: Closed, cause: None }
+✓ Compiled in 1111ms
+ GET /app/crawl-history 200 in 45ms (next.js: 7ms, application-code: 38ms)
+ GET /api/auth/session 200 in 790ms (next.js: 14ms, application-code: 775ms)
+ GET /app/crawl-history 200 in 43ms (next.js: 3ms, application-code: 40ms)
+ GET /api/auth/session 200 in 1216ms (next.js: 5ms, application-code: 1211ms)
+ GET /api/auth/session 200 in 165ms (next.js: 4ms, application-code: 161ms)
+ GET /app/rank-tracker 200 in 63ms (next.js: 43ms, application-code: 20ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /api/auth/session 200 in 154ms (next.js: 2ms, application-code: 152ms)
+ GET /api/auth/session 200 in 155ms (next.js: 5ms, application-code: 150ms)
+ GET /api/auth/session 200 in 150ms (next.js: 2ms, application-code: 148ms)
+ GET /api/me/rank-tracker 200 in 1098ms (next.js: 447ms, application-code: 651ms)
+ GET /api/me/rank-tracker 200 in 232ms (next.js: 3ms, application-code: 229ms)
+ GET /api/me/rank-tracker 200 in 229ms (next.js: 1778µs, application-code: 227ms)
+ GET /api/me/rank-tracker 200 in 931ms (next.js: 5ms, application-code: 926ms)
+ GET /api/auth/session 200 in 178ms (next.js: 23ms, application-code: 155ms)
+ GET /api/auth/session 200 in 153ms (next.js: 1180µs, application-code: 152ms)
+ GET /api/auth/session 200 in 155ms (next.js: 1376µs, application-code: 154ms)
+ POST /api/rank-tracker 200 in 2.3s (next.js: 126ms, application-code: 2.2s)
+ POST /api/me/rank-tracker 200 in 873ms (next.js: 1863µs, application-code: 871ms)
+[browser] Received NaN for the `cx` attribute. If this is expected, cast the value to a string. 
+✓ Compiled in 98ms
+ GET /api/auth/session 200 in 175ms (next.js: 9ms, application-code: 166ms)
+ GET /api/auth/session 200 in 158ms (next.js: 1829µs, application-code: 156ms)
+ GET /api/auth/session 200 in 156ms (next.js: 1324µs, application-code: 155ms)
+ GET /api/auth/session 200 in 343ms (next.js: 75ms, application-code: 268ms)
+ GET /api/auth/session 200 in 151ms (next.js: 816µs, application-code: 150ms)
+ GET /api/auth/session 200 in 150ms (next.js: 1031µs, application-code: 149ms)
+ GET /app/rank-tracker 200 in 72ms (next.js: 19ms, application-code: 54ms)
+ GET /app/rank-tracker 200 in 35ms (next.js: 5ms, application-code: 31ms)
+ GET /api/me/rank-tracker 200 in 49ms (next.js: 2ms, application-code: 47ms)
+ GET /api/auth/session 200 in 40ms (next.js: 2ms, application-code: 38ms)
+ GET /api/me/rank-tracker 200 in 1135ms (next.js: 1322µs, application-code: 1134ms)
+[browser] Received NaN for the `cx` attribute. If this is expected, cast the value to a string. 
+ GET /api/me/rank-tracker 200 in 308ms (next.js: 2ms, application-code: 306ms)
+ GET /api/auth/session 200 in 1780ms (next.js: 3ms, application-code: 1776ms)
+ GET /api/auth/session 200 in 199ms (next.js: 6ms, application-code: 193ms)
+ GET /api/auth/session 200 in 171ms (next.js: 5ms, application-code: 165ms)
+ GET /api/auth/session 200 in 152ms (next.js: 1013µs, application-code: 151ms)
+ GET /api/auth/session 200 in 446ms (next.js: 3ms, application-code: 444ms)
+ GET /api/auth/session 200 in 148ms (next.js: 2ms, application-code: 146ms)
+ GET /api/auth/session 200 in 148ms (next.js: 1008µs, application-code: 147ms)
+ GET /api/auth/session 200 in 199ms (next.js: 34ms, application-code: 165ms)
+ GET /api/auth/session 200 in 150ms (next.js: 929µs, application-code: 149ms)
+ GET /api/auth/session 200 in 161ms (next.js: 1854µs, application-code: 159ms)
+ GET /api/auth/session 200 in 249ms (next.js: 13ms, application-code: 236ms)
+ GET /api/auth/session 200 in 455ms (next.js: 1719µs, application-code: 454ms)
+ GET /api/auth/session 200 in 446ms (next.js: 7ms, application-code: 439ms)
+✓ Compiled in 105ms
+ GET /api/auth/session 200 in 338ms (next.js: 77ms, application-code: 262ms)
+ GET /api/auth/session 200 in 159ms (next.js: 1659µs, application-code: 157ms)
+ GET /api/auth/session 200 in 152ms (next.js: 907µs, application-code: 151ms)
+ POST /api/rank-tracker 200 in 2.3s (next.js: 10ms, application-code: 2.3s)
+ POST /api/me/rank-tracker 200 in 769ms (next.js: 4ms, application-code: 766ms)
+ GET /api/auth/session 200 in 272ms (next.js: 36ms, application-code: 236ms)
+ GET /api/auth/session 200 in 157ms (next.js: 1046µs, application-code: 156ms)
+ GET /api/auth/session 200 in 149ms (next.js: 1324µs, application-code: 148ms)
+✓ Compiled in 269ms
+ GET /api/auth/session 200 in 297ms (next.js: 54ms, application-code: 244ms)
+ GET /api/auth/session 200 in 434ms (next.js: 970µs, application-code: 433ms)
+ GET /api/auth/session 200 in 154ms (next.js: 4ms, application-code: 150ms)
+ GET /app/content 200 in 79ms (next.js: 63ms, application-code: 16ms)
+[browser] Detected `scroll-behavior: smooth` on the `<html>` element. To disable smooth scrolling during route transitions, add `data-scroll-behavior="smooth"` to your <html> element. Learn more: https://nextjs.org/docs/messages/missing-data-scroll-behavior
+ GET /app/rank-tracker 200 in 15ms (next.js: 5ms, application-code: 10ms)
+ GET /api/me/rank-tracker 200 in 1107ms (next.js: 6ms, application-code: 1102ms)
+ GET /api/me/rank-tracker 200 in 309ms (next.js: 4ms, application-code: 305ms)
+ GET /api/me/rank-tracker 200 in 384ms (next.js: 6ms, application-code: 378ms)
+ POST /api/rank-tracker 200 in 6.4s (next.js: 18ms, application-code: 6.3s)
+ POST /api/me/rank-tracker 200 in 541ms (next.js: 2ms, application-code: 539ms)

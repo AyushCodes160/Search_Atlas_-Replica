@@ -285,7 +285,6 @@ export default function RankTrackerPage() {
       }
 
       setHistory(updatedHistory);
-      setBulkKeywords("");
       if (updatedHistory.length > 0) {
         setSelectedKeywordId(updatedHistory[0].id || updatedHistory[0].keyword);
       }
@@ -497,7 +496,9 @@ export default function RankTrackerPage() {
 
     // Build coordinates
     const coords = points.map((p, i) => {
-      const x = paddingLeft + (i / (points.length - 1)) * usableWidth;
+      const x = points.length === 1
+        ? paddingLeft + usableWidth / 2
+        : paddingLeft + (i / (points.length - 1)) * usableWidth;
       // Invert Y axis: position 1 -> top (y = paddingTop), position 100 -> bottom (y = height - paddingBottom)
       // Rank 101 (unranked) is plotted just below the limit (height - paddingBottom + 5)
       const rankVal = p.position > 100 ? 105 : p.position;
