@@ -41,7 +41,7 @@ const NAV = [
   { label: "Competitor Site Audit", href: "/app/competitor-crawl", Icon: GitCompare, ready: true },
   { label: "History", href: "/app/history", Icon: History, ready: true },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true },
-  { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: false },
+  { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: true },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: false },
   { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: false },
   { label: "LLM Visibility", href: "/app/llm-visibility", Icon: Eye, ready: true },

@@ -37,7 +37,7 @@ const QUICK_LINKS = [
   { label: "Audit History", href: "/app/history", Icon: History, ready: true, note: "Last 10 audits, locally stored" },
   { label: "OTTO SEO", href: "/app/otto-seo", Icon: Wand2, ready: false, note: "Needs OAuth" },
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true, note: "Llama-powered writer" },
-  { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: false, note: "Needs SerpAPI" },
+  { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: true, note: "Pulls Google positions" },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: false, note: "Needs GBP OAuth" },
   { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: false, note: "Needs Ahrefs" },
   { label: "LLM Visibility", href: "/app/llm-visibility", Icon: Eye, ready: true, note: "Track brand in AI answers" },

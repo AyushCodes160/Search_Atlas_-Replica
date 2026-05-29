@@ -26,6 +26,7 @@ model User {
   keywordLists KeywordList[]
   siteCrawls   SiteCrawl[]
   llmQueries   LlmQuery[]
+  trackedKeywords TrackedKeyword[]
 
   createdAt DateTime @default(now())
 }
@@ -141,4 +142,30 @@ model LlmVisibilitySnapshot {
   query      LlmQuery @relation(fields: [queryId], references: [id], onDelete: Cascade)
 
   @@index([queryId, date])
+}
+
+model TrackedKeyword {
+  id        String        @id @default(cuid())
+  userId    String
+  keyword   String
+  domain    String
+  createdAt DateTime      @default(now())
+  user      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  history   RankHistory[]
+
+  @@unique([userId, keyword, domain])
+  @@index([userId, createdAt])
+}
+
+model RankHistory {
+  id               String         @id @default(cuid())
+  trackedKeywordId String
+  date             DateTime       @default(now())
+  position         Int            // Rank position: 1 to 100. 101+ represents unranked.
+  searchVolume     Int?
+  cpc              Float?
+  serpFeatures     String[]       // e.g., ["snippet", "people_also_ask", "local_pack", "images"]
+  trackedKeyword   TrackedKeyword @relation(fields: [trackedKeywordId], references: [id], onDelete: Cascade)
+
+  @@index([trackedKeywordId, date])
 }
