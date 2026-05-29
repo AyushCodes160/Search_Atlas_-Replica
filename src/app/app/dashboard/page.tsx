@@ -39,9 +39,9 @@ const QUICK_LINKS = [
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true, note: "Llama-powered writer" },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: true, note: "Pulls Google positions" },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: true, note: "NAP audit + grid heatmap" },
-  { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: false, note: "Needs Ahrefs" },
+  { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: true, note: "AI backlink analysis" },
   { label: "LLM Visibility", href: "/app/llm-visibility", Icon: Eye, ready: true, note: "Track brand in AI answers" },
-  { label: "Smart Ads", href: "/app/smart-ads", Icon: Megaphone, ready: false, note: "Needs Google Ads OAuth" },
+  { label: "Smart Ads", href: "/app/smart-ads", Icon: Megaphone, ready: true, note: "AI ad copy generator" },
   { label: "Reports", href: "/app/reports", Icon: FileBarChart2, ready: true, note: "Aggregate all data · PDF" },
 ];
 

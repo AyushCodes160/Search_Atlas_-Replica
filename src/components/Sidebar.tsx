@@ -43,9 +43,9 @@ const NAV = [
   { label: "Content", href: "/app/content", Icon: Pencil, ready: true },
   { label: "Rank Tracker", href: "/app/rank-tracker", Icon: TrendingUp, ready: true },
   { label: "Local SEO", href: "/app/local-seo", Icon: MapPin, ready: true },
-  { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: false },
+  { label: "Backlinks", href: "/app/backlinks", Icon: Link2, ready: true },
   { label: "LLM Visibility", href: "/app/llm-visibility", Icon: Eye, ready: true },
-  { label: "Smart Ads", href: "/app/smart-ads", Icon: Megaphone, ready: false },
+  { label: "Smart Ads", href: "/app/smart-ads", Icon: Megaphone, ready: true },
   { label: "Reports", href: "/app/reports", Icon: FileBarChart2, ready: true },
   { label: "Atlas Agent", href: "/app/atlas-agent", Icon: Bot, ready: true },
 ];
